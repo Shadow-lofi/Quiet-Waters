@@ -1,0 +1,133 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { RefreshCw, Minus, Plus, Flame } from 'lucide-react'
+import { Logo } from '../components/Logo'
+import { Onboarding } from '../components/Onboarding'
+import { SessionOverlay } from '../components/SessionOverlay'
+import { useStore } from '../lib/store'
+import { primeAudio } from '../lib/audio'
+import { computeStats } from '../lib/streak'
+import { VERSES } from '../data/verses'
+import { DURATION_PRESETS } from '../data/presets'
+
+function greeting(name: string): string {
+  const h = new Date().getHours()
+  const part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  return name ? `${part}, ${name}` : part
+}
+
+export function Meditate() {
+  const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions } = useStore()
+  const verse = VERSES[verseCursor % VERSES.length]
+  const streak = computeStats(sessions).currentStreak
+
+  const [minutes, setMinutes] = useState(lastDurationMin)
+  const [active, setActive] = useState(false)
+
+  const clamp = (n: number) => Math.max(1, Math.min(120, n))
+
+  const begin = () => {
+    primeAudio() // unlock audio within the user gesture
+    setLastDuration(minutes)
+    setActive(true)
+  }
+
+  return (
+    <div className="flex flex-col gap-7">
+      <Onboarding />
+
+      {/* header — centered hero */}
+      <header className="qw-enter flex flex-col items-center gap-2 pt-2 text-center">
+        <span className="qw-float text-water-500">
+          <Logo size={46} />
+        </span>
+        <h1 className="qw-title text-4xl leading-none tracking-tight">Quiet Waters</h1>
+        <p className="text-sm text-deep-500">{greeting(name)}</p>
+        {streak > 0 && (
+          <Link
+            to="/journey"
+            className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1 text-sm font-semibold text-water-600 shadow-sm ring-1 ring-line"
+          >
+            <Flame size={15} /> {streak} day{streak > 1 ? 's' : ''}
+          </Link>
+        )}
+      </header>
+
+      {/* verse to dwell on */}
+      <section className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Dwell on this</p>
+          <button
+            onClick={() => nextVerse(VERSES.length)}
+            className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-deep-500 hover:bg-mist-200 hover:text-deep-700"
+            aria-label="Show another verse"
+          >
+            <RefreshCw size={13} /> New
+          </button>
+        </div>
+        <blockquote className="font-serif text-2xl leading-relaxed text-deep-900">
+          “{verse.text}”
+        </blockquote>
+        <p className="mt-3 text-sm uppercase tracking-[0.18em] text-water-600">{verse.ref}</p>
+      </section>
+
+      {/* duration */}
+      <section>
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-deep-500">How long?</p>
+        <div className="flex flex-wrap gap-2">
+          {DURATION_PRESETS.map((m) => (
+            <button
+              key={m}
+              onClick={() => setMinutes(m)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                minutes === m
+                  ? 'bg-water-500 text-onwater shadow-sm'
+                  : 'bg-card text-deep-700 ring-1 ring-line hover:bg-mist-200'
+              }`}
+            >
+              {m} min
+            </button>
+          ))}
+        </div>
+
+        {/* fine stepper */}
+        <div className="mt-4 flex items-center justify-center gap-6">
+          <button
+            onClick={() => setMinutes((v) => clamp(v - 1))}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-deep-700 ring-1 ring-line hover:bg-mist-200"
+            aria-label="One minute less"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="text-center">
+            <span className="font-serif text-4xl tabular-nums text-deep-900">{minutes}</span>
+            <span className="ml-1 text-deep-500">min</span>
+          </div>
+          <button
+            onClick={() => setMinutes((v) => clamp(v + 1))}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-deep-700 ring-1 ring-line hover:bg-mist-200"
+            aria-label="One minute more"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+      </section>
+
+      {/* begin */}
+      <button
+        onClick={begin}
+        className="rounded-full bg-water-500 py-4 text-lg font-semibold text-onwater shadow-lg shadow-water-500/20 transition-transform active:scale-[0.98]"
+      >
+        Begin
+      </button>
+
+      {active && (
+        <SessionOverlay
+          durationMin={minutes}
+          verse={verse}
+          onClose={() => setActive(false)}
+        />
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,46 @@
+import { NavLink, Outlet } from 'react-router-dom'
+import { Waves, CalendarHeart, Settings as SettingsIcon } from 'lucide-react'
+
+const tabs = [
+  { to: '/', label: 'Meditate', Icon: Waves, end: true },
+  { to: '/journey', label: 'Journey', Icon: CalendarHeart, end: false },
+  { to: '/settings', label: 'Settings', Icon: SettingsIcon, end: false },
+]
+
+export function AppLayout() {
+  return (
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
+      <main className="flex-1 px-5 pb-28 pt-6">
+        <Outlet />
+      </main>
+
+      {/* Bottom tab bar — thumb-reachable, safe-area aware. */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/85 backdrop-blur-md">
+        <div
+          className="mx-auto flex max-w-lg items-stretch justify-around"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          {tabs.map(({ to, label, Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `flex flex-1 flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
+                  isActive ? 'text-water-600' : 'text-deep-500 hover:text-deep-700'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon size={22} strokeWidth={isActive ? 2.4 : 1.8} />
+                  {label}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    </div>
+  )
+}
