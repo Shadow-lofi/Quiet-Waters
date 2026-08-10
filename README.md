@@ -22,27 +22,10 @@ device.
   and **Auto** (follow-the-OS) appearances.
 - **Installable & offline** — PWA with a service worker and app icons.
 
-## Stack
+## License
 
-React 19 · Vite · TypeScript · Tailwind v4 (token-based theming) · Zustand
-(local-first, `localStorage`-persisted) · react-router · self-hosted variable
-fonts (Newsreader + Nunito Sans).
-
-## Develop
-
-```bash
-npm install
-npm run gen:icons   # rasterize the PWA/app icons (needs the sharp dep)
-npm run dev
-```
-
-- `npm run build` — production build to `dist/`
-- `npm run verify` — lint + typecheck
-
-## Deploy
-
-Static SPA — deploys to Vercel as-is (`vercel.json` handles SPA rewrites and cache
-headers). Any static host works; point the SPA fallback at `index.html`.
+Copyright © 2026 Tavaris Freeman (Midnight Codex). All rights reserved.
+Source-viewable, but not open source — see [LICENSE](LICENSE).
 
 ---
 
