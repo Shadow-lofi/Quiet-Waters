@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { Waves, CalendarHeart, Settings as SettingsIcon } from 'lucide-react'
+import { WaterBackground } from './WaterBackground'
 
 const tabs = [
   { to: '/', label: 'Meditate', Icon: Waves, end: true },
@@ -10,7 +11,8 @@ const tabs = [
 export function AppLayout() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
-      <main className="flex-1 px-5 pb-28 pt-6">
+      <WaterBackground />
+      <main className="relative z-10 flex-1 px-5 pb-28 pt-6">
         <Outlet />
       </main>
 

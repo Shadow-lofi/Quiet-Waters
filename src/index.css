@@ -263,3 +263,83 @@
     -webkit-text-fill-color: currentColor;
   }
 }
+
+/* ───────────────────────────────────────────────────────────
+   Underwater background — soft light rays + rising bubbles.
+   Colors flip with the theme: sunlit blue by day, moonlit teal by night.
+   ─────────────────────────────────────────────────────────── */
+:root {
+  --qw-ray: rgba(108, 164, 198, 0.16);
+  --qw-bubble: rgba(120, 172, 205, 0.42);
+}
+:root[data-theme='night'] {
+  --qw-ray: rgba(120, 205, 220, 0.1);
+  --qw-bubble: rgba(132, 212, 226, 0.3);
+}
+
+.qw-ray {
+  position: absolute;
+  top: -30%;
+  width: 24vw;
+  max-width: 240px;
+  height: 150vh;
+  background: linear-gradient(to bottom, var(--qw-ray), transparent 72%);
+  filter: blur(26px);
+  transform-origin: top center;
+  animation-name: qw-ray-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes qw-ray-drift {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: rotate(16deg) translateX(-12px);
+  }
+  50% {
+    opacity: 0.85;
+    transform: rotate(16deg) translateX(16px);
+  }
+}
+
+.qw-bubble {
+  position: absolute;
+  bottom: -6%;
+  border-radius: 9999px;
+  border: 1px solid var(--qw-bubble);
+  background: radial-gradient(
+    circle at 32% 28%,
+    color-mix(in oklab, var(--qw-bubble) 55%, transparent),
+    transparent 62%
+  );
+  animation-name: qw-bubble-rise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes qw-bubble-rise {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(var(--drift, 10px), -112vh) scale(1.05);
+    opacity: 0;
+  }
+}
+
+/* The whole point is gentle motion — for reduced-motion users, remove it. */
+@media (prefers-reduced-motion: reduce) {
+  .qw-water {
+    display: none;
+  }
+}
