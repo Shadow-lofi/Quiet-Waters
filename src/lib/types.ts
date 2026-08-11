@@ -4,6 +4,9 @@ export type ThemePref = 'day' | 'night' | 'auto'
 // Breath-prayer pacing for the breathing guide. 'off' shows a still circle.
 export type BreathPace = 'off' | 'gentle' | 'calm' | 'deep'
 
+// Optional ambient sound played during a sitting. All synthesized in-browser.
+export type Soundscape = 'off' | 'rain' | 'stream' | 'waves' | 'fire'
+
 // One completed (or ended-early) meditation sitting.
 export interface Session {
   id: string

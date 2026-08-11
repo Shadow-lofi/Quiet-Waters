@@ -3,6 +3,7 @@ import { Pause, Play, X, Check } from 'lucide-react'
 import { BreathCircle } from './BreathCircle'
 import { useStore } from '../lib/store'
 import { playChime, primeAudio } from '../lib/audio'
+import { startAmbient, stopAmbient } from '../lib/ambient'
 import { formatClock, formatMinutes } from '../lib/date'
 import type { MeditationVerse } from '../data/verses'
 import type { Session } from '../lib/types'
@@ -17,8 +18,17 @@ export function SessionOverlay({
   onClose: () => void
 }) {
   const totalSec = Math.round(durationMin * 60)
-  const { soundOn, openingChime, closingChime, intervalMin, breathPace, keepAwake, addSession } =
-    useStore()
+  const {
+    soundOn,
+    openingChime,
+    closingChime,
+    intervalMin,
+    breathPace,
+    keepAwake,
+    soundscape,
+    ambientVolume,
+    addSession,
+  } = useStore()
 
   const [remaining, setRemaining] = useState(totalSec)
   const [paused, setPaused] = useState(false)
@@ -30,27 +40,30 @@ export function SessionOverlay({
   const flags = useRef({ soundOn, closingChime, intervalMin })
   flags.current = { soundOn, closingChime, intervalMin }
 
-  // ── mount: opening chime, wake lock ──
+  // ── mount: opening chime, ambient soundscape, wake lock ──
   useEffect(() => {
     primeAudio()
     if (soundOn && openingChime) playChime('open')
+    startAmbient(soundscape, ambientVolume)
 
+    let reacquire: (() => void) | null = null
     if (keepAwake && 'wakeLock' in navigator) {
       navigator.wakeLock
         .request('screen')
         .then((s) => (wakeRef.current = s))
         .catch(() => {})
-      const reacquire = () => {
+      reacquire = () => {
         if (document.visibilityState === 'visible' && !wakeRef.current) {
           navigator.wakeLock.request('screen').then((s) => (wakeRef.current = s)).catch(() => {})
         }
       }
       document.addEventListener('visibilitychange', reacquire)
-      return () => {
-        document.removeEventListener('visibilitychange', reacquire)
-        wakeRef.current?.release().catch(() => {})
-        wakeRef.current = null
-      }
+    }
+    return () => {
+      if (reacquire) document.removeEventListener('visibilitychange', reacquire)
+      wakeRef.current?.release().catch(() => {})
+      wakeRef.current = null
+      stopAmbient()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -62,6 +75,7 @@ export function SessionOverlay({
     // Ended almost immediately: just slip back to setup — no chime, no log, no
     // "Amen" celebration for a sitting that never really began.
     if (!completed && actual < 20) {
+      stopAmbient()
       wakeRef.current?.release().catch(() => {})
       wakeRef.current = null
       onClose()
@@ -69,6 +83,7 @@ export function SessionOverlay({
     }
 
     if (completed && flags.current.soundOn && flags.current.closingChime) playChime('close')
+    stopAmbient()
     wakeRef.current?.release().catch(() => {})
     wakeRef.current = null
     const session: Session = {

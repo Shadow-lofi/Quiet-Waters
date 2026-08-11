@@ -19,6 +19,14 @@ export function primeAudio(): void {
   }
 }
 
+/** The shared AudioContext (created + resumed on demand). Exposed so the ambient
+ *  soundscape engine can mix into the same context as the chimes. Returns null if
+ *  audio is unavailable. */
+export function getAudioContext(): AudioContext | null {
+  primeAudio()
+  return ctx
+}
+
 type ChimeKind = 'open' | 'interval' | 'close'
 
 // Base pitch (Hz) per chime. Opening is a calm mid tone; the closing bell is a

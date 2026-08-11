@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { BreathPace, Session, ThemePref } from './types'
+import type { BreathPace, Session, Soundscape, ThemePref } from './types'
 
 // The whole app is local-first: everything lives in this one persisted store,
 // so it works fully offline and keeps no account. (Cloud sync can come later.)
@@ -21,6 +21,8 @@ interface State {
   intervalMin: number // 0 = no interval bell
   breathPace: BreathPace
   keepAwake: boolean
+  soundscape: Soundscape // ambient sound during a sitting ('off' = silence)
+  ambientVolume: number // 0–1
 
   // ── setup memory ──
   lastDurationMin: number
@@ -39,7 +41,15 @@ interface State {
 // The preference keys that setPref can write.
 type Prefs = Pick<
   State,
-  'theme' | 'soundOn' | 'openingChime' | 'closingChime' | 'intervalMin' | 'breathPace' | 'keepAwake'
+  | 'theme'
+  | 'soundOn'
+  | 'openingChime'
+  | 'closingChime'
+  | 'intervalMin'
+  | 'breathPace'
+  | 'keepAwake'
+  | 'soundscape'
+  | 'ambientVolume'
 >
 
 export const useStore = create<State>()(
@@ -57,6 +67,8 @@ export const useStore = create<State>()(
       intervalMin: 0,
       breathPace: 'gentle',
       keepAwake: true,
+      soundscape: 'off',
+      ambientVolume: 0.6,
 
       lastDurationMin: 10,
       verseCursor: 0,
@@ -71,7 +83,13 @@ export const useStore = create<State>()(
     }),
     {
       name: 'quiet-waters-v1',
-      version: 1,
+      version: 2,
+      // v2 retired the 'wind' soundscape (replaced by 'fire') — fall back to off.
+      migrate: (persisted, from) => {
+        const st = persisted as Partial<State>
+        if (from < 2 && (st.soundscape as string) === 'wind') st.soundscape = 'off'
+        return st as State
+      },
     },
   ),
 )
