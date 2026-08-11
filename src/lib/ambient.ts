@@ -4,10 +4,10 @@ import type { Soundscape } from './types'
 // Ambient soundscapes, synthesized entirely with the Web Audio API — no audio
 // files, so they add nothing to the bundle and work fully offline.
 //
-// Each scape is a continuous "bed" (looping pink noise shaped by filters) plus,
-// for the lively ones, discrete one-shot "voices" fired at randomized intervals
-// by a small scheduler: rain drops, breaking waves, distant gulls, fire crackles.
-// That irregularity is what makes them read as real rather than as flat noise.
+// Fire and Leaves are noise-based (a continuous filtered "bed" plus one-shot
+// crackle/rustle "voices" fired at random intervals); Bowls is tonal (sustained
+// sine partials rung at slow intervals over a faint drone). That irregularity is
+// what makes them read as real rather than as flat loops.
 
 let noiseBuffer: AudioBuffer | null = null
 
@@ -39,7 +39,7 @@ function pinkNoise(ctx: AudioContext): AudioBuffer {
 
 // The live graph, kept so we can fade out and tear it down cleanly.
 let master: GainNode | null = null
-let sources: AudioScheduledSourceNode[] = [] // long-lived beds + LFO oscillators
+let sources: AudioScheduledSourceNode[] = [] // long-lived beds/drones + LFO oscillators
 let chain: AudioNode[] = [] // long-lived filters/gains to disconnect
 let timers: number[] = [] // pending scheduler timeouts
 let gen = 0 // bumped on every stop/start so stale schedulers bail
@@ -47,11 +47,13 @@ let currentKind: Soundscape = 'off'
 
 // Perceived-loudness trim per scape, applied under the user's 0–1 volume.
 const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
-  rain: 0.55,
-  stream: 0.42,
-  waves: 0.6,
   fire: 0.5,
+  leaves: 0.5,
+  bowls: 0.45,
 }
+
+// A calm C-based pentatonic for the singing bowls (Hz).
+const BOWL_SCALE = [196, 261.63, 293.66, 329.63, 392, 440]
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -82,202 +84,6 @@ function schedule(myGen: number, min: number, max: number, fn: () => void) {
 
 // ── one-shot voices ─────────────────────────────────────────────────────────
 
-/** A single rain drop tapping a surface: a short, lightly-resonant noise blip. */
-function droplet(ctx: AudioContext, out: AudioNode, big = false) {
-  if (!noiseBuffer) return
-  const t = ctx.currentTime
-  const decay = big ? rand(0.09, 0.18) : rand(0.035, 0.1)
-  const src = ctx.createBufferSource()
-  src.buffer = noiseBuffer
-  const bp = ctx.createBiquadFilter()
-  bp.type = 'bandpass'
-  bp.frequency.value = big ? rand(500, 1200) : rand(900, 2700)
-  bp.Q.value = big ? 9 : 6
-  const g = ctx.createGain()
-  const v = (big ? 0.24 : 0.12) * rand(0.5, 1)
-  g.gain.setValueAtTime(0.0001, t)
-  g.gain.exponentialRampToValueAtTime(v, t + 0.003)
-  g.gain.exponentialRampToValueAtTime(0.0001, t + decay)
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.6, 0.6)
-  src.connect(bp)
-  bp.connect(g)
-  g.connect(pan)
-  pan.connect(out)
-  src.start(t, Math.random() * (noiseBuffer.duration - 0.3))
-  src.stop(t + decay + 0.05)
-}
-
-/** One wave: a swell that builds, brightens into a foamy break, then recedes. */
-function wave(ctx: AudioContext, out: AudioNode) {
-  if (!noiseBuffer) return
-  const t = ctx.currentTime
-  const build = rand(1.8, 3)
-  const recede = rand(2.6, 4.4)
-  const peak = rand(0.5, 0.9)
-  const src = ctx.createBufferSource()
-  src.buffer = noiseBuffer
-  src.loop = true
-  const hp = ctx.createBiquadFilter()
-  hp.type = 'highpass'
-  hp.frequency.value = 240
-  const lp = ctx.createBiquadFilter()
-  lp.type = 'lowpass'
-  lp.frequency.setValueAtTime(480, t)
-  lp.frequency.linearRampToValueAtTime(5600, t + build) // brighten to the crest
-  lp.frequency.linearRampToValueAtTime(700, t + build + recede) // dull as it recedes
-  const g = ctx.createGain()
-  g.gain.setValueAtTime(0.0001, t)
-  g.gain.linearRampToValueAtTime(peak, t + build)
-  g.gain.linearRampToValueAtTime(0.0001, t + build + recede)
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.35, 0.35)
-  src.connect(hp)
-  hp.connect(lp)
-  lp.connect(g)
-  g.connect(pan)
-  pan.connect(out)
-  src.start(t)
-  src.stop(t + build + recede + 0.1)
-}
-
-/** A distant seagull: a couple of raspy, down-gliding chirps, quiet and echoey. */
-function gull(ctx: AudioContext, out: AudioNode) {
-  const t0 = ctx.currentTime
-  const chirps = 2 + Math.floor(Math.random() * 3)
-  const bus = ctx.createGain()
-  bus.gain.value = rand(0.03, 0.06) // quiet = far away
-  const lp = ctx.createBiquadFilter()
-  lp.type = 'lowpass'
-  lp.frequency.value = 2200
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.85, 0.85)
-  const delay = ctx.createDelay()
-  delay.delayTime.value = 0.19
-  const fb = ctx.createGain()
-  fb.gain.value = 0.25
-  bus.connect(lp)
-  lp.connect(pan)
-  pan.connect(out)
-  lp.connect(delay)
-  delay.connect(fb)
-  fb.connect(delay)
-  delay.connect(pan) // a touch of echo for open space
-
-  let t = t0
-  for (let i = 0; i < chirps; i++) {
-    const dur = rand(0.1, 0.17)
-    const f1 = rand(1100, 1500)
-    const osc = ctx.createOscillator()
-    osc.type = 'sawtooth'
-    osc.frequency.setValueAtTime(f1, t)
-    osc.frequency.exponentialRampToValueAtTime(f1 * rand(0.62, 0.8), t + dur)
-    const vib = ctx.createOscillator()
-    vib.frequency.value = 26
-    const vibGain = ctx.createGain()
-    vibGain.gain.value = 38
-    vib.connect(vibGain)
-    vibGain.connect(osc.frequency)
-    const og = ctx.createGain()
-    og.gain.setValueAtTime(0.0001, t)
-    og.gain.exponentialRampToValueAtTime(1, t + 0.012)
-    og.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-    osc.connect(og)
-    og.connect(bus)
-    osc.start(t)
-    osc.stop(t + dur + 0.02)
-    vib.start(t)
-    vib.stop(t + dur + 0.02)
-    t += dur + rand(0.05, 0.12)
-  }
-  // Tidy up the shared bus after the cry + its echo tail have died away.
-  const id = window.setTimeout(
-    () => {
-      ;[bus, lp, pan, delay, fb].forEach((n) => {
-        try {
-          n.disconnect()
-        } catch {
-          /* noop */
-        }
-      })
-    },
-    (t - t0 + 1.6) * 1000,
-  )
-  timers.push(id)
-}
-
-/** A single water bubble/trickle: a soft sine with a quick rising pitch — the
- *  "bloop" of water moving over stones. */
-function bubble(ctx: AudioContext, out: AudioNode) {
-  const t = ctx.currentTime
-  const dur = rand(0.05, 0.11)
-  const f0 = rand(360, 820)
-  const osc = ctx.createOscillator()
-  osc.type = 'sine'
-  osc.frequency.setValueAtTime(f0, t)
-  osc.frequency.exponentialRampToValueAtTime(f0 * rand(1.4, 2.2), t + dur) // rising = a bubble
-  const g = ctx.createGain()
-  const v = rand(0.04, 0.13)
-  g.gain.setValueAtTime(0.0001, t)
-  g.gain.exponentialRampToValueAtTime(v, t + 0.006)
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.5, 0.5)
-  osc.connect(g)
-  g.connect(pan)
-  pan.connect(out)
-  osc.start(t)
-  osc.stop(t + dur + 0.03)
-}
-
-/** A distant forest bird: one to three soft, high, warbling notes. */
-function birdChirp(ctx: AudioContext, out: AudioNode) {
-  const t0 = ctx.currentTime
-  const notes = 1 + Math.floor(Math.random() * 3)
-  const bus = ctx.createGain()
-  bus.gain.value = rand(0.02, 0.05) // soft = far off among the trees
-  const lp = ctx.createBiquadFilter()
-  lp.type = 'lowpass'
-  lp.frequency.value = 5000
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.8, 0.8)
-  bus.connect(lp)
-  lp.connect(pan)
-  pan.connect(out)
-  let t = t0
-  for (let i = 0; i < notes; i++) {
-    const dur = rand(0.06, 0.13)
-    const f = rand(2200, 3600)
-    const osc = ctx.createOscillator()
-    osc.type = 'triangle'
-    osc.frequency.setValueAtTime(f, t)
-    osc.frequency.linearRampToValueAtTime(f * rand(1.05, 1.3), t + dur * 0.5)
-    osc.frequency.linearRampToValueAtTime(f * rand(0.9, 1), t + dur)
-    const og = ctx.createGain()
-    og.gain.setValueAtTime(0.0001, t)
-    og.gain.exponentialRampToValueAtTime(1, t + 0.01)
-    og.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-    osc.connect(og)
-    og.connect(bus)
-    osc.start(t)
-    osc.stop(t + dur + 0.02)
-    t += dur + rand(0.06, 0.16)
-  }
-  const id = window.setTimeout(
-    () => {
-      ;[bus, lp, pan].forEach((n) => {
-        try {
-          n.disconnect()
-        } catch {
-          /* noop */
-        }
-      })
-    },
-    (t - t0 + 0.5) * 1000,
-  )
-  timers.push(id)
-}
-
 /** A burst of fire crackle: one to a few very short, bright pops. */
 function crackle(ctx: AudioContext, out: AudioNode) {
   if (!noiseBuffer) return
@@ -305,6 +111,89 @@ function crackle(ctx: AudioContext, out: AudioNode) {
     src.stop(t + decay + 0.03)
     t += rand(0.012, 0.05)
   }
+}
+
+/** A soft cluster of papery crinkles — individual leaves shifting. */
+function rustle(ctx: AudioContext, out: AudioNode) {
+  if (!noiseBuffer) return
+  const cluster = 2 + Math.floor(Math.random() * 4) // 2–5 quick crinkles
+  let t = ctx.currentTime
+  for (let i = 0; i < cluster; i++) {
+    const decay = rand(0.02, 0.07)
+    const src = ctx.createBufferSource()
+    src.buffer = noiseBuffer
+    const hp = ctx.createBiquadFilter()
+    hp.type = 'highpass'
+    hp.frequency.value = rand(2200, 5200)
+    const g = ctx.createGain()
+    const v = rand(0.03, 0.12)
+    g.gain.setValueAtTime(0.0001, t)
+    g.gain.exponentialRampToValueAtTime(v, t + 0.004)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + decay)
+    const pan = ctx.createStereoPanner()
+    pan.pan.value = rand(-0.55, 0.55)
+    src.connect(hp)
+    hp.connect(g)
+    g.connect(pan)
+    pan.connect(out)
+    src.start(t, Math.random() * (noiseBuffer.duration - 0.1))
+    src.stop(t + decay + 0.03)
+    t += rand(0.015, 0.06)
+  }
+}
+
+/** One struck crystal bowl: pure sine partials that swell in and ring out long,
+ *  each with a faintly detuned twin for the characteristic shimmer/beat. */
+function bowl(ctx: AudioContext, out: AudioNode) {
+  const t = ctx.currentTime
+  const base = BOWL_SCALE[Math.floor(Math.random() * BOWL_SCALE.length)]
+  const attack = rand(0.4, 1.2)
+  const decay = rand(8, 14)
+  const peak = rand(0.08, 0.15)
+
+  const bus = ctx.createGain()
+  bus.gain.setValueAtTime(0.0001, t)
+  bus.gain.exponentialRampToValueAtTime(peak, t + attack)
+  bus.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay)
+  const pan = ctx.createStereoPanner()
+  pan.pan.value = rand(-0.4, 0.4)
+  bus.connect(pan)
+  pan.connect(out)
+
+  const partials = [
+    { mult: 1, g: 1 },
+    { mult: 2, g: 0.14 },
+    { mult: 2.8, g: 0.05 }, // a faint inharmonic top for the "glassy" ring
+  ]
+  for (const p of partials) {
+    for (const detune of [1, 1 + rand(0.002, 0.006)]) {
+      const osc = ctx.createOscillator()
+      osc.type = 'sine'
+      osc.frequency.value = base * p.mult * detune
+      const g = ctx.createGain()
+      g.gain.value = p.g * (detune === 1 ? 0.6 : 0.4)
+      osc.connect(g)
+      g.connect(bus)
+      osc.start(t)
+      osc.stop(t + attack + decay + 0.1)
+    }
+  }
+  const id = window.setTimeout(
+    () => {
+      try {
+        bus.disconnect()
+      } catch {
+        /* noop */
+      }
+      try {
+        pan.disconnect()
+      } catch {
+        /* noop */
+      }
+    },
+    (attack + decay + 0.5) * 1000,
+  )
+  timers.push(id)
 }
 
 // ── control surface ─────────────────────────────────────────────────────────
@@ -347,52 +236,7 @@ export function startAmbient(kind: Soundscape, volume: number): void {
     return g
   }
 
-  if (kind === 'rain') {
-    // a light drizzle: faint background wash + sparse, gentle droplet taps
-    const src = noiseSource()
-    const hp = biquad('highpass', 700)
-    const lp = biquad('lowpass', 2800)
-    const bed = gain(0.06)
-    src.connect(hp)
-    hp.connect(lp)
-    lp.connect(bed)
-    bed.connect(out)
-    src.start()
-    lfo(ctx, 0.13, 0.03, bed.gain)
-    schedule(myGen, 90, 340, () => droplet(ctx, out)) // gentle patter (was a downpour)
-    schedule(myGen, 900, 2600, () => droplet(ctx, out, true)) // an occasional fuller drop
-  } else if (kind === 'stream') {
-    // a slow forest brook: soft flowing-water bed, water trickling over stones,
-    // and the odd far-off bird among the trees
-    const src = noiseSource()
-    const bp = biquad('bandpass', 720, 0.6)
-    const lp = biquad('lowpass', 2600)
-    const bed = gain(0.4)
-    src.connect(bp)
-    bp.connect(lp)
-    lp.connect(bed)
-    bed.connect(out)
-    src.start()
-    lfo(ctx, 0.18, 150, bp.frequency) // slow, gentle wander of the current
-    lfo(ctx, 0.5, 0.05, bed.gain) // subtle breathing of the flow
-    schedule(myGen, 140, 520, () => bubble(ctx, out)) // trickling over pebbles
-    schedule(myGen, 16000, 38000, () => birdChirp(ctx, out)) // distant forest bird
-  } else if (kind === 'waves') {
-    // low ocean rumble bed, breaking waves, and the odd distant gull
-    const src = noiseSource()
-    const lp = biquad('lowpass', 500)
-    const bed = gain(0.26)
-    src.connect(lp)
-    lp.connect(bed)
-    bed.connect(out)
-    src.start()
-    lfo(ctx, 0.06, 0.1, bed.gain)
-    lfo(ctx, 0.06, 170, lp.frequency)
-    const first = window.setTimeout(() => myGen === gen && master && wave(ctx, out), 1200)
-    timers.push(first)
-    schedule(myGen, 6500, 12000, () => wave(ctx, out))
-    schedule(myGen, 13000, 32000, () => gull(ctx, out))
-  } else if (kind === 'fire') {
+  if (kind === 'fire') {
     // low roar + soft hiss bed, with frequent crackle bursts
     const roarSrc = noiseSource()
     const roarLp = biquad('lowpass', 380)
@@ -410,6 +254,34 @@ export function startAmbient(kind: Soundscape, volume: number): void {
     hiss.connect(out)
     hissSrc.start()
     schedule(myGen, 110, 620, () => crackle(ctx, out))
+  } else if (kind === 'leaves') {
+    // papery wind-through-leaves bed that swells and fades, plus soft rustles
+    const src = noiseSource()
+    const hp = biquad('highpass', 1500)
+    const lp = biquad('lowpass', 7000)
+    const bed = gain(0.5)
+    src.connect(hp)
+    hp.connect(lp)
+    lp.connect(bed)
+    bed.connect(out)
+    src.start()
+    lfo(ctx, 0.12, 0.35, bed.gain) // gusts swell and settle
+    lfo(ctx, 0.12, 700, hp.frequency) // brightness shifts with the gust
+    schedule(myGen, 240, 820, () => rustle(ctx, out)) // individual leaves
+  } else if (kind === 'bowls') {
+    // faint sustained drone for continuity, with bowls rung at slow intervals
+    const drone = ctx.createOscillator()
+    drone.type = 'sine'
+    drone.frequency.value = 130.81 // C3
+    const droneGain = gain(0.03)
+    drone.connect(droneGain)
+    droneGain.connect(out)
+    drone.start()
+    sources.push(drone)
+    lfo(ctx, 0.07, 0.015, droneGain.gain) // gentle breathing
+    const first = window.setTimeout(() => myGen === gen && master && bowl(ctx, out), 600)
+    timers.push(first)
+    schedule(myGen, 4000, 9000, () => bowl(ctx, out))
   }
 
   const target = clamp01(volume) * trim

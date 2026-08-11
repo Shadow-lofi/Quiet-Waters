@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react'
-import { CloudRain, Droplets, Waves, Flame, VolumeX, Play, Square } from 'lucide-react'
+import { Flame, Leaf, Sparkles, VolumeX, Play, Square } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
 import { startAmbient, stopAmbient, setAmbientVolume } from '../lib/ambient'
-import { APP_VERSION } from '../lib/version'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
-const SCAPE_ICON: Record<Soundscape, typeof Waves> = {
+const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
   off: VolumeX,
-  rain: CloudRain,
-  stream: Droplets,
-  waves: Waves,
   fire: Flame,
+  leaves: Leaf,
+  bowls: Sparkles,
 }
 
 const APPEARANCE_HINT: Record<ThemePref, string> = {
@@ -330,11 +328,6 @@ export function Settings() {
           )}
         </Row>
       </section>
-
-      <footer className="pb-2 text-center text-xs text-deep-400">
-        <p className="font-serif text-sm italic text-deep-500">“Be still, and know that I am God.”</p>
-        <p className="mt-2">Quiet Waters · v{APP_VERSION}</p>
-      </footer>
     </div>
   )
 }

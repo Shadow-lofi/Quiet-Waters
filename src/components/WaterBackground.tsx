@@ -28,7 +28,7 @@ export function WaterBackground() {
   return (
     <div
       aria-hidden="true"
-      className="qw-water pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      className="qw-water pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       {RAYS.map((style, i) => (
         <span key={`ray-${i}`} className="qw-ray" style={style} />

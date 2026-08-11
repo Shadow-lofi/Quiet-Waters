@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { Waves, CalendarHeart, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
+import { APP_VERSION } from '../lib/version'
 
 const tabs = [
   { to: '/', label: 'Meditate', Icon: Waves, end: true },
@@ -12,8 +13,17 @@ export function AppLayout() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
       <WaterBackground />
-      <main className="relative z-10 flex-1 px-5 pb-28 pt-6">
+      <main className="flex-1 px-5 pb-28 pt-6">
         <Outlet />
+        <footer className="mt-12 text-center text-xs leading-relaxed text-deep-400">
+          <p>
+            Developed by <span className="text-deep-500">Tavaris Freeman</span> · Midnight Codex
+          </p>
+          <p className="mt-0.5">
+            © {new Date().getFullYear()} Quiet Waters · v{APP_VERSION} · All rights reserved{' '}
+            <sup className="text-[0.65em]">†</sup>
+          </p>
+        </footer>
       </main>
 
       {/* Bottom tab bar — thumb-reachable, safe-area aware. */}
