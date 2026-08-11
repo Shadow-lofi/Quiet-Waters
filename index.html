@@ -36,11 +36,13 @@
           var raw = localStorage.getItem('quiet-waters-v1')
           // Night is the default look, so first paint (before any saved pref) is dark.
           var pref = (raw ? (JSON.parse(raw).state || {}).theme : 'night') || 'night'
+          var h = new Date().getHours()
           var dark =
             pref === 'night' ||
             (pref === 'auto' &&
               window.matchMedia &&
-              window.matchMedia('(prefers-color-scheme: dark)').matches)
+              window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+            (pref === 'cycle' && !(h >= 6 && h < 19))
           if (dark) {
             document.documentElement.dataset.theme = 'night'
             document.documentElement.style.colorScheme = 'dark'

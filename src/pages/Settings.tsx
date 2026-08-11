@@ -15,6 +15,13 @@ const SCAPE_ICON: Record<Soundscape, typeof Waves> = {
   fire: Flame,
 }
 
+const APPEARANCE_HINT: Record<ThemePref, string> = {
+  day: 'Always light',
+  night: 'Always dark',
+  auto: 'Follows your device',
+  cycle: 'Light by day, dark by night',
+}
+
 /** A pill segmented control. */
 function Segmented<T extends string>({
   value,
@@ -136,20 +143,21 @@ export function Settings() {
       </section>
 
       {/* appearance */}
-      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
-        <Row label="Appearance" hint="Auto follows your device">
-          <div className="w-44">
-            <Segmented<ThemePref>
-              value={s.theme}
-              onChange={(v) => s.setPref('theme', v)}
-              options={[
-                { value: 'day', label: 'Day' },
-                { value: 'night', label: 'Night' },
-                { value: 'auto', label: 'Auto' },
-              ]}
-            />
-          </div>
-        </Row>
+      <section className="rounded-card bg-card px-5 py-4 shadow-sm ring-1 ring-line">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-deep-800">Appearance</p>
+          <p className="text-xs text-deep-500">{APPEARANCE_HINT[s.theme]}</p>
+        </div>
+        <Segmented<ThemePref>
+          value={s.theme}
+          onChange={(v) => s.setPref('theme', v)}
+          options={[
+            { value: 'day', label: 'Day' },
+            { value: 'night', label: 'Night' },
+            { value: 'auto', label: 'Auto' },
+            { value: 'cycle', label: 'Cycle' },
+          ]}
+        />
       </section>
 
       {/* sound */}

@@ -1,5 +1,6 @@
-// Appearance preference. 'auto' follows the OS light/dark setting.
-export type ThemePref = 'day' | 'night' | 'auto'
+// Appearance preference. 'auto' follows the OS light/dark setting; 'cycle'
+// follows the local time of day (light by day, dark by night).
+export type ThemePref = 'day' | 'night' | 'auto' | 'cycle'
 
 // Breath-prayer pacing for the breathing guide. 'off' shows a still circle.
 export type BreathPace = 'off' | 'gentle' | 'calm' | 'deep'
