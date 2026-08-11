@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { BreathPace, Session, Soundscape, ThemePref } from './types'
+import type { BreathPace, MotionPref, Session, Soundscape, ThemePref } from './types'
 
 // The whole app is local-first: everything lives in this one persisted store,
 // so it works fully offline and keeps no account. (Cloud sync can come later.)
@@ -23,6 +23,7 @@ interface State {
   keepAwake: boolean
   soundscape: Soundscape // ambient sound during a sitting ('off' = silence)
   ambientVolume: number // 0–1
+  motion: MotionPref // whether the gentle animations run
 
   // ── setup memory ──
   lastDurationMin: number
@@ -50,6 +51,7 @@ type Prefs = Pick<
   | 'keepAwake'
   | 'soundscape'
   | 'ambientVolume'
+  | 'motion'
 >
 
 export const useStore = create<State>()(
@@ -60,7 +62,7 @@ export const useStore = create<State>()(
 
       sessions: [],
 
-      theme: 'night',
+      theme: 'cycle',
       soundOn: true,
       openingChime: true,
       closingChime: true,
@@ -69,6 +71,7 @@ export const useStore = create<State>()(
       keepAwake: true,
       soundscape: 'off',
       ambientVolume: 0.6,
+      motion: 'on',
 
       lastDurationMin: 10,
       verseCursor: 0,

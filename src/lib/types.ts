@@ -8,6 +8,11 @@ export type BreathPace = 'off' | 'gentle' | 'calm' | 'deep'
 // Optional ambient sound played during a sitting. All synthesized in-browser.
 export type Soundscape = 'off' | 'rain' | 'stream' | 'waves' | 'fire'
 
+// Animation preference. 'system' follows the OS reduced-motion setting; 'on'
+// forces the gentle animations even when the OS asks to reduce motion; 'off'
+// disables them regardless.
+export type MotionPref = 'system' | 'on' | 'off'
+
 // One completed (or ended-early) meditation sitting.
 export interface Session {
   id: string

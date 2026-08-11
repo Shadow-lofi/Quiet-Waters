@@ -144,17 +144,19 @@
     outline-offset: 2px;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
-    }
+  /* Reduced motion is driven by [data-motion="reduce"] on <html> (set by the
+     no-flash script + ThemeProvider from the OS setting AND the in-app Animations
+     preference), so a user can opt back into the gentle motion even when their
+     device asks to reduce it. */
+  html[data-motion='reduce'] {
+    scroll-behavior: auto;
+  }
+  html[data-motion='reduce'] *,
+  html[data-motion='reduce'] *::before,
+  html[data-motion='reduce'] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }
 
@@ -247,21 +249,19 @@
   animation: qw-shimmer 8s linear infinite;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .qw-ripple-ring {
-    animation: none;
-    opacity: 0.18;
-  }
-  .qw-enter,
-  .qw-float {
-    animation: none;
-  }
-  /* Never leave the title as transparent clipped text when unanimated. */
-  .qw-title {
-    animation: none;
-    background-image: none;
-    -webkit-text-fill-color: currentColor;
-  }
+html[data-motion='reduce'] .qw-ripple-ring {
+  animation: none;
+  opacity: 0.18;
+}
+html[data-motion='reduce'] .qw-enter,
+html[data-motion='reduce'] .qw-float {
+  animation: none;
+}
+/* Never leave the title as transparent clipped text when unanimated. */
+html[data-motion='reduce'] .qw-title {
+  animation: none;
+  background-image: none;
+  -webkit-text-fill-color: currentColor;
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -337,9 +337,7 @@
   }
 }
 
-/* The whole point is gentle motion — for reduced-motion users, remove it. */
-@media (prefers-reduced-motion: reduce) {
-  .qw-water {
-    display: none;
-  }
+/* The whole point is gentle motion — when motion is reduced, remove it. */
+html[data-motion='reduce'] .qw-water {
+  display: none;
 }

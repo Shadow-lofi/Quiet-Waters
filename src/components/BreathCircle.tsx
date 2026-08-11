@@ -39,9 +39,10 @@ export function BreathCircle({
   const [label, setLabel] = useState('')
   const [word, setWord] = useState('')
 
+  // Resolved by the no-flash script + ThemeProvider from the OS setting AND the
+  // in-app Animations pref, so 'on' brings the breathing motion back too.
   const reduced =
-    typeof window !== 'undefined' &&
-    !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    typeof document !== 'undefined' && document.documentElement.dataset.motion === 'reduce'
 
   useEffect(() => {
     // Still mode (pace off, or reduced motion): a calm, unmoving disc with the

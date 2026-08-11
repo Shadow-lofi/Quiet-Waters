@@ -34,8 +34,15 @@
       ;(function () {
         try {
           var raw = localStorage.getItem('quiet-waters-v1')
-          // Night is the default look, so first paint (before any saved pref) is dark.
-          var pref = (raw ? (JSON.parse(raw).state || {}).theme : 'night') || 'night'
+          var state = {}
+          try {
+            state = raw ? JSON.parse(raw).state || {} : {}
+          } catch (e) {}
+          var root = document.documentElement
+
+          // Appearance — Cycle is the default, so first paint (before any saved
+          // pref) follows the local time of day.
+          var pref = state.theme || 'cycle'
           var h = new Date().getHours()
           var dark =
             pref === 'night' ||
@@ -44,9 +51,19 @@
               window.matchMedia('(prefers-color-scheme: dark)').matches) ||
             (pref === 'cycle' && !(h >= 6 && h < 19))
           if (dark) {
-            document.documentElement.dataset.theme = 'night'
-            document.documentElement.style.colorScheme = 'dark'
+            root.dataset.theme = 'night'
+            root.style.colorScheme = 'dark'
           }
+
+          // Motion — default 'on' so the gentle animations show everywhere; a
+          // visitor can choose 'system' (follow device) or 'off' in Settings.
+          var motion = state.motion || 'on'
+          var reduce =
+            motion === 'off' ||
+            (motion !== 'on' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+          root.dataset.motion = reduce ? 'reduce' : 'full'
         } catch (e) {}
       })()
     </script>

@@ -1,13 +1,26 @@
 import { useEffect } from 'react'
 import { useStore } from '../lib/store'
-import { applyTheme } from '../lib/theme'
+import { applyMotion, applyTheme } from '../lib/theme'
 
-/** Applies the chosen appearance to <html>. 'auto' follows the OS light/dark
- *  setting live; 'cycle' follows the local time of day, re-checking each minute
- *  and whenever the app regains focus. Renders nothing. */
+/** Applies the chosen appearance + motion preference to <html>. 'auto' follows
+ *  the OS light/dark setting live; 'cycle' follows the local time of day,
+ *  re-checking each minute and whenever the app regains focus. Motion 'system'
+ *  follows the OS reduced-motion setting live. Renders nothing. */
 export function ThemeProvider() {
   const theme = useStore((s) => s.theme)
+  const motion = useStore((s) => s.motion)
 
+  // ── motion ──
+  useEffect(() => {
+    applyMotion(motion)
+    if (motion !== 'system') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => applyMotion('system')
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [motion])
+
+  // ── appearance ──
   useEffect(() => {
     applyTheme(theme)
 

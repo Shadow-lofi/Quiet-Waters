@@ -5,7 +5,7 @@ import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
 import { startAmbient, stopAmbient, setAmbientVolume } from '../lib/ambient'
 import { APP_VERSION } from '../lib/version'
-import type { BreathPace, Soundscape, ThemePref } from '../lib/types'
+import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Waves> = {
   off: VolumeX,
@@ -20,6 +20,12 @@ const APPEARANCE_HINT: Record<ThemePref, string> = {
   night: 'Always dark',
   auto: 'Follows your device',
   cycle: 'Light by day, dark by night',
+}
+
+const MOTION_HINT: Record<MotionPref, string> = {
+  system: 'Follows your device',
+  on: 'Gentle motion, always',
+  off: 'Still — no animations',
 }
 
 /** A pill segmented control. */
@@ -38,7 +44,7 @@ function Segmented<T extends string>({
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
-          className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`flex-1 whitespace-nowrap rounded-full px-2 py-1.5 text-sm font-medium transition-colors ${
             value === o.value ? 'bg-card text-water-600 shadow-sm' : 'text-deep-500 hover:text-deep-700'
           }`}
         >
@@ -65,13 +71,13 @@ function Toggle({
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-40 ${
+      className={`inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors disabled:opacity-40 ${
         checked ? 'bg-water-500' : 'bg-mist-300'
       }`}
     >
       <span
-        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-1'
+        className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+          checked ? 'translate-x-5' : 'translate-x-0'
         }`}
       />
     </button>
@@ -156,6 +162,23 @@ export function Settings() {
             { value: 'night', label: 'Night' },
             { value: 'auto', label: 'Auto' },
             { value: 'cycle', label: 'Cycle' },
+          ]}
+        />
+      </section>
+
+      {/* animations */}
+      <section className="rounded-card bg-card px-5 py-4 shadow-sm ring-1 ring-line">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-deep-800">Animations</p>
+          <p className="text-xs text-deep-500">{MOTION_HINT[s.motion]}</p>
+        </div>
+        <Segmented<MotionPref>
+          value={s.motion}
+          onChange={(v) => s.setPref('motion', v)}
+          options={[
+            { value: 'system', label: 'System' },
+            { value: 'on', label: 'On' },
+            { value: 'off', label: 'Off' },
           ]}
         />
       </section>
