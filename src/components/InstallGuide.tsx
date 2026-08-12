@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Share, MoreVertical, MonitorDown, Plus, Download, X } from 'lucide-react'
 import { Logo } from './Logo'
-import { canPromptInstall, detectPlatform, promptInstall } from '../lib/install'
+import { canPromptInstall, detectPlatform, promptInstall, type Platform } from '../lib/install'
 
-/** An inline glyph used within a step, styled to sit in the text baseline. */
+/** An inline glyph used within a step, styled to sit on the text baseline. */
 function Glyph({ children }: { children: React.ReactNode }) {
   return (
     <span className="mx-0.5 inline-flex h-5 w-5 -translate-y-px items-center justify-center rounded-md bg-mist-200 text-water-600 align-middle">
@@ -12,7 +12,7 @@ function Glyph({ children }: { children: React.ReactNode }) {
   )
 }
 
-function steps(platform: ReturnType<typeof detectPlatform>): React.ReactNode[] {
+function steps(platform: Platform): React.ReactNode[] {
   if (platform === 'ios') {
     return [
       <>
@@ -71,18 +71,27 @@ function steps(platform: ReturnType<typeof detectPlatform>): React.ReactNode[] {
   ]
 }
 
-const HINT: Record<ReturnType<typeof detectPlatform>, string> = {
-  ios: 'On iPhone or iPad, in Safari',
-  android: 'On Android, in Chrome',
-  desktop: 'On your computer, in Chrome or Edge',
+const TABS: Platform[] = ['ios', 'android', 'desktop']
+
+const TAB_LABEL: Record<Platform, string> = {
+  ios: 'iPhone',
+  android: 'Android',
+  desktop: 'Computer',
 }
 
-/** A gentle walkthrough for installing Quiet Waters to the home screen. Offers
- *  the browser's native install prompt where one is available (Chromium), and
- *  clear manual steps everywhere else (notably iOS Safari). */
+const BROWSER_HINT: Record<Platform, string> = {
+  ios: 'In Safari, on iPhone or iPad',
+  android: 'In Chrome, on Android',
+  desktop: 'In Chrome or Edge',
+}
+
+/** A gentle walkthrough for installing Quiet Waters to the home screen. Covers
+ *  every platform (iPhone/iPad, Android, computer) with a tab switcher that
+ *  opens to the user's own device, and offers the browser's native install
+ *  prompt where one is available (Chromium). */
 export function InstallGuide({ onClose }: { onClose: () => void }) {
-  const [platform] = useState(detectPlatform)
   const [native] = useState(canPromptInstall)
+  const [tab, setTab] = useState<Platform>(detectPlatform)
 
   const install = async () => {
     const outcome = await promptInstall()
@@ -120,10 +129,27 @@ export function InstallGuide({ onClose }: { onClose: () => void }) {
         )}
 
         <p className="mt-6 text-xs uppercase tracking-[0.16em] text-deep-400">
-          {native ? 'Or add it by hand' : HINT[platform]}
+          {native ? 'Or add it by hand' : 'Choose your device'}
         </p>
-        <ol className="mt-3 flex flex-col gap-3.5">
-          {steps(platform).map((node, i) => (
+
+        {/* Platform switcher — opens to the user's device, covers them all. */}
+        <div className="mt-3 flex gap-1 rounded-full bg-mist-200 p-1">
+          {TABS.map((p) => (
+            <button
+              key={p}
+              onClick={() => setTab(p)}
+              className={`flex-1 rounded-full px-2 py-1.5 text-sm font-medium transition-colors ${
+                tab === p ? 'bg-card text-water-600 shadow-sm' : 'text-deep-500 hover:text-deep-700'
+              }`}
+            >
+              {TAB_LABEL[p]}
+            </button>
+          ))}
+        </div>
+
+        <p className="mt-4 text-xs font-medium text-deep-500">{BROWSER_HINT[tab]}</p>
+        <ol className="mt-2.5 flex flex-col gap-3.5">
+          {steps(tab).map((node, i) => (
             <li key={i} className="flex items-start gap-3">
               <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mist-200 text-sm font-semibold text-water-600">
                 {i + 1}
@@ -132,6 +158,12 @@ export function InstallGuide({ onClose }: { onClose: () => void }) {
             </li>
           ))}
         </ol>
+
+        {tab === 'desktop' && (
+          <p className="mt-3 text-xs leading-relaxed text-deep-400">
+            Using Safari on a Mac? Open <span className="font-medium text-deep-600">File → Add to Dock</span>.
+          </p>
+        )}
 
         <button
           onClick={onClose}

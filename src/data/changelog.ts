@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 12 (v1.4.2) ──────────────────────────────────
+  {
+    date: 'August 12, 2026',
+    tag: 'Improved',
+    title: 'Install steps for every device',
+    detail:
+      'The Add to Home Screen guide now walks you through iPhone & iPad, Android, and computer — and opens to your own device. Find it in Settings.',
+    to: '/settings',
+  },
+
   // ── August 12 (v1.4.1) ──────────────────────────────────
   {
     date: 'August 12, 2026',
