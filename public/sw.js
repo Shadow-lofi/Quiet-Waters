@@ -2,7 +2,7 @@
 // The app shell is precached on install; everything else (hashed JS/CSS, fonts)
 // is cached cache-first the first time it's fetched, so a repeat visit works
 // with no network. Bump CACHE to retire old assets on a new deploy.
-const CACHE = 'quiet-waters-v1'
+const CACHE = 'quiet-waters-v2'
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg']
 
 self.addEventListener('install', (event) => {
@@ -21,6 +21,19 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
+  )
+})
+
+// Tapping the daily reminder focuses an open Quiet Waters window, or opens one.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if ('focus' in client) return client.focus()
+      }
+      return self.clients.openWindow ? self.clients.openWindow('/') : undefined
+    }),
   )
 })
 

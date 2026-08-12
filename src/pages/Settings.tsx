@@ -4,6 +4,11 @@ import { useStore } from '../lib/store'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
 import { startAmbient, stopAmbient, setAmbientVolume } from '../lib/ambient'
+import {
+  NOTIFICATIONS_SUPPORTED,
+  notificationPermission,
+  requestNotificationPermission,
+} from '../lib/reminders'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
@@ -96,9 +101,28 @@ export function Settings() {
   const s = useStore()
   const [confirmClear, setConfirmClear] = useState(false)
   const [previewing, setPreviewing] = useState(false)
+  const [perm, setPerm] = useState(notificationPermission())
 
   // Always silence any preview when leaving Settings.
   useEffect(() => () => stopAmbient(), [])
+
+  const toggleReminder = async (on: boolean) => {
+    s.setPref('reminderOn', on)
+    // Ask for notification permission the first time it's switched on (this is
+    // a user gesture, so the prompt is allowed). Without it the in-app banner
+    // still works — notifications just add the backgrounded nudge.
+    if (on && NOTIFICATIONS_SUPPORTED && notificationPermission() === 'default') {
+      setPerm(await requestNotificationPermission())
+    }
+  }
+
+  const reminderHint = (): string => {
+    if (!s.reminderOn) return 'A gentle daily nudge to be still'
+    if (!NOTIFICATIONS_SUPPORTED) return 'Appears in the app when you open it'
+    if (perm === 'granted') return 'A nudge here, and on your device when it’s in the background'
+    if (perm === 'denied') return 'Notifications are blocked — you’ll still see a nudge in the app'
+    return 'Allow notifications to be nudged while the app is in the background'
+  }
 
   const pickScape = (id: Soundscape) => {
     s.setPref('soundscape', id)
@@ -177,6 +201,26 @@ export function Settings() {
             { value: 'off', label: 'Off' },
           ]}
         />
+      </section>
+
+      {/* reminder */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <div className={s.reminderOn ? 'divide-y divide-line' : ''}>
+          <Row label="Daily reminder" hint={reminderHint()}>
+            <Toggle checked={s.reminderOn} onChange={toggleReminder} />
+          </Row>
+          {s.reminderOn && (
+            <Row label="Time" hint="When to gently invite you">
+              <input
+                type="time"
+                value={s.reminderTime}
+                onChange={(e) => s.setPref('reminderTime', e.target.value)}
+                aria-label="Reminder time"
+                className="rounded-full bg-mist-100 px-3.5 py-1.5 text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
+              />
+            </Row>
+          )}
+        </div>
       </section>
 
       {/* sound */}

@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { Waves, CalendarHeart, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
+import { ReminderScheduler } from './ReminderScheduler'
 import { APP_VERSION } from '../lib/version'
 
 const tabs = [
@@ -13,6 +14,7 @@ export function AppLayout() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
       <WaterBackground />
+      <ReminderScheduler />
       <main className="flex-1 px-5 pb-28 pt-6">
         <Outlet />
         <footer className="mt-12 text-center text-xs leading-relaxed text-deep-400">

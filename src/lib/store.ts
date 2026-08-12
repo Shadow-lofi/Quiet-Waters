@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { dayKey } from './date'
 import type { BreathPace, MotionPref, Session, Soundscape, ThemePref } from './types'
 
 // The whole app is local-first: everything lives in this one persisted store,
@@ -25,6 +26,12 @@ interface State {
   ambientVolume: number // 0–1
   motion: MotionPref // whether the gentle animations run
 
+  // ── gentle reminder (local, no server) ──
+  reminderOn: boolean
+  reminderTime: string // 'HH:MM' 24-hour, local time
+  reminderDismissedDay: string // dayKey the in-app banner was last dismissed
+  reminderNotifiedDay: string // dayKey a device notification last fired
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -37,6 +44,8 @@ interface State {
   setPref: <K extends keyof Prefs>(key: K, value: Prefs[K]) => void
   setLastDuration: (min: number) => void
   nextVerse: (total: number) => void
+  dismissReminderToday: () => void
+  markReminderNotified: () => void
 }
 
 // The preference keys that setPref can write.
@@ -52,6 +61,8 @@ type Prefs = Pick<
   | 'soundscape'
   | 'ambientVolume'
   | 'motion'
+  | 'reminderOn'
+  | 'reminderTime'
 >
 
 export const useStore = create<State>()(
@@ -73,6 +84,11 @@ export const useStore = create<State>()(
       ambientVolume: 0.6,
       motion: 'on',
 
+      reminderOn: false,
+      reminderTime: '08:00',
+      reminderDismissedDay: '',
+      reminderNotifiedDay: '',
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -83,10 +99,12 @@ export const useStore = create<State>()(
       setPref: (key, value) => set({ [key]: value } as Partial<State>),
       setLastDuration: (min) => set({ lastDurationMin: min }),
       nextVerse: (total) => set((st) => ({ verseCursor: (st.verseCursor + 1) % Math.max(1, total) })),
+      dismissReminderToday: () => set({ reminderDismissedDay: dayKey() }),
+      markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
     }),
     {
       name: 'quiet-waters-v1',
-      version: 5,
+      version: 6,
       // Retired soundscapes fall back to off. Dropped over versions: wind, rain,
       // stream, waves, leaves, bowls, guitar — leaving just fire.
       migrate: (persisted) => {

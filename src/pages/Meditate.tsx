@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
+import { ReminderBanner } from '../components/ReminderBanner'
 import { SessionOverlay } from '../components/SessionOverlay'
 import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
@@ -77,6 +78,8 @@ export function Meditate() {
           </Link>
         )}
       </header>
+
+      <ReminderBanner onBegin={begin} />
 
       {/* verse to dwell on */}
       <section className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
