@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 12 (v1.4.3) ──────────────────────────────────
+  {
+    date: 'August 12, 2026',
+    tag: 'Improved',
+    title: 'A tidier name field',
+    detail: 'The name field in Settings is smaller now, so the card sits more neatly.',
+    to: '/settings',
+  },
+
   // ── August 12 (v1.4.2) ──────────────────────────────────
   {
     date: 'August 12, 2026',

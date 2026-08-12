@@ -183,7 +183,7 @@ export function Settings() {
             onChange={(e) => s.setName(e.target.value)}
             placeholder="Add name"
             maxLength={40}
-            className="w-32 rounded-full bg-mist-100 px-3 py-1 text-right text-sm text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
+            className="w-24 rounded-full bg-mist-100 px-3 py-1 text-right text-sm text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
           />
         </Row>
       </section>
