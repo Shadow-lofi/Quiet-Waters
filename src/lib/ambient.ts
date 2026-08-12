@@ -4,10 +4,9 @@ import type { Soundscape } from './types'
 // Ambient soundscapes, synthesized entirely with the Web Audio API — no audio
 // files, so they add nothing to the bundle and work fully offline.
 //
-// Fire and Leaves are noise-based (a continuous filtered "bed" plus one-shot
-// crackle/rustle "voices" fired at random intervals); Bowls is tonal (sustained
-// sine partials rung at slow intervals over a faint drone). That irregularity is
-// what makes them read as real rather than as flat loops.
+// Fire is noise-based: a continuous warm low "bed" (looping pink noise, lowpassed
+// so there's no airy mid hiss) plus one-shot crackle "pops" fired at random
+// intervals. That irregularity is what makes it read as a real hearth.
 
 let noiseBuffer: AudioBuffer | null = null
 
@@ -39,7 +38,7 @@ function pinkNoise(ctx: AudioContext): AudioBuffer {
 
 // The live graph, kept so we can fade out and tear it down cleanly.
 let master: GainNode | null = null
-let sources: AudioScheduledSourceNode[] = [] // long-lived beds/drones + LFO oscillators
+let sources: AudioScheduledSourceNode[] = [] // long-lived beds + LFO oscillators
 let chain: AudioNode[] = [] // long-lived filters/gains to disconnect
 let timers: number[] = [] // pending scheduler timeouts
 let gen = 0 // bumped on every stop/start so stale schedulers bail
@@ -48,12 +47,7 @@ let currentKind: Soundscape = 'off'
 // Perceived-loudness trim per scape, applied under the user's 0–1 volume.
 const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
   fire: 0.5,
-  leaves: 0.5,
-  bowls: 0.45,
 }
-
-// A calm C-based pentatonic for the singing bowls (Hz).
-const BOWL_SCALE = [196, 261.63, 293.66, 329.63, 392, 440]
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -113,89 +107,6 @@ function crackle(ctx: AudioContext, out: AudioNode) {
   }
 }
 
-/** A soft cluster of papery crinkles — individual leaves shifting. */
-function rustle(ctx: AudioContext, out: AudioNode) {
-  if (!noiseBuffer) return
-  const cluster = 2 + Math.floor(Math.random() * 4) // 2–5 quick crinkles
-  let t = ctx.currentTime
-  for (let i = 0; i < cluster; i++) {
-    const decay = rand(0.02, 0.07)
-    const src = ctx.createBufferSource()
-    src.buffer = noiseBuffer
-    const hp = ctx.createBiquadFilter()
-    hp.type = 'highpass'
-    hp.frequency.value = rand(2200, 5200)
-    const g = ctx.createGain()
-    const v = rand(0.03, 0.12)
-    g.gain.setValueAtTime(0.0001, t)
-    g.gain.exponentialRampToValueAtTime(v, t + 0.004)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + decay)
-    const pan = ctx.createStereoPanner()
-    pan.pan.value = rand(-0.55, 0.55)
-    src.connect(hp)
-    hp.connect(g)
-    g.connect(pan)
-    pan.connect(out)
-    src.start(t, Math.random() * (noiseBuffer.duration - 0.1))
-    src.stop(t + decay + 0.03)
-    t += rand(0.015, 0.06)
-  }
-}
-
-/** One struck crystal bowl: pure sine partials that swell in and ring out long,
- *  each with a faintly detuned twin for the characteristic shimmer/beat. */
-function bowl(ctx: AudioContext, out: AudioNode) {
-  const t = ctx.currentTime
-  const base = BOWL_SCALE[Math.floor(Math.random() * BOWL_SCALE.length)]
-  const attack = rand(0.4, 1.2)
-  const decay = rand(8, 14)
-  const peak = rand(0.08, 0.15)
-
-  const bus = ctx.createGain()
-  bus.gain.setValueAtTime(0.0001, t)
-  bus.gain.exponentialRampToValueAtTime(peak, t + attack)
-  bus.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay)
-  const pan = ctx.createStereoPanner()
-  pan.pan.value = rand(-0.4, 0.4)
-  bus.connect(pan)
-  pan.connect(out)
-
-  const partials = [
-    { mult: 1, g: 1 },
-    { mult: 2, g: 0.14 },
-    { mult: 2.8, g: 0.05 }, // a faint inharmonic top for the "glassy" ring
-  ]
-  for (const p of partials) {
-    for (const detune of [1, 1 + rand(0.002, 0.006)]) {
-      const osc = ctx.createOscillator()
-      osc.type = 'sine'
-      osc.frequency.value = base * p.mult * detune
-      const g = ctx.createGain()
-      g.gain.value = p.g * (detune === 1 ? 0.6 : 0.4)
-      osc.connect(g)
-      g.connect(bus)
-      osc.start(t)
-      osc.stop(t + attack + decay + 0.1)
-    }
-  }
-  const id = window.setTimeout(
-    () => {
-      try {
-        bus.disconnect()
-      } catch {
-        /* noop */
-      }
-      try {
-        pan.disconnect()
-      } catch {
-        /* noop */
-      }
-    },
-    (attack + decay + 0.5) * 1000,
-  )
-  timers.push(id)
-}
-
 // ── control surface ─────────────────────────────────────────────────────────
 
 /** Start (or switch to) an ambient soundscape, fading it in. */
@@ -237,51 +148,16 @@ export function startAmbient(kind: Soundscape, volume: number): void {
   }
 
   if (kind === 'fire') {
-    // low roar + soft hiss bed, with frequent crackle bursts
-    const roarSrc = noiseSource()
-    const roarLp = biquad('lowpass', 380)
-    const roar = gain(0.32)
-    roarSrc.connect(roarLp)
-    roarLp.connect(roar)
-    roar.connect(out)
-    roarSrc.start()
-    lfo(ctx, 0.4, 0.06, roar.gain) // flicker
-    const hissSrc = noiseSource()
-    const hissBp = biquad('bandpass', 1100, 0.8)
-    const hiss = gain(0.05)
-    hissSrc.connect(hissBp)
-    hissBp.connect(hiss)
-    hiss.connect(out)
-    hissSrc.start()
-    schedule(myGen, 110, 620, () => crackle(ctx, out))
-  } else if (kind === 'leaves') {
-    // papery wind-through-leaves bed that swells and fades, plus soft rustles
+    // a warm low bed of embers + frequent crackle pops — no airy mid "hiss"
     const src = noiseSource()
-    const hp = biquad('highpass', 1500)
-    const lp = biquad('lowpass', 7000)
-    const bed = gain(0.5)
-    src.connect(hp)
-    hp.connect(lp)
+    const lp = biquad('lowpass', 260)
+    const bed = gain(0.22)
+    src.connect(lp)
     lp.connect(bed)
     bed.connect(out)
     src.start()
-    lfo(ctx, 0.12, 0.35, bed.gain) // gusts swell and settle
-    lfo(ctx, 0.12, 700, hp.frequency) // brightness shifts with the gust
-    schedule(myGen, 240, 820, () => rustle(ctx, out)) // individual leaves
-  } else if (kind === 'bowls') {
-    // faint sustained drone for continuity, with bowls rung at slow intervals
-    const drone = ctx.createOscillator()
-    drone.type = 'sine'
-    drone.frequency.value = 130.81 // C3
-    const droneGain = gain(0.03)
-    drone.connect(droneGain)
-    droneGain.connect(out)
-    drone.start()
-    sources.push(drone)
-    lfo(ctx, 0.07, 0.015, droneGain.gain) // gentle breathing
-    const first = window.setTimeout(() => myGen === gen && master && bowl(ctx, out), 600)
-    timers.push(first)
-    schedule(myGen, 4000, 9000, () => bowl(ctx, out))
+    lfo(ctx, 0.5, 0.03, bed.gain) // subtle ember flicker (small depth = no whoosh)
+    schedule(myGen, 90, 520, () => crackle(ctx, out))
   }
 
   const target = clamp01(volume) * trim

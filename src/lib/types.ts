@@ -6,7 +6,7 @@ export type ThemePref = 'day' | 'night' | 'auto' | 'cycle'
 export type BreathPace = 'off' | 'gentle' | 'calm' | 'deep'
 
 // Optional ambient sound played during a sitting. All synthesized in-browser.
-export type Soundscape = 'off' | 'fire' | 'leaves' | 'bowls'
+export type Soundscape = 'off' | 'fire'
 
 // Animation preference. 'system' follows the OS reduced-motion setting; 'on'
 // forces the gentle animations even when the OS asks to reduce motion; 'off'

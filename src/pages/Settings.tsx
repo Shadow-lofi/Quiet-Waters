@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Flame, Leaf, Sparkles, VolumeX, Play, Square } from 'lucide-react'
+import { Flame, VolumeX, Play, Square } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
@@ -9,8 +9,6 @@ import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types
 const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
   off: VolumeX,
   fire: Flame,
-  leaves: Leaf,
-  bowls: Sparkles,
 }
 
 const APPEARANCE_HINT: Record<ThemePref, string> = {

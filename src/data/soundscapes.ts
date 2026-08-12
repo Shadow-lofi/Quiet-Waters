@@ -11,6 +11,4 @@ export interface SoundscapeInfo {
 export const SOUNDSCAPES: SoundscapeInfo[] = [
   { id: 'off', label: 'Off', hint: 'Silence' },
   { id: 'fire', label: 'Fire', hint: 'A crackling hearth' },
-  { id: 'leaves', label: 'Leaves', hint: 'Wind through the leaves' },
-  { id: 'bowls', label: 'Bowls', hint: 'Crystal singing bowls' },
 ]

@@ -86,12 +86,12 @@ export const useStore = create<State>()(
     }),
     {
       name: 'quiet-waters-v1',
-      version: 3,
-      // Retired soundscapes fall back to off (v2 dropped 'wind'; v3 dropped
-      // 'rain', 'stream', and 'waves' in favor of 'leaves' + 'bowls').
+      version: 5,
+      // Retired soundscapes fall back to off. Dropped over versions: wind, rain,
+      // stream, waves, leaves, bowls, guitar — leaving just fire.
       migrate: (persisted) => {
         const st = persisted as Partial<State>
-        const retired = ['wind', 'rain', 'stream', 'waves']
+        const retired = ['wind', 'rain', 'stream', 'waves', 'leaves', 'bowls', 'guitar']
         if (retired.includes(st.soundscape as string)) st.soundscape = 'off'
         return st as State
       },
