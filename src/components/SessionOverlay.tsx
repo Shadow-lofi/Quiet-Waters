@@ -77,6 +77,17 @@ export function SessionOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Lock body scroll for the duration of the sitting — keeps the page behind the
+  // overlay from moving, and signals pull-to-refresh to stand down (see
+  // PullToRefresh's blocked() check) so a pull can't reload mid-sitting.
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [])
+
   const finish = (completed: boolean) => {
     if (done) return
     const actual = Math.min(elapsedRef.current, totalSec)

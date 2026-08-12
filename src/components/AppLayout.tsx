@@ -1,7 +1,9 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, Link } from 'react-router-dom'
 import { Waves, CalendarHeart, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
+import { PullToRefresh } from './PullToRefresh'
+import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 
 const tabs = [
@@ -15,6 +17,8 @@ export function AppLayout() {
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
       <WaterBackground />
       <ReminderScheduler />
+      <PullToRefresh />
+      <Toaster />
       <main className="flex-1 px-5 pb-28 pt-6">
         <Outlet />
         <footer className="mt-12 text-center text-xs leading-relaxed text-deep-400">
@@ -22,8 +26,11 @@ export function AppLayout() {
             Developed by <span className="text-deep-500">Tavaris Freeman</span> · Midnight Codex
           </p>
           <p className="mt-0.5">
-            © {new Date().getFullYear()} Quiet Waters · v{APP_VERSION} · All rights reserved{' '}
-            <sup className="text-[0.65em]">†</sup>
+            © {new Date().getFullYear()} Quiet Waters ·{' '}
+            <Link to="/updates" className="underline-offset-2 hover:text-deep-600 hover:underline">
+              v{APP_VERSION}
+            </Link>{' '}
+            · All rights reserved <sup className="text-[0.65em]">†</sup>
           </p>
         </footer>
       </main>

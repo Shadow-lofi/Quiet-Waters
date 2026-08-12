@@ -1,12 +1,16 @@
-// Quiet Waters offline service worker — runtime caching.
-// The app shell is precached on install; everything else (hashed JS/CSS, fonts)
-// is cached cache-first the first time it's fetched, so a repeat visit works
-// with no network. Bump CACHE to retire old assets on a new deploy.
-const CACHE = 'quiet-waters-v2'
+// Quiet Waters — offline service worker.
+//
+// CACHE carries a build id so each deploy gets its own cache; the id is stamped
+// in at build time by the stamp-sw plugin in vite.config.ts (it replaces the
+// 'quiet-waters-dev' literal below with a content hash). In dev the worker isn't
+// registered (see main.tsx / lib/swUpdate.ts), so the 'dev' default stays inert.
+const CACHE = 'quiet-waters-dev'
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg']
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting()
+  // Precache the shell, but DON'T skipWaiting: a fresh build waits so the app can
+  // surface a gentle "a new version is ready" prompt instead of swapping the
+  // running assets out mid-sitting. The page tells us to activate via a message.
   event.waitUntil(
     caches
       .open(CACHE)
@@ -15,11 +19,23 @@ self.addEventListener('install', (event) => {
   )
 })
 
+// The page posts this once the user accepts the update; then we take over and a
+// controllerchange on the client triggers a single reload onto the new assets.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
+})
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((k) => k.startsWith('quiet-waters-') && k !== CACHE)
+            .map((k) => caches.delete(k)),
+        ),
+      )
       .then(() => self.clients.claim()),
   )
 })
@@ -44,11 +60,16 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
 
-  // SPA navigations: network-first so a fresh deploy is picked up, falling back
-  // to the cached shell when offline.
+  // App navigations: serve the installed shell from THIS worker's OWN cache, so a
+  // reload keeps running the exact version the user is on. A newer build precaches
+  // its own shell but stays "waiting" — the app only swaps to it when the user
+  // accepts (Update now → SKIP_WAITING). The network is only a first-load fallback.
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req).catch(() => caches.match('/index.html').then((r) => r || caches.match('/'))),
+      caches.open(CACHE).then(async (cache) => {
+        const cached = (await cache.match('/index.html')) || (await cache.match('/'))
+        return cached || fetch(req)
+      }),
     )
     return
   }

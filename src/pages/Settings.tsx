@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Flame, VolumeX, Play, Square } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Flame, VolumeX, Play, Square, Share2, Sparkles, ChevronRight } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
@@ -9,6 +10,9 @@ import {
   notificationPermission,
   requestNotificationPermission,
 } from '../lib/reminders'
+import { shareApp } from '../lib/share'
+import { useToast } from '../lib/toast'
+import { APP_VERSION } from '../lib/version'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
@@ -102,9 +106,21 @@ export function Settings() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [previewing, setPreviewing] = useState(false)
   const [perm, setPerm] = useState(notificationPermission())
+  const pushToast = useToast((t) => t.push)
 
   // Always silence any preview when leaving Settings.
   useEffect(() => () => stopAmbient(), [])
+
+  const onShare = async () => {
+    const outcome = await shareApp()
+    if (outcome === 'copied') {
+      pushToast({
+        tone: 'success',
+        title: 'Link copied',
+        message: 'Share it with someone who needs a moment of stillness.',
+      })
+    }
+  }
 
   const toggleReminder = async (on: boolean) => {
     s.setPref('reminderOn', on)
@@ -369,6 +385,46 @@ export function Settings() {
             </button>
           )}
         </Row>
+      </section>
+
+      {/* about */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <p className="pt-3 text-xs uppercase tracking-[0.2em] text-deep-500">About</p>
+        <div className="divide-y divide-line">
+          <button
+            onClick={onShare}
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Share2 size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">Share Quiet Waters</span>
+                <span className="block text-xs text-deep-500">Invite someone to be still</span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </button>
+
+          <Link
+            to="/updates"
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Sparkles size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">What’s new</span>
+                <span className="block text-xs text-deep-500">
+                  Version {APP_VERSION} · see what changed
+                </span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </Link>
+        </div>
       </section>
     </div>
   )

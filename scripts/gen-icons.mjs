@@ -1,8 +1,10 @@
 // Rasterize the app icons from an inline SVG (drop + ripples on a water
-// gradient) into the PNGs the manifest and iOS need. Run: npm run gen:icons
+// gradient) into the PNGs the manifest and iOS need, plus the og-card.png share
+// preview from public/og-card.svg. Run: npm run gen:icons
 import sharp from 'sharp'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { readFileSync } from 'node:fs'
 
 const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
 
@@ -41,3 +43,8 @@ for (const job of jobs) {
     .toFile(resolve(publicDir, job.file))
   console.log(`✓ ${job.file} (${job.size}×${job.size})`)
 }
+
+// Social share card (1200×630) from the authored SVG.
+const ogSvg = readFileSync(resolve(publicDir, 'og-card.svg'))
+await sharp(ogSvg).resize(1200, 630).png().toFile(resolve(publicDir, 'og-card.png'))
+console.log('✓ og-card.png (1200×630)')

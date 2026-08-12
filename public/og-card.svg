@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Link-preview card for shared Quiet Waters links (og:image). Rendered to
+       og-card.png at 1200x630 by scripts/gen-icons.mjs. Night-water palette. -->
+  <defs>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#102630" />
+      <stop offset="1" stop-color="#0b171f" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="4%" r="72%">
+      <stop offset="0" stop-color="#2f8ba0" stop-opacity="0.34" />
+      <stop offset="0.62" stop-color="#2f8ba0" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ground)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+
+  <!-- soft frame -->
+  <rect x="26" y="26" width="1148" height="578" rx="30" fill="none" stroke="#2f6d7e" stroke-width="2.5" opacity="0.75" />
+  <rect x="38" y="38" width="1124" height="554" rx="22" fill="none" stroke="#294c58" stroke-width="1.5" opacity="0.7" />
+
+  <!-- water drop + ripples (from the app icon), centered near the top -->
+  <g transform="translate(600,158) scale(3.05) translate(-32,-30)">
+    <ellipse cx="32" cy="45" rx="19" ry="5.5" fill="none" stroke="#dff2f6" stroke-width="2.4" opacity="0.5" />
+    <ellipse cx="32" cy="45" rx="11" ry="3.8" fill="none" stroke="#ffffff" stroke-width="2.4" opacity="0.85" />
+    <path d="M32 11C32 11 43 24 43 32a11 11 0 1 1-22 0C21 24 32 11 32 11z" fill="#ffffff" />
+    <circle cx="27.5" cy="29" r="3" fill="#9bd6e1" opacity="0.7" />
+  </g>
+
+  <text x="600" y="360" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="104" fill="#eef4f7">Quiet Waters</text>
+
+  <line x1="530" y1="404" x2="670" y2="404" stroke="#46b0c3" stroke-width="2" />
+
+  <text x="600" y="470" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-style="italic" fill="#b6d3dc">Be still, and know that He is God.</text>
+
+  <text x="600" y="546" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="2" fill="#6f97a3">quiet-waters-meditation.vercel.app</text>
+</svg>
