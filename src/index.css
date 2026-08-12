@@ -178,6 +178,22 @@
   animation: qw-ripple 6s ease-out infinite;
 }
 
+/* Guided-session prompts fade in gently as they change. */
+@keyframes qw-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qw-fadein {
+  animation: qw-fadein 1s ease both;
+}
+
 /* Header entrance: a calm fade + rise on load. */
 @keyframes qw-rise {
   from {

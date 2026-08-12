@@ -10,6 +10,11 @@ export interface MeditationVerse {
   breathOut: string
 }
 
+/** Look up a verse by its reference (falls back to the first if not found). */
+export function verseByRef(ref: string): MeditationVerse {
+  return VERSES.find((v) => v.ref === ref) ?? VERSES[0]
+}
+
 export const VERSES: MeditationVerse[] = [
   {
     ref: 'Psalm 46:10',

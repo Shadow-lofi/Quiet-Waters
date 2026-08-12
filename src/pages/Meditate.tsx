@@ -1,19 +1,38 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { RefreshCw, Minus, Plus, Flame } from 'lucide-react'
+import {
+  RefreshCw,
+  Minus,
+  Plus,
+  Flame,
+  Feather,
+  Sunrise,
+  Wind,
+  Moon,
+  Hourglass,
+} from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { SessionOverlay } from '../components/SessionOverlay'
 import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
 import { computeStats } from '../lib/streak'
-import { VERSES } from '../data/verses'
+import { VERSES, verseByRef } from '../data/verses'
 import { DURATION_PRESETS } from '../data/presets'
+import { GUIDED_SESSIONS, type GuidedSession } from '../data/guided'
 
 function greeting(name: string): string {
   const h = new Date().getHours()
   const part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
   return name ? `${part}, ${name}` : part
+}
+
+const GUIDED_ICON: Record<GuidedSession['icon'], typeof Sunrise> = {
+  still: Feather,
+  sunrise: Sunrise,
+  breath: Wind,
+  rest: Moon,
+  wait: Hourglass,
 }
 
 export function Meditate() {
@@ -23,6 +42,7 @@ export function Meditate() {
 
   const [minutes, setMinutes] = useState(lastDurationMin)
   const [active, setActive] = useState(false)
+  const [guided, setGuided] = useState<GuidedSession | null>(null)
 
   const clamp = (n: number) => Math.max(1, Math.min(120, n))
 
@@ -30,6 +50,11 @@ export function Meditate() {
     primeAudio() // unlock audio within the user gesture
     setLastDuration(minutes)
     setActive(true)
+  }
+
+  const beginGuided = (session: GuidedSession) => {
+    primeAudio()
+    setGuided(session)
   }
 
   return (
@@ -121,11 +146,45 @@ export function Meditate() {
         Begin
       </button>
 
+      {/* guided sessions */}
+      <section>
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-deep-500">Guided sessions</p>
+        <div className="flex flex-col gap-3">
+          {GUIDED_SESSIONS.map((s) => {
+            const Icon = GUIDED_ICON[s.icon]
+            return (
+              <button
+                key={s.id}
+                onClick={() => beginGuided(s)}
+                className="flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                  <Icon size={20} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-deep-900">{s.title}</p>
+                  <p className="truncate text-sm text-deep-500">{s.subtitle}</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-mist-200 px-3 py-1 text-xs font-semibold text-deep-600">
+                  {s.durationMin} min
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
       {active && (
+        <SessionOverlay durationMin={minutes} verse={verse} onClose={() => setActive(false)} />
+      )}
+      {guided && (
         <SessionOverlay
-          durationMin={minutes}
-          verse={verse}
-          onClose={() => setActive(false)}
+          durationMin={guided.durationMin}
+          verse={verseByRef(guided.verseRef)}
+          paceOverride={guided.pace}
+          steps={guided.steps}
+          title={guided.title}
+          onClose={() => setGuided(null)}
         />
       )}
     </div>
