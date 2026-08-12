@@ -8,6 +8,17 @@ let ctx: AudioContext | null = null
 /** Lazily create the AudioContext and resume it. Must be called from a user
  *  gesture (e.g. the Begin button) or iOS/Safari will keep it suspended. */
 export function primeAudio(): void {
+  // On iOS, Web Audio defaults to an "ambient" audio session that the hardware
+  // mute switch silences — so chimes are audible through headphones but not the
+  // speaker when the phone is on silent. Declaring "playback" makes them ring
+  // through the speaker regardless of the mute switch (Safari 16.4+). Harmless
+  // no-op on browsers without the Audio Session API.
+  try {
+    const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession
+    if (session && session.type !== 'playback') session.type = 'playback'
+  } catch {
+    /* Audio Session API unavailable — ignore */
+  }
   try {
     if (!ctx) {
       const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext

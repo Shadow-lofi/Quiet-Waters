@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 12 (v1.4.4) ──────────────────────────────────
+  {
+    date: 'August 12, 2026',
+    tag: 'Fixed',
+    title: 'Chimes play when your phone is on silent',
+    detail:
+      'On iPhone, the opening, closing, and interval bells now sound through the speaker even with the mute switch on — not only through headphones.',
+  },
+
   // ── August 12 (v1.4.3) ──────────────────────────────────
   {
     date: 'August 12, 2026',
