@@ -17,10 +17,27 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 12 (v1.4.1) ──────────────────────────────────
+  {
+    date: 'August 12, 2026',
+    tag: 'New',
+    title: 'Add to your home screen',
+    detail:
+      'A short walkthrough shows how to install Quiet Waters to your home screen for a full-screen, offline, one-tap sitting. Find it in Settings.',
+    to: '/settings',
+  },
+  {
+    date: 'August 12, 2026',
+    tag: 'Improved',
+    title: 'A softer opening chime',
+    detail:
+      'The bell that opens a sitting now eases in more gently and warmly, so beginning feels a little more like settling than starting.',
+  },
+
   // ── August 12 (v1.4.0) ──────────────────────────────────
   {
     date: 'August 12, 2026',
@@ -29,13 +46,6 @@ export const CHANGELOG: ChangeEntry[] = [
     detail:
       'Invite someone to be still with a single tap — the link opens with a gentle preview card. Find it in Settings.',
     to: '/settings',
-  },
-  {
-    date: 'August 12, 2026',
-    tag: 'New',
-    title: 'Pull to refresh',
-    detail:
-      'A gentle pull from the top reloads the app when it’s installed to your phone.',
   },
   {
     date: 'August 12, 2026',

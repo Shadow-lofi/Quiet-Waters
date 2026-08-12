@@ -38,9 +38,33 @@ const BASE: Record<ChimeKind, number> = {
 }
 
 const DECAY: Record<ChimeKind, number> = {
-  open: 3.4,
+  open: 4.2,
   interval: 2.6,
   close: 5.0,
+}
+
+// Attack (seconds) — how quickly the tone swells in. A longer attack removes any
+// "ping" so the sound settles rather than starts. The opening bell is the
+// gentlest, easing in slowly.
+const ATTACK: Record<ChimeKind, number> = {
+  open: 0.16,
+  interval: 0.02,
+  close: 0.05,
+}
+
+// Low-pass cutoff (Hz) — lower is warmer/softer, higher is brighter/glassier.
+const TONE_HZ: Record<ChimeKind, number> = {
+  open: 1350,
+  interval: 2200,
+  close: 1800,
+}
+
+// How much of the upper harmonics (the fifth + octave shimmer) to keep. Less
+// shimmer = a purer, calmer tone; the opening chime is the most sine-like.
+const SHIMMER: Record<ChimeKind, number> = {
+  open: 0.45,
+  interval: 1,
+  close: 0.8,
 }
 
 /** Play one chime. Silent (and harmless) if audio couldn't start. */
@@ -51,21 +75,25 @@ export function playChime(kind: ChimeKind, volume = 0.5): void {
   const fundamental = BASE[kind]
   const decay = DECAY[kind]
 
-  // A shared gentle low-pass keeps the tone warm rather than glassy.
+  const attack = ATTACK[kind]
+  const shimmer = SHIMMER[kind]
+
+  // A gentle low-pass keeps the tone warm rather than glassy (warmer per kind).
   const master = ctx.createGain()
   master.gain.value = volume
   const tone = ctx.createBiquadFilter()
   tone.type = 'lowpass'
-  tone.frequency.value = 2200
+  tone.frequency.value = TONE_HZ[kind]
   tone.connect(master)
   master.connect(ctx.destination)
 
   // Fundamental + a fifth + an octave, each quieter and shorter than the last —
-  // the recipe for a soft, bell-like shimmer.
+  // the recipe for a soft, bell-like shimmer. The upper partials are scaled by
+  // `shimmer` so a gentler chime rings closer to a pure sine.
   const partials = [
     { ratio: 1, gain: 1.0, decay: decay },
-    { ratio: 1.5, gain: 0.4, decay: decay * 0.7 },
-    { ratio: 2.0, gain: 0.22, decay: decay * 0.5 },
+    { ratio: 1.5, gain: 0.4 * shimmer, decay: decay * 0.7 },
+    { ratio: 2.0, gain: 0.22 * shimmer, decay: decay * 0.5 },
   ]
 
   for (const p of partials) {
@@ -74,8 +102,8 @@ export function playChime(kind: ChimeKind, volume = 0.5): void {
     osc.frequency.value = fundamental * p.ratio
     const g = ctx.createGain()
     g.gain.setValueAtTime(0.0001, now)
-    g.gain.exponentialRampToValueAtTime(p.gain, now + 0.02) // fast, soft attack
-    g.gain.exponentialRampToValueAtTime(0.0001, now + p.decay) // long decay
+    g.gain.exponentialRampToValueAtTime(p.gain, now + attack) // soft, eased attack
+    g.gain.exponentialRampToValueAtTime(0.0001, now + p.decay) // long, smooth decay
     osc.connect(g)
     g.connect(tone)
     osc.start(now)
