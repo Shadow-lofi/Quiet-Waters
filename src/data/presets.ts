@@ -17,3 +17,14 @@ export const BREATH_PATTERNS: Record<'gentle' | 'calm' | 'deep', BreathPattern> 
   calm: { inhale: 4, hold: 4, exhale: 6, holdOut: 2, label: 'Calm · 4–4–6–2' },
   deep: { inhale: 5, hold: 5, exhale: 5, holdOut: 5, label: 'Deep · box 5' },
 }
+
+// A slower, hold-less rhythm just for the YHWH "Breath of God" prayer, so the
+// Name rests fully on one long, unhurried in-and-out breath. Used whenever the
+// name-breath visual is active, regardless of the chosen pace (see BreathCircle).
+export const NAME_BREATH_PATTERN: BreathPattern = {
+  inhale: 4.5,
+  hold: 0,
+  exhale: 7,
+  holdOut: 0,
+  label: 'The Name · 4.5–7',
+}

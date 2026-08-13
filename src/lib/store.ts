@@ -25,6 +25,7 @@ interface State {
   soundscape: Soundscape // ambient sound during a sitting ('off' = silence)
   ambientVolume: number // 0–1
   motion: MotionPref // whether the gentle animations run
+  breatheName: boolean // free timer: pray the Name (Yah/weh) instead of the verse
 
   // ── gentle reminder (local, no server) ──
   reminderOn: boolean
@@ -61,6 +62,7 @@ type Prefs = Pick<
   | 'soundscape'
   | 'ambientVolume'
   | 'motion'
+  | 'breatheName'
   | 'reminderOn'
   | 'reminderTime'
 >
@@ -83,6 +85,7 @@ export const useStore = create<State>()(
       soundscape: 'off',
       ambientVolume: 0.6,
       motion: 'on',
+      breatheName: false,
 
       reminderOn: false,
       reminderTime: '08:00',
@@ -104,7 +107,7 @@ export const useStore = create<State>()(
     }),
     {
       name: 'quiet-waters-v1',
-      version: 6,
+      version: 7,
       // Retired soundscapes fall back to off. Dropped over versions: wind, rain,
       // stream, waves, leaves, bowls, guitar — leaving just fire.
       migrate: (persisted) => {

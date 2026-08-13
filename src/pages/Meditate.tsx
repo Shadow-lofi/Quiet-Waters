@@ -18,7 +18,7 @@ import { SessionOverlay } from '../components/SessionOverlay'
 import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
 import { computeStats } from '../lib/streak'
-import { VERSES, verseByRef } from '../data/verses'
+import { VERSES, verseByRef, YAHWEH_BREATH } from '../data/verses'
 import { DURATION_PRESETS } from '../data/presets'
 import { GUIDED_SESSIONS, type GuidedSession } from '../data/guided'
 
@@ -37,7 +37,8 @@ const GUIDED_ICON: Record<GuidedSession['icon'], typeof Sunrise> = {
 }
 
 export function Meditate() {
-  const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions } = useStore()
+  const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions, breatheName, setPref } =
+    useStore()
   const verse = VERSES[verseCursor % VERSES.length]
   const streak = computeStats(sessions).currentStreak
 
@@ -97,6 +98,34 @@ export function Meditate() {
           “{verse.text}”
         </blockquote>
         <p className="mt-3 text-sm uppercase tracking-[0.18em] text-water-600">{verse.ref}</p>
+      </section>
+
+      {/* what to carry on the breath */}
+      <section>
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-deep-500">On the breath</p>
+        <div className="flex max-w-xs gap-1 rounded-full bg-mist-200 p-1">
+          <button
+            onClick={() => setPref('breatheName', false)}
+            className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              !breatheName ? 'bg-card text-water-600 shadow-sm' : 'text-deep-500 hover:text-deep-700'
+            }`}
+          >
+            Scripture
+          </button>
+          <button
+            onClick={() => setPref('breatheName', true)}
+            className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              breatheName ? 'bg-card text-water-600 shadow-sm' : 'text-deep-500 hover:text-deep-700'
+            }`}
+          >
+            The Name
+          </button>
+        </div>
+        {breatheName && (
+          <p className="mt-2 text-xs text-deep-500">
+            Breathe the name of God — Yah in, weh out.
+          </p>
+        )}
       </section>
 
       {/* duration */}
@@ -178,7 +207,12 @@ export function Meditate() {
       </section>
 
       {active && (
-        <SessionOverlay durationMin={minutes} verse={verse} onClose={() => setActive(false)} />
+        <SessionOverlay
+          durationMin={minutes}
+          verse={breatheName ? YAHWEH_BREATH : verse}
+          nameBreath={breatheName}
+          onClose={() => setActive(false)}
+        />
       )}
       {guided && (
         <SessionOverlay

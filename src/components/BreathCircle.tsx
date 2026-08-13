@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BREATH_PATTERNS } from '../data/presets'
+import { BREATH_PATTERNS, NAME_BREATH_PATTERN, type BreathPattern } from '../data/presets'
 import type { MeditationVerse } from '../data/verses'
 import type { BreathPace } from '../lib/types'
 
@@ -14,8 +14,7 @@ interface Phase {
   to: number
 }
 
-function buildPhases(pace: Exclude<BreathPace, 'off'>): Phase[] {
-  const p = BREATH_PATTERNS[pace]
+function buildPhases(p: BreathPattern): Phase[] {
   const phases: Phase[] = [{ name: 'in', label: 'Breathe in', dur: p.inhale, from: MIN_SCALE, to: MAX_SCALE }]
   if (p.hold) phases.push({ name: 'hold', label: 'Hold', dur: p.hold, from: MAX_SCALE, to: MAX_SCALE })
   phases.push({ name: 'out', label: 'Breathe out', dur: p.exhale, from: MAX_SCALE, to: MIN_SCALE })
@@ -65,7 +64,9 @@ export function BreathCircle({
       return
     }
 
-    const phases = buildPhases(pace)
+    // The Name prays at its own slower, hold-less rhythm; otherwise the chosen pace.
+    const pattern = nameBreath ? NAME_BREATH_PATTERN : BREATH_PATTERNS[pace]
+    const phases = buildPhases(pattern)
     const cycle = phases.reduce((sum, p) => sum + p.dur, 0)
     let raf = 0
     let start = performance.now()
@@ -118,7 +119,7 @@ export function BreathCircle({
 
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [pace, paused, reduced, verse])
+  }, [pace, paused, reduced, verse, nameBreath])
 
   return (
     <div className="relative flex aspect-square w-full max-w-xs items-center justify-center">

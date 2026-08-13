@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 13 (v1.7.0) ──────────────────────────────────
+  {
+    date: 'August 13, 2026',
+    tag: 'New',
+    title: 'Pray the Name on any sitting',
+    detail:
+      'Choose “The Name” under On the breath and your own free-timer sitting breathes Yah / weh — at its own slower, restful pace — with the Hebrew Name above the circle.',
+    to: '/meditate',
+  },
+
   // ── August 13 (v1.6.0) ──────────────────────────────────
   {
     date: 'August 13, 2026',
