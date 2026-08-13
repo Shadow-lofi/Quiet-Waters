@@ -2,7 +2,7 @@
   "name": "Quiet Waters · Christian Meditation",
   "short_name": "Quiet Waters",
   "description": "A Christian meditation timer — be still before God with Scripture and breath prayer.",
-  "start_url": "/",
+  "start_url": "/meditate",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

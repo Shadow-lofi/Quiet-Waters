@@ -8,6 +8,7 @@
       name="description"
       content="Quiet Waters — a Christian meditation timer. Be still before God with gentle chimes, Scripture to dwell on, and breath-prayer pacing."
     />
+    <link rel="canonical" href="https://quiet-waters-meditation.vercel.app/" />
     <meta name="theme-color" content="#0e1b24" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#eef4f7" media="(prefers-color-scheme: light)" />
 
@@ -31,6 +32,23 @@
       content="Be still and know that He is God. A quiet timer for Scripture meditation and breath prayer."
     />
     <meta name="twitter:image" content="https://quiet-waters-meditation.vercel.app/og-card.png" />
+
+    <!-- Structured data so search engines understand what Quiet Waters is. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Quiet Waters",
+        "url": "https://quiet-waters-meditation.vercel.app/",
+        "description": "A Christian meditation timer — be still before God with Scripture to dwell on, a gentle breathing guide, and soft chimes. Free, private, and works offline.",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Any (installable Progressive Web App)",
+        "browserRequirements": "Requires a modern web browser",
+        "isAccessibleForFree": true,
+        "inLanguage": "en",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
 
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

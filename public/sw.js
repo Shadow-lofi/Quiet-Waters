@@ -48,7 +48,7 @@ self.addEventListener('notificationclick', (event) => {
       for (const client of list) {
         if ('focus' in client) return client.focus()
       }
-      return self.clients.openWindow ? self.clients.openWindow('/') : undefined
+      return self.clients.openWindow ? self.clients.openWindow('/meditate') : undefined
     }),
   )
 })

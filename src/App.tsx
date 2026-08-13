@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
+import { Landing } from './pages/Landing'
 import { Meditate } from './pages/Meditate'
 import { Journey } from './pages/Journey'
 import { Settings } from './pages/Settings'
@@ -9,13 +10,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public landing / SEO front door (returning visitors auto-continue). */}
+        <Route path="/" element={<Landing />} />
+        {/* The app itself lives under the bottom-tab layout. */}
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Meditate />} />
+          <Route path="/meditate" element={<Meditate />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/updates" element={<Updates />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/meditate" replace />} />
       </Routes>
     </BrowserRouter>
   )

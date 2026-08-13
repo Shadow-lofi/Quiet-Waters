@@ -7,7 +7,7 @@ import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 
 const tabs = [
-  { to: '/', label: 'Meditate', Icon: Waves, end: true },
+  { to: '/meditate', label: 'Meditate', Icon: Waves, end: true },
   { to: '/journey', label: 'Journey', Icon: CalendarHeart, end: false },
   { to: '/settings', label: 'Settings', Icon: SettingsIcon, end: false },
 ]

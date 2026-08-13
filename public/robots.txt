@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://quiet-waters-meditation.vercel.app/sitemap.xml

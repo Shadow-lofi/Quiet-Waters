@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 12 (v1.5.0) ──────────────────────────────────
+  {
+    date: 'August 12, 2026',
+    tag: 'New',
+    title: 'A welcome page',
+    detail:
+      'A gentle introduction now greets first-time visitors at the front door. The app opens straight to your timer as always.',
+  },
+
   // ── August 12 (v1.4.4) ──────────────────────────────────
   {
     date: 'August 12, 2026',
@@ -108,7 +117,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Guided sittings',
     detail:
       'Five ready-made sessions — from a 3-minute “Be Still” to “Waiting on God” — each with quiet prompts that unfold as you sit.',
-    to: '/',
+    to: '/meditate',
   },
 
   // ── August 11 (v1.1.0) ──────────────────────────────────
@@ -142,6 +151,6 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Quiet Waters',
     detail:
       'A Christian meditation timer — soft chimes, Scripture to dwell on, a breathing guide, and a gentle streak. Be still, and know that He is God.',
-    to: '/',
+    to: '/meditate',
   },
 ]
