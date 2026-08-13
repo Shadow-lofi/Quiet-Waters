@@ -16,6 +16,7 @@ export function SessionOverlay({
   paceOverride,
   steps,
   title,
+  nameBreath,
 }: {
   durationMin: number
   verse: MeditationVerse
@@ -23,6 +24,7 @@ export function SessionOverlay({
   paceOverride?: BreathPace // guided sessions fix the breath pace
   steps?: GuidedStep[] // guided: timed prompts that replace the static verse
   title?: string // guided: shown in the top bar + logged as the session label
+  nameBreath?: boolean // guided: show the YHWH "name of God" breathing visual
 }) {
   const totalSec = Math.round(durationMin * 60)
   const {
@@ -175,7 +177,7 @@ export function SessionOverlay({
 
           {/* breathing guide */}
           <div className="flex flex-1 flex-col items-center justify-center gap-10">
-            <BreathCircle pace={pace} verse={verse} paused={paused} />
+            <BreathCircle pace={pace} verse={verse} paused={paused} nameBreath={nameBreath} />
 
             {steps && steps.length ? (
               <div className="flex min-h-[7rem] max-w-sm items-center justify-center px-2">

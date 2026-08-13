@@ -15,6 +15,7 @@ export interface GuidedSession {
   verseRef: string // must match a ref in VERSES (drives the breath-prayer words)
   pace: BreathPace
   steps: GuidedStep[]
+  nameBreath?: boolean // show the YHWH "name of God" breathing visual
 }
 
 // Ready-made sittings that bundle a length, a Scripture, a breath pace, and a
@@ -70,6 +71,25 @@ export const GUIDED_SESSIONS: GuidedSession[] = [
       { at: 240, text: 'Let the words grow slower than your thoughts.' },
       { at: 360, text: 'If you lose the line, simply begin again. Grace is patient.' },
       { at: 440, text: 'Rest here a little longer.' },
+    ],
+  },
+  {
+    id: 'breath-of-god',
+    title: 'The Breath of God',
+    subtitle: 'Pray the Name on your breath',
+    icon: 'breath',
+    durationMin: 6,
+    verseRef: 'The Breath of God',
+    pace: 'gentle',
+    nameBreath: true,
+    steps: [
+      { at: 0, text: 'Settle in, and let your breath find its own slow rhythm.' },
+      { at: 25, text: 'The name of God — YHWH — is the sound of a breath.' },
+      { at: 55, text: 'Breathe it in: Yah. Breathe it out: weh.' },
+      { at: 95, text: 'Without a single word, you are speaking His name.' },
+      { at: 160, text: 'Your first breath and your last both carry it — and so does this one.' },
+      { at: 240, text: 'When your mind wanders, return to the breath. He is nearer than it.' },
+      { at: 320, text: 'Rest here. Simply be, and breathe His name.' },
     ],
   },
   {

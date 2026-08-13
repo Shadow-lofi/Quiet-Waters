@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 13 (v1.6.0) ──────────────────────────────────
+  {
+    date: 'August 13, 2026',
+    tag: 'New',
+    title: 'The Breath of God',
+    detail:
+      'A new guided sitting that prays the name of God on the breath — in: Yah, out: weh — with the Hebrew Name gently breathing above the circle. Find it under Guided sessions.',
+    to: '/meditate',
+  },
+
   // ── August 12 (v1.5.0) ──────────────────────────────────
   {
     date: 'August 12, 2026',

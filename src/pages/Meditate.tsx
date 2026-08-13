@@ -187,6 +187,7 @@ export function Meditate() {
           paceOverride={guided.pace}
           steps={guided.steps}
           title={guided.title}
+          nameBreath={guided.nameBreath}
           onClose={() => setGuided(null)}
         />
       )}

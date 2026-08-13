@@ -10,8 +10,20 @@ export interface MeditationVerse {
   breathOut: string
 }
 
+// The YHWH breath prayer — not a Scripture in the rotation, but a contemplative
+// practice: the name of God breathed. Inhale "Yah" (יה), exhale "weh" (וה). Kept
+// out of VERSES so it never appears as a "dwell on this" verse; the guided
+// sitting "The Breath of God" resolves it via verseByRef.
+export const YAHWEH_BREATH: MeditationVerse = {
+  ref: 'The Breath of God',
+  text: 'Let everything that has breath praise the LORD.',
+  breathIn: 'Yah',
+  breathOut: 'weh',
+}
+
 /** Look up a verse by its reference (falls back to the first if not found). */
 export function verseByRef(ref: string): MeditationVerse {
+  if (ref === YAHWEH_BREATH.ref) return YAHWEH_BREATH
   return VERSES.find((v) => v.ref === ref) ?? VERSES[0]
 }
 

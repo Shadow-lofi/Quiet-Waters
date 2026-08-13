@@ -26,18 +26,26 @@ function buildPhases(pace: Exclude<BreathPace, 'off'>): Phase[] {
 // Ease-in-out so the disc swells and settles like a real breath.
 const ease = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * t)
 
+// The two halves of the Name (right-to-left): יה = "Yah" (in-breath), וה = "weh"
+// (out-breath). Rendered in an rtl container so they read together as יהוה.
+const GLOW = '0 0 22px color-mix(in oklab, var(--color-water-400) 85%, transparent)'
+
 export function BreathCircle({
   pace,
   verse,
   paused,
+  nameBreath = false,
 }: {
   pace: BreathPace
   verse: MeditationVerse
   paused: boolean
+  nameBreath?: boolean
 }) {
   const discRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLSpanElement>(null)
   const [label, setLabel] = useState('')
   const [word, setWord] = useState('')
+  const [inhaling, setInhaling] = useState(true)
 
   // Resolved by the no-flash script + ThemeProvider from the OS setting AND the
   // in-app Animations pref, so 'on' brings the breathing motion back too.
@@ -46,11 +54,14 @@ export function BreathCircle({
 
   useEffect(() => {
     // Still mode (pace off, or reduced motion): a calm, unmoving disc with the
-    // verse's inhale phrase as a single anchor word.
+    // verse's inhale phrase as a single anchor word. The Name (if shown) rests
+    // fully lit rather than breathing.
     if (pace === 'off' || reduced) {
       if (discRef.current) discRef.current.style.transform = 'scale(0.82)'
+      if (glowRef.current) glowRef.current.style.opacity = '0.55'
       setLabel(pace === 'off' ? '' : 'Be still')
       setWord(verse.breathIn)
+      setInhaling(true)
       return
     }
 
@@ -89,11 +100,18 @@ export function BreathCircle({
 
       const scale = cur.from + (cur.to - cur.from) * ease(within)
       if (discRef.current) discRef.current.style.transform = `scale(${scale.toFixed(3)})`
+      // The Name's glow swells and softens with the breath.
+      if (glowRef.current) {
+        const norm = (scale - MIN_SCALE) / (MAX_SCALE - MIN_SCALE)
+        glowRef.current.style.opacity = (0.3 + 0.6 * norm).toFixed(3)
+      }
 
       if (cur.name !== lastName) {
         lastName = cur.name
+        const inh = cur.name === 'in' || cur.name === 'hold'
         setLabel(cur.label)
-        setWord(cur.name === 'in' || cur.name === 'hold' ? verse.breathIn : verse.breathOut)
+        setInhaling(inh)
+        setWord(inh ? verse.breathIn : verse.breathOut)
       }
       raf = requestAnimationFrame(tick)
     }
@@ -104,6 +122,52 @@ export function BreathCircle({
 
   return (
     <div className="relative flex aspect-square w-full max-w-xs items-center justify-center">
+      {/* The Name, breathed — a crown of light above the disc. Halves cross-fade:
+          יה ("Yah") on the in-breath, וה ("weh") on the out-breath. */}
+      {nameBreath && (
+        <div
+          dir="rtl"
+          aria-label="YHWH"
+          className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 select-none font-serif text-4xl leading-none tracking-wide"
+        >
+          <span
+            className="transition-opacity duration-700"
+            style={{
+              color: 'var(--color-water-500)',
+              opacity: inhaling ? 1 : 0.35,
+              textShadow: inhaling ? GLOW : 'none',
+            }}
+          >
+            יה
+          </span>
+          <span
+            className="transition-opacity duration-700"
+            style={{
+              color: 'var(--color-water-500)',
+              opacity: inhaling ? 0.35 : 1,
+              textShadow: inhaling ? 'none' : GLOW,
+            }}
+          >
+            וה
+          </span>
+        </div>
+      )}
+
+      {/* Name-mode glow behind the disc that breathes with the scale. */}
+      {nameBreath && !reduced && (
+        <span
+          ref={glowRef}
+          aria-hidden
+          className="absolute h-64 w-64 rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle, color-mix(in oklab, var(--color-water-400) 45%, transparent), transparent 70%)',
+            filter: 'blur(22px)',
+            opacity: 0.4,
+          }}
+        />
+      )}
+
       {/* ambient ripples */}
       {!reduced &&
         [0, 2, 4].map((delay) => (
