@@ -34,7 +34,8 @@ interface State {
   reminderNotifiedDay: string // dayKey a device notification last fired
 
   // ── install invite (browser only) ──
-  installPromptDismissed: boolean // hides the "add to home screen" banner for good
+  installPromptDismissed: boolean // user tapped X — hide the banner for good
+  installCompleted: boolean // the app was actually installed — stop prompting
 
   // ── setup memory ──
   lastDurationMin: number
@@ -51,6 +52,7 @@ interface State {
   dismissReminderToday: () => void
   markReminderNotified: () => void
   dismissInstallPrompt: () => void
+  markInstalled: () => void
 }
 
 // The preference keys that setPref can write.
@@ -97,6 +99,7 @@ export const useStore = create<State>()(
       reminderNotifiedDay: '',
 
       installPromptDismissed: false,
+      installCompleted: false,
 
       lastDurationMin: 10,
       verseCursor: 0,
@@ -111,6 +114,7 @@ export const useStore = create<State>()(
       dismissReminderToday: () => set({ reminderDismissedDay: dayKey() }),
       markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
+      markInstalled: () => set({ installCompleted: true }),
     }),
     {
       name: 'quiet-waters-v1',

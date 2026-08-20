@@ -13,12 +13,15 @@ import { useStore } from '../lib/store'
  */
 export function InstallBanner() {
   const dismissed = useStore((s) => s.installPromptDismissed)
+  const completed = useStore((s) => s.installCompleted)
   const dismiss = useStore((s) => s.dismissInstallPrompt)
   // Standalone status doesn't change within a session, so read it just once.
   const [installed] = useState(isStandalone)
   const [showGuide, setShowGuide] = useState(false)
 
-  if (installed || dismissed) return null
+  // Retire the invite once the app is installed — whether it's already running
+  // standalone, the browser reported the install, or the user waved it off.
+  if (installed || completed || dismissed) return null
 
   return (
     <>
