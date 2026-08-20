@@ -33,6 +33,9 @@ interface State {
   reminderDismissedDay: string // dayKey the in-app banner was last dismissed
   reminderNotifiedDay: string // dayKey a device notification last fired
 
+  // ── install invite (browser only) ──
+  installPromptDismissed: boolean // hides the "add to home screen" banner for good
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -47,6 +50,7 @@ interface State {
   nextVerse: (total: number) => void
   dismissReminderToday: () => void
   markReminderNotified: () => void
+  dismissInstallPrompt: () => void
 }
 
 // The preference keys that setPref can write.
@@ -92,6 +96,8 @@ export const useStore = create<State>()(
       reminderDismissedDay: '',
       reminderNotifiedDay: '',
 
+      installPromptDismissed: false,
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -104,6 +110,7 @@ export const useStore = create<State>()(
       nextVerse: (total) => set((st) => ({ verseCursor: (st.verseCursor + 1) % Math.max(1, total) })),
       dismissReminderToday: () => set({ reminderDismissedDay: dayKey() }),
       markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
+      dismissInstallPrompt: () => set({ installPromptDismissed: true }),
     }),
     {
       name: 'quiet-waters-v1',
