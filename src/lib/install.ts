@@ -2,6 +2,8 @@
 // which we capture so we can offer a real in-app Install button; iOS Safari has
 // no such API, so there we show manual steps instead. All detection is
 // best-effort and the app is fully usable without ever installing.
+import { useStore } from './store'
+import { useToast } from './toast'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -16,8 +18,21 @@ if (typeof window !== 'undefined') {
     e.preventDefault()
     deferred = e as BeforeInstallPromptEvent
   })
+  // Fires once the app is actually installed (Android/desktop Chromium),
+  // however the user got there — our button or the browser's own menu. We
+  // record it so the invitation never shows again, and offer a soft "you're
+  // set" note. (iOS Safari has no such event; there the banner simply retires
+  // once the app is next opened from the home screen, i.e. in standalone mode.)
   window.addEventListener('appinstalled', () => {
     deferred = null
+    const { installCompleted, markInstalled } = useStore.getState()
+    if (installCompleted) return
+    markInstalled()
+    useToast.getState().push({
+      tone: 'success',
+      title: 'Quiet Waters is on your home screen',
+      message: 'Open it anytime for a full-screen, offline sitting.',
+    })
   })
 }
 
