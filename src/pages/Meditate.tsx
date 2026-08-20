@@ -15,6 +15,7 @@ import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { ReminderBanner } from '../components/ReminderBanner'
 import { InstallBanner } from '../components/InstallBanner'
+import { NotificationsBell } from '../components/NotificationsBell'
 import { SessionOverlay } from '../components/SessionOverlay'
 import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
@@ -61,8 +62,10 @@ export function Meditate() {
   }
 
   return (
-    <div className="flex flex-col gap-7">
+    <div className="relative flex flex-col gap-7">
       <Onboarding />
+
+      <NotificationsBell className="absolute right-0 top-0 z-10" />
 
       {/* header — centered hero */}
       <header className="qw-enter flex flex-col items-center gap-2 pt-2 text-center">
