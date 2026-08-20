@@ -5,6 +5,7 @@ import { Meditate } from './pages/Meditate'
 import { Journey } from './pages/Journey'
 import { Settings } from './pages/Settings'
 import { Updates } from './pages/Updates'
+import { Notifications } from './pages/Notifications'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/journey" element={<Journey />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/updates" element={<Updates />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
         <Route path="*" element={<Navigate to="/meditate" replace />} />
       </Routes>

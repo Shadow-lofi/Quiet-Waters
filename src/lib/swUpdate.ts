@@ -13,8 +13,10 @@ import { useToast } from './toast'
 interface AppUpdateState {
   ready: boolean // a newer build is installed and waiting to activate
   checking: boolean // a manual "check for updates" is in flight
+  dismissed: boolean // the in-app notification was waved off (this session)
   apply: () => void // activate the waiting worker and reload
   check: () => Promise<void> // ask the browser to look for a newer build
+  dismiss: () => void // hide the update from the notifications inbox
 }
 
 let registration: ServiceWorkerRegistration | null = null
@@ -25,6 +27,8 @@ let prompted = false
 export const useAppUpdate = create<AppUpdateState>((set, get) => ({
   ready: false,
   checking: false,
+  dismissed: false,
+  dismiss: () => set({ dismissed: true }),
   apply: () => {
     if (!waitingWorker) {
       window.location.reload()
@@ -63,7 +67,8 @@ export const useAppUpdate = create<AppUpdateState>((set, get) => ({
 
 function markReady(worker: ServiceWorker) {
   waitingWorker = worker
-  useAppUpdate.setState({ ready: true, checking: false })
+  // A freshly-installed build re-surfaces even if a prior one was waved off.
+  useAppUpdate.setState({ ready: true, checking: false, dismissed: false })
 }
 
 // Take the user to the Updates page (client-side, no reload) so they can see
