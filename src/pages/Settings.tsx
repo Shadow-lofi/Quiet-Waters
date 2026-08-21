@@ -11,7 +11,14 @@ import {
   requestNotificationPermission,
 } from '../lib/reminders'
 import { shareApp } from '../lib/share'
-import { isStandalone } from '../lib/install'
+import { isStandalone, detectPlatform } from '../lib/install'
+import {
+  PUSH_CONFIGURED,
+  isPushSupported,
+  currentSubscription,
+  enablePush,
+  disablePush,
+} from '../lib/push'
 import { InstallGuide } from '../components/InstallGuide'
 import { useToast } from '../lib/toast'
 import { APP_VERSION } from '../lib/version'
@@ -112,8 +119,52 @@ export function Settings() {
   const [installable] = useState(() => !isStandalone())
   const pushToast = useToast((t) => t.push)
 
+  // Web-push opt-in (broadcasts: new features + the daily verse). Only meaningful
+  // in the built app, where the service worker is registered.
+  const showPush = PUSH_CONFIGURED && import.meta.env.PROD
+  const [pushSupported] = useState(() => isPushSupported())
+  const [pushOn, setPushOn] = useState(false)
+  const [pushBusy, setPushBusy] = useState(false)
+  const iosNeedsInstall = detectPlatform() === 'ios' && !isStandalone()
+
+  // Reflect any existing subscription on this device.
+  useEffect(() => {
+    if (showPush && pushSupported) void currentSubscription().then((sub) => setPushOn(Boolean(sub)))
+  }, [showPush, pushSupported])
+
   // Always silence any preview when leaving Settings.
   useEffect(() => () => stopAmbient(), [])
+
+  const togglePush = async (on: boolean) => {
+    if (pushBusy) return
+    setPushBusy(true)
+    try {
+      if (on) {
+        const result = await enablePush()
+        if (result === 'subscribed') {
+          setPushOn(true)
+          pushToast({
+            tone: 'success',
+            title: 'Notifications on',
+            message: 'You’ll get gentle announcements and the daily verse.',
+          })
+        } else if (result === 'denied') {
+          pushToast({
+            title: 'Notifications are blocked',
+            message: 'Allow them for Quiet Waters in your browser settings to turn this on.',
+          })
+        } else {
+          pushToast({ title: 'Couldn’t enable notifications', message: 'Please try again in a moment.' })
+        }
+      } else {
+        await disablePush()
+        setPushOn(false)
+        pushToast({ title: 'Notifications off' })
+      }
+    } finally {
+      setPushBusy(false)
+    }
+  }
 
   const onShare = async () => {
     const outcome = await shareApp()
@@ -242,6 +293,49 @@ export function Settings() {
           )}
         </div>
       </section>
+
+      {/* push notifications — broadcasts to the phone even when the app is closed */}
+      {showPush && (
+        <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+          <p className="pt-3 text-xs uppercase tracking-[0.2em] text-deep-500">Notifications</p>
+          <div className="divide-y divide-line">
+            {pushSupported ? (
+              <Row
+                label="On this device"
+                hint={
+                  pushOn
+                    ? 'Gentle announcements and the daily verse'
+                    : 'New features and a daily verse, sent to your phone'
+                }
+              >
+                <Toggle checked={pushOn} disabled={pushBusy} onChange={togglePush} />
+              </Row>
+            ) : iosNeedsInstall ? (
+              <button
+                onClick={() => setShowInstall(true)}
+                className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                    <Smartphone size={18} />
+                  </span>
+                  <span>
+                    <span className="block text-deep-800">Notifications</span>
+                    <span className="block text-xs text-deep-500">
+                      Add to Home Screen to enable them on iPhone
+                    </span>
+                  </span>
+                </span>
+                <ChevronRight size={17} className="shrink-0 text-deep-300" />
+              </button>
+            ) : (
+              <Row label="Notifications" hint="This browser doesn’t support them">
+                <span className="text-xs text-deep-400">Unavailable</span>
+              </Row>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* sound */}
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
