@@ -5,7 +5,7 @@
 // 'quiet-waters-dev' literal below with a content hash). In dev the worker isn't
 // registered (see main.tsx / lib/swUpdate.ts), so the 'dev' default stays inert.
 const CACHE = 'quiet-waters-dev'
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg']
+const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg', '/announcements.json']
 
 self.addEventListener('install', (event) => {
   // Precache the shell, but DON'T skipWaiting: a fresh build waits so the app can
@@ -86,6 +86,23 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
+
+  // Announcements feed: network-first so a fresh post is seen promptly, falling
+  // back to the last cached copy (or the precached one) when offline.
+  if (url.pathname === '/announcements.json') {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone()
+            caches.open(CACHE).then((c) => c.put('/announcements.json', copy))
+          }
+          return res
+        })
+        .catch(() => caches.match('/announcements.json')),
+    )
+    return
+  }
 
   // App navigations: serve the installed shell from THIS worker's OWN cache, so a
   // reload keeps running the exact version the user is on. A newer build precaches

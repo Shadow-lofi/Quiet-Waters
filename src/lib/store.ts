@@ -37,6 +37,11 @@ interface State {
   installPromptDismissed: boolean // user tapped X — hide the banner for good
   installCompleted: boolean // the app was actually installed — stop prompting
 
+  // ── notifications inbox ──
+  // Ids the user has checked off: announcement feed ids, and 'onthisday-<dayKey>'
+  // for the local "on this day" card. Kept bounded.
+  dismissedNotices: string[]
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -53,6 +58,7 @@ interface State {
   markReminderNotified: () => void
   dismissInstallPrompt: () => void
   markInstalled: () => void
+  dismissNotice: (id: string) => void
 }
 
 // The preference keys that setPref can write.
@@ -101,6 +107,8 @@ export const useStore = create<State>()(
       installPromptDismissed: false,
       installCompleted: false,
 
+      dismissedNotices: [],
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -115,6 +123,12 @@ export const useStore = create<State>()(
       markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       markInstalled: () => set({ installCompleted: true }),
+      dismissNotice: (id) =>
+        set((st) =>
+          st.dismissedNotices.includes(id)
+            ? st
+            : { dismissedNotices: [...st.dismissedNotices, id].slice(-200) },
+        ),
     }),
     {
       name: 'quiet-waters-v1',

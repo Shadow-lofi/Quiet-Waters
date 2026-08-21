@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Waves, Download, RefreshCw } from 'lucide-react'
+import { Waves, Download, RefreshCw, Sparkles, History } from 'lucide-react'
 import { useStore } from './store'
 import { useAppUpdate } from './swUpdate'
+import { useAnnouncements } from './announcements'
 import { isStandalone } from './install'
-import { dayKey } from './date'
+import { dayKey, formatMinutes } from './date'
 import { hasSatToday, isPastReminderTime, todaysNudge } from './reminders'
 
-// The notifications inbox is a *derived* view — the app keeps no server and no
-// stored message list. Each item is computed from the same local state that
-// drives the home-screen banners, and its `dismiss` reuses the very same flag,
-// so marking something "done" in the inbox and dismissing its banner are one
-// and the same. When nothing is active, the inbox shows the "all caught up"
-// rest state (see components/AllCaughtUp).
+// The notifications inbox is a *derived* view — assembled each render from local
+// state and a lightweight announcements feed, never a stored message list. Each
+// item's `dismiss` writes through to the flag that governs it, so checking
+// something off here and dismissing its banner are one and the same. When
+// nothing is active, the inbox shows the "all caught up" rest state.
 
 type IconComponent = typeof Waves
 
@@ -29,16 +29,35 @@ export interface AppNotification {
   dismiss: () => void
 }
 
+/** A past sitting on today's month/day in an earlier year, if there is one. */
+function onThisDay(
+  sessions: { endedAt: string; actualSec: number }[],
+  now: Date,
+): { yearsAgo: number; count: number; longestSec: number } | null {
+  const m = now.getMonth()
+  const d = now.getDate()
+  const y = now.getFullYear()
+  const prior = sessions.filter((s) => {
+    const dt = new Date(s.endedAt)
+    return dt.getMonth() === m && dt.getDate() === d && dt.getFullYear() < y
+  })
+  if (prior.length === 0) return null
+  const mostRecentYear = Math.max(...prior.map((s) => new Date(s.endedAt).getFullYear()))
+  const longestSec = Math.max(...prior.map((s) => s.actualSec))
+  return { yearsAgo: y - mostRecentYear, count: prior.length, longestSec }
+}
+
 /**
- * The live list of things asking for the user's attention, newest-intent first:
- * the daily stillness reminder (once its time has passed and today's sitting is
- * still undone), the invitation to install, and a waiting app update. Re-renders
- * on the minute so the reminder appears right when it's due.
+ * The live list of things asking for the user's attention: the daily stillness
+ * reminder (once due), fresh announcements, an "on this day" remembrance, the
+ * invitation to install, and a waiting app update. Re-renders on the minute so
+ * the reminder surfaces right when it's due, and loads the announcements feed
+ * once on mount.
  */
 export function useNotifications(): AppNotification[] {
-  // Tick each minute so a time-gated reminder surfaces even on an idle screen.
   const [, tick] = useState(0)
   useEffect(() => {
+    void useAnnouncements.getState().load()
     const id = setInterval(() => tick((t) => t + 1), 60_000)
     return () => clearInterval(id)
   }, [])
@@ -49,8 +68,10 @@ export function useNotifications(): AppNotification[] {
   const reminderDismissedDay = useStore((s) => s.reminderDismissedDay)
   const installDismissed = useStore((s) => s.installPromptDismissed)
   const installCompleted = useStore((s) => s.installCompleted)
+  const dismissedNotices = useStore((s) => s.dismissedNotices)
   const updateReady = useAppUpdate((s) => s.ready)
   const updateDismissed = useAppUpdate((s) => s.dismissed)
+  const announcements = useAnnouncements((s) => s.items)
 
   const list: AppNotification[] = []
 
@@ -69,6 +90,37 @@ export function useNotifications(): AppNotification[] {
       to: '/meditate',
       dismiss: () => useStore.getState().dismissReminderToday(),
     })
+  }
+
+  // Announcements (server-authored feed), newest first, minus dismissed ones.
+  for (const a of announcements) {
+    const id = `announce-${a.id}`
+    if (dismissedNotices.includes(id)) continue
+    list.push({
+      id,
+      Icon: Sparkles,
+      title: a.title,
+      body: a.body,
+      to: a.url || '/updates',
+      dismiss: () => useStore.getState().dismissNotice(id),
+    })
+  }
+
+  // "On this day" — a gentle remembrance drawn purely from local history.
+  const otd = onThisDay(sessions, new Date())
+  if (otd) {
+    const id = `onthisday-${dayKey()}`
+    if (!dismissedNotices.includes(id)) {
+      const when = otd.yearsAgo === 1 ? 'A year ago today' : `${otd.yearsAgo} years ago today`
+      list.push({
+        id,
+        Icon: History,
+        title: 'On this day',
+        body: `${when} you paused here — ${formatMinutes(otd.longestSec)} of stillness. Return to the water.`,
+        to: '/journey',
+        dismiss: () => useStore.getState().dismissNotice(id),
+      })
+    }
   }
 
   if (!isStandalone() && !installCompleted && !installDismissed) {
