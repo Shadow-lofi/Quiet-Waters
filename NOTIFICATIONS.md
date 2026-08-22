@@ -27,26 +27,22 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | "New version ready" | inbox | Detected client-side by the service worker |
 | **New feature / version announcement** | push | Manual broadcast via `scripts/broadcast.mjs` |
 | **Daily verse / prayer of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-verse`) |
+| **Announcements feed → inbox** | both | `public/announcements.json` → inbox cards; network-first SW; the enabler |
+| **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
 
 ---
 
 ## Next up (low infra, high value)
 
-1. **Announcements feed → inbox** 🟡 `both`
-   A small hosted `announcements.json` the app fetches to populate the inbox with
-   server-authored items (so pushed broadcasts *also* land in the inbox, and we
-   can announce things without a push every time). This is the key enabler for
-   several items below.
-2. **New guided-session / series announcement** 🟢 `both`
-   "An *Evening Rest* sitting has arrived." Broadcast + (with #1) an inbox card.
-3. **Seasonal / liturgical invitations** 🟡 `both`
-   Advent, Lent, Holy Week, Pentecost. Date-triggered broadcast (cron or manual).
-4. **"On this day"** 🟢 `inbox`
-   A gentle anniversary of a past sitting — computed purely from local session
-   history, zero backend.
-5. **Weekly reflection** 🟡 `inbox` (optional push)
+1. **New guided-session / series announcement** 🟢 `both`
+   "An *Evening Rest* sitting has arrived." Now that the feed is shipped, this is
+   just a `public/announcements.json` entry (+ an optional push to ping phones).
+2. **Seasonal / liturgical invitations** 🟡 `both`
+   Advent, Lent, Holy Week, Pentecost. Date-triggered broadcast (cron or manual);
+   can also drop into the announcements feed.
+3. **Weekly reflection** 🟡 `inbox` (optional push)
    Sunday recap: "This week — 5 sittings, 62 min. Rest well." From local data.
-6. **Milestone blessing** 🟢 `inbox` (optional push)
+4. **Milestone blessing** 🟢 `inbox` (optional push)
    "40 days of stillness. Well done." Celebration, not a badge economy.
 
 ---
