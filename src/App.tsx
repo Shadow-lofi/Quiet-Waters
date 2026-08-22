@@ -6,6 +6,7 @@ import { Journey } from './pages/Journey'
 import { Settings } from './pages/Settings'
 import { Updates } from './pages/Updates'
 import { Notifications } from './pages/Notifications'
+import { Study } from './pages/Study'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/meditate" element={<Meditate />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/study" element={<Study />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/notifications" element={<Notifications />} />
