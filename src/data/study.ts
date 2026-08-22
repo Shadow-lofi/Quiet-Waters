@@ -76,7 +76,7 @@ export const STUDY_MATERIAL: StudyPiece[] = [
       },
       {
         text:
-          'I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the ' +
+          'I believe in the Holy Spirit, the holy Christian Church, the communion of saints, the ' +
           'forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
       },
     ],
