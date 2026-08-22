@@ -5,7 +5,7 @@
 
 export interface StudyItem {
   text: string
-  ref: string
+  ref?: string // per-line reference (numbered pieces); omitted for flowing prayers
 }
 
 export interface StudyPiece {
@@ -13,6 +13,9 @@ export interface StudyPiece {
   title: string
   reference: string
   intro?: string
+  // 'numbered' → an ordered list with a circle + per-line ref (default);
+  // 'lines' → flowing serif lines, read as one prayer.
+  layout?: 'numbered' | 'lines'
   items: StudyItem[]
 }
 
@@ -40,6 +43,21 @@ export const STUDY_MATERIAL: StudyPiece[] = [
         text: 'You shall not covet anything that belongs to your neighbor.',
         ref: 'Exodus 20:17',
       },
+    ],
+  },
+  {
+    id: 'lords-prayer',
+    title: "The Lord's Prayer",
+    reference: 'Matthew 6:9–13',
+    intro: '“Pray like this:”',
+    layout: 'lines',
+    items: [
+      { text: 'Our Father in heaven, may your name be kept holy.' },
+      { text: 'Let your Kingdom come. Let your will be done, as in heaven, so on earth.' },
+      { text: 'Give us today our daily bread.' },
+      { text: 'Forgive us our debts, as we also forgive our debtors.' },
+      { text: 'Bring us not into temptation, but deliver us from the evil one.' },
+      { text: 'For yours is the Kingdom, the power, and the glory forever. Amen.' },
     ],
   },
 ]

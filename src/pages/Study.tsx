@@ -35,21 +35,33 @@ function StudyCard({ piece }: { piece: StudyPiece }) {
           </blockquote>
         )}
 
-        <ol className="flex flex-col gap-5">
-          {piece.items.map((item, i) => (
-            <li key={i} className="flex items-start gap-4">
-              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-mist-200 text-sm font-semibold text-water-600">
-                {i + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-serif text-lg leading-snug text-deep-900">{item.text}</p>
-                <p className="mt-1 text-[0.7rem] uppercase tracking-[0.15em] text-deep-400">
-                  {item.ref}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        {piece.layout === 'lines' ? (
+          <div className="flex flex-col gap-4">
+            {piece.items.map((item, i) => (
+              <p key={i} className="font-serif text-xl leading-relaxed text-deep-900">
+                {item.text}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <ol className="flex flex-col gap-5">
+            {piece.items.map((item, i) => (
+              <li key={i} className="flex items-start gap-4">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-mist-200 text-sm font-semibold text-water-600">
+                  {i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-serif text-lg leading-snug text-deep-900">{item.text}</p>
+                  {item.ref && (
+                    <p className="mt-1 text-[0.7rem] uppercase tracking-[0.15em] text-deep-400">
+                      {item.ref}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
     </section>
   )
