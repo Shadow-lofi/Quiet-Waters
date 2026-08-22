@@ -60,4 +60,25 @@ export const STUDY_MATERIAL: StudyPiece[] = [
       { text: 'For yours is the Kingdom, the power, and the glory forever. Amen.' },
     ],
   },
+  {
+    id: 'apostles-creed',
+    title: "The Apostles' Creed",
+    reference: 'An ancient confession of faith',
+    layout: 'lines',
+    items: [
+      { text: 'I believe in God, the Father almighty, creator of heaven and earth.' },
+      {
+        text:
+          'I believe in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, ' +
+          'born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried; ' +
+          'he descended to the dead. On the third day he rose again; he ascended into heaven, is seated ' +
+          'at the right hand of the Father, and will come again to judge the living and the dead.',
+      },
+      {
+        text:
+          'I believe in the Holy Spirit, the holy Christian Church, the communion of saints, the ' +
+          'forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
+      },
+    ],
+  },
 ]
