@@ -29,6 +29,10 @@ function StudyCard({ piece }: { piece: StudyPiece }) {
       </div>
 
       <div className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
+        {piece.overview && (
+          <p className="mb-5 leading-relaxed text-deep-700">{piece.overview}</p>
+        )}
+
         {piece.intro && (
           <blockquote className="mb-5 border-l-2 border-water-500/30 pl-4 font-serif text-lg italic leading-relaxed text-deep-700">
             {piece.intro}
@@ -43,6 +47,22 @@ function StudyCard({ piece }: { piece: StudyPiece }) {
               </p>
             ))}
           </div>
+        ) : piece.layout === 'mapping' ? (
+          <ul className="flex flex-col gap-5">
+            {piece.items.map((item, i) => (
+              <li key={i} className="border-l-2 border-water-500/25 pl-4">
+                {item.term && (
+                  <p className="font-serif text-lg leading-snug text-deep-900">{item.term}</p>
+                )}
+                <p className="mt-0.5 leading-relaxed text-deep-600">{item.text}</p>
+                {item.ref && (
+                  <p className="mt-1 text-[0.7rem] uppercase tracking-[0.15em] text-water-600">
+                    {item.ref}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
         ) : (
           <ol className="flex flex-col gap-5">
             {piece.items.map((item, i) => (
@@ -61,6 +81,12 @@ function StudyCard({ piece }: { piece: StudyPiece }) {
               </li>
             ))}
           </ol>
+        )}
+
+        {piece.note && (
+          <p className="mt-6 border-t border-line pt-4 text-sm leading-relaxed text-deep-500">
+            {piece.note}
+          </p>
         )}
       </div>
     </section>

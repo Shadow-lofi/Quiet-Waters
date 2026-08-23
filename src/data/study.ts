@@ -4,19 +4,23 @@
 // time; the Study page renders each one.
 
 export interface StudyItem {
+  term?: string // a heading for the item (e.g. an ancient nation name), for 'mapping'
   text: string
-  ref?: string // per-line reference (numbered pieces); omitted for flowing prayers
+  ref?: string // per-line reference (numbered / mapping pieces)
 }
 
 export interface StudyPiece {
   id: string
   title: string
   reference: string
-  intro?: string
-  // 'numbered' → an ordered list with a circle + per-line ref (default);
-  // 'lines' → flowing serif lines, read as one prayer.
-  layout?: 'numbered' | 'lines'
+  overview?: string // plain opening paragraph (for teachings)
+  intro?: string // an emphasized quote shown as a blockquote
+  // 'numbered' → ordered list with a circle + per-line ref (default);
+  // 'lines' → flowing serif lines, read as one prayer/creed;
+  // 'mapping' → a glossary of term → explanation (for teachings).
+  layout?: 'numbered' | 'lines' | 'mapping'
   items: StudyItem[]
+  note?: string // a closing note (e.g. an interpretive caveat)
 }
 
 export const STUDY_MATERIAL: StudyPiece[] = [
@@ -80,5 +84,79 @@ export const STUDY_MATERIAL: StudyPiece[] = [
           'forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
       },
     ],
+  },
+  {
+    id: 'gog-and-magog',
+    title: 'The War of Gog and Magog',
+    reference: 'Ezekiel 38–39',
+    overview:
+      'In the latter years, the prophet foresees a vast coalition — led by “Gog, of the land of ' +
+      'Magog” — that gathers from the far north and beyond to come against a regathered, ' +
+      'unsuspecting Israel dwelling in peace. But the battle is the LORD’s: God Himself intervenes ' +
+      'and defeats the invaders on the mountains of Israel, so that the nations, and His own ' +
+      'people, know that He is the LORD.',
+    intro:
+      '“Son of man, set your face toward Gog, of the land of Magog… and prophesy against him.” — Ezekiel 38:2',
+    layout: 'mapping',
+    items: [
+      {
+        term: 'Gog',
+        text:
+          'Not a nation but the leader of the coalition — the chief prince “of the land of Magog” ' +
+          'who heads the invasion.',
+        ref: 'Ezekiel 38:2–3',
+      },
+      {
+        term: 'Magog',
+        text:
+          'The ancient Scythians, nomadic peoples north of the Black and Caspian Seas — widely ' +
+          'identified today with Russia and the Central Asian steppes.',
+        ref: 'Ezekiel 38:2',
+      },
+      {
+        term: 'Rosh (in some translations)',
+        text:
+          'Sometimes read as a place-name and linked to Russia; many scholars instead render it ' +
+          '“chief prince.” Disputed.',
+        ref: 'Ezekiel 38:2–3',
+      },
+      {
+        term: 'Meshech and Tubal',
+        text: 'Ancient Anatolian peoples (Mushki and Tabal) — the region of modern Turkey.',
+        ref: 'Ezekiel 38:2',
+      },
+      {
+        term: 'Persia',
+        text: 'Modern Iran, which was called Persia until it was renamed in 1935.',
+        ref: 'Ezekiel 38:5',
+      },
+      {
+        term: 'Cush',
+        text: 'The Upper Nile region — modern Sudan, and parts of Ethiopia.',
+        ref: 'Ezekiel 38:5',
+      },
+      {
+        term: 'Put (Phut)',
+        text: 'North Africa west of Egypt — modern Libya.',
+        ref: 'Ezekiel 38:5',
+      },
+      {
+        term: 'Gomer',
+        text:
+          'The ancient Cimmerians of Asia Minor — often identified with modern Turkey and parts ' +
+          'of Eastern Europe.',
+        ref: 'Ezekiel 38:6',
+      },
+      {
+        term: 'Beth-togarmah',
+        text: 'The “house of Togarmah” from the far north — modern Armenia and eastern Turkey (the Caucasus).',
+        ref: 'Ezekiel 38:6',
+      },
+    ],
+    note:
+      'These modern identifications are the common view among many Bible teachers, drawn from ' +
+      'where these ancient peoples once lived; the details are debated, and the timing and ' +
+      'fulfillment belong to God. The prophecy’s aim is not fear but assurance: “I will magnify ' +
+      'myself and sanctify myself… and they will know that I am the LORD.” (Ezekiel 38:23)',
   },
 ]
