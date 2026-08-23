@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Waves, Download, RefreshCw, Sparkles, History } from 'lucide-react'
+import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart } from 'lucide-react'
 import { useStore } from './store'
 import { useAppUpdate } from './swUpdate'
 import { useAnnouncements } from './announcements'
 import { isStandalone } from './install'
-import { dayKey, formatMinutes } from './date'
+import { dayKey, dayKeyBefore, formatMinutes } from './date'
 import { hasSatToday, isPastReminderTime, todaysNudge } from './reminders'
 
 // The notifications inbox is a *derived* view — assembled each render from local
@@ -119,6 +119,29 @@ export function useNotifications(): AppNotification[] {
         body: `${when} you paused here — ${formatMinutes(otd.longestSec)} of stillness. Return to the water.`,
         to: '/journey',
         dismiss: () => useStore.getState().dismissNotice(id),
+      })
+    }
+  }
+
+  // Weekly reflection — a gentle Sunday recap of the past week's practice
+  // (the seven days ending today), shown only if there was at least one sitting.
+  const now = new Date()
+  if (now.getDay() === 0) {
+    const weekId = `weekly-${dayKey(now)}`
+    const cutoff = dayKeyBefore(6, now)
+    const week = sessions.filter((s) => dayKey(new Date(s.endedAt)) >= cutoff)
+    if (week.length > 0 && !dismissedNotices.includes(weekId)) {
+      const totalSec = week.reduce((sum, s) => sum + s.actualSec, 0)
+      const days = new Set(week.map((s) => dayKey(new Date(s.endedAt)))).size
+      list.push({
+        id: 'weekly',
+        Icon: CalendarHeart,
+        title: 'Your week of stillness',
+        body: `${week.length} sitting${week.length > 1 ? 's' : ''} across ${days} day${
+          days > 1 ? 's' : ''
+        } — ${formatMinutes(totalSec)}. Rest well.`,
+        to: '/journey',
+        dismiss: () => useStore.getState().dismissNotice(weekId),
       })
     }
   }

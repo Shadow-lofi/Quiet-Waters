@@ -29,6 +29,7 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | **Daily verse / prayer of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-verse`) |
 | **Announcements feed → inbox** | both | `public/announcements.json` → inbox cards; network-first SW; the enabler |
 | **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
+| **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
 
 ---
 
@@ -40,9 +41,7 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 2. **Seasonal / liturgical invitations** 🟡 `both`
    Advent, Lent, Holy Week, Pentecost. Date-triggered broadcast (cron or manual);
    can also drop into the announcements feed.
-3. **Weekly reflection** 🟡 `inbox` (optional push)
-   Sunday recap: "This week — 5 sittings, 62 min. Rest well." From local data.
-4. **Milestone blessing** 🟢 `inbox` (optional push)
+3. **Milestone blessing** 🟢 `inbox` (optional push)
    "40 days of stillness. Well done." Celebration, not a badge economy.
 
 ---
