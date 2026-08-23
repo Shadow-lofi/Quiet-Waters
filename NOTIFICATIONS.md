@@ -30,6 +30,7 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | **Announcements feed → inbox** | both | `public/announcements.json` → inbox cards; network-first SW; the enabler |
 | **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
 | **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
+| **Milestone blessing** | inbox | Quiet celebration when the streak reaches a marker (7, 30, 40, 365…) |
 
 ---
 
@@ -41,8 +42,6 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 2. **Seasonal / liturgical invitations** 🟡 `both`
    Advent, Lent, Holy Week, Pentecost. Date-triggered broadcast (cron or manual);
    can also drop into the announcements feed.
-3. **Milestone blessing** 🟢 `inbox` (optional push)
-   "40 days of stillness. Well done." Celebration, not a badge economy.
 
 ---
 
