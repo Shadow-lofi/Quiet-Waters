@@ -1,7 +1,7 @@
 {
   "name": "quiet-waters",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.11.0",
   "type": "module",
   "engines": {
     "node": "22.x"

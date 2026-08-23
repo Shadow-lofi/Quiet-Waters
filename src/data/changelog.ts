@@ -17,10 +17,66 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 23 (v1.11.0) ─────────────────────────────────
+  {
+    date: 'August 23, 2026',
+    tag: 'New',
+    title: 'Gog and Magog — Ezekiel to Revelation',
+    detail:
+      'A three-part teaching in Study: the latter-days war of Ezekiel 38 — with each ancient nation matched to what it’s called today — its aftermath in Ezekiel 39, and how Revelation 20 relates.',
+    to: '/study',
+  },
+
+  // ── August 22 (v1.10.0) ─────────────────────────────────
+  {
+    date: 'August 22, 2026',
+    tag: 'New',
+    title: 'A new Study section',
+    detail:
+      'A place for Scripture to sit with and return to — opening with the Ten Commandments, the Lord’s Prayer, and the Apostles’ Creed.',
+    to: '/study',
+  },
+
+  // ── August 21 (v1.9.0) ──────────────────────────────────
+  {
+    date: 'August 21, 2026',
+    tag: 'New',
+    title: 'Notifications on your phone',
+    detail:
+      'Invite gentle notifications — a daily verse, and word of new features — that reach you even when the app is closed. Turn them on in Settings (on iPhone, add the app to your home screen first).',
+    to: '/settings',
+  },
+  {
+    date: 'August 21, 2026',
+    tag: 'New',
+    title: 'A quiet inbox that fills itself',
+    detail:
+      'Announcements now arrive in your Notifications, and “On this day” gently remembers a sitting from a year ago.',
+    to: '/notifications',
+  },
+
+  // ── August 20 (v1.8.0) ──────────────────────────────────
+  {
+    date: 'August 20, 2026',
+    tag: 'New',
+    title: 'A Notifications inbox',
+    detail:
+      'A calm inbox gathers the app’s gentle nudges — your daily reminder, invitations, and updates — and settles into an “All caught up” rest when there’s nothing left to tend.',
+    to: '/notifications',
+  },
+  {
+    date: 'August 20, 2026',
+    tag: 'New',
+    title: 'Add to Home Screen',
+    detail:
+      'A gentle invitation — with a step-by-step walkthrough — to install Quiet Waters for full-screen, offline stillness. It quietly steps aside once you’ve installed it.',
+    to: '/settings',
+  },
+
   // ── August 13 (v1.7.0) ──────────────────────────────────
   {
     date: 'August 13, 2026',
