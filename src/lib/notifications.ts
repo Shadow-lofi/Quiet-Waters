@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart } from 'lucide-react'
+import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart, Flame } from 'lucide-react'
 import { useStore } from './store'
 import { useAppUpdate } from './swUpdate'
 import { useAnnouncements } from './announcements'
 import { isStandalone } from './install'
+import { computeStats } from './streak'
 import { dayKey, dayKeyBefore, formatMinutes } from './date'
 import { hasSatToday, isPastReminderTime, todaysNudge } from './reminders'
+
+// Streak days worth a gentle blessing — a curated set, kept sparse on purpose
+// (a celebration, not a badge economy).
+const STREAK_MILESTONES = [7, 14, 21, 30, 40, 60, 90, 100, 150, 200, 300, 365, 500, 730, 1000]
+
+function milestoneLabel(days: number): string {
+  if (days === 7) return 'One week of stillness'
+  if (days === 30) return 'A month of stillness'
+  if (days === 365) return 'A year of stillness'
+  if (days === 730) return 'Two years of stillness'
+  return `${days.toLocaleString()} days of stillness`
+}
 
 // The notifications inbox is a *derived* view — assembled each render from local
 // state and a lightweight announcements feed, never a stored message list. Each
@@ -142,6 +155,25 @@ export function useNotifications(): AppNotification[] {
         } — ${formatMinutes(totalSec)}. Rest well.`,
         to: '/journey',
         dismiss: () => useStore.getState().dismissNotice(weekId),
+      })
+    }
+  }
+
+  // Milestone blessing — a quiet celebration when the streak reaches a marker.
+  // Shows the highest milestone reached that hasn't been acknowledged yet, so a
+  // missed day never robs the moment.
+  const streak = computeStats(sessions).currentStreak
+  const milestone = STREAK_MILESTONES.filter((m) => m <= streak).pop()
+  if (milestone) {
+    const id = `milestone-${milestone}`
+    if (!dismissedNotices.includes(id)) {
+      list.push({
+        id,
+        Icon: Flame,
+        title: milestoneLabel(milestone),
+        body: 'Well done for returning, day after day. Be still, and rest in the quiet.',
+        to: '/journey',
+        dismiss: () => useStore.getState().dismissNotice(id),
       })
     }
   }
