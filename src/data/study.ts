@@ -159,4 +159,84 @@ export const STUDY_MATERIAL: StudyPiece[] = [
       'fulfillment belong to God. The prophecy’s aim is not fear but assurance: “I will magnify ' +
       'myself and sanctify myself… and they will know that I am the LORD.” (Ezekiel 38:23)',
   },
+  {
+    id: 'gog-aftermath',
+    title: 'The Aftermath of the War',
+    reference: 'Ezekiel 39',
+    overview:
+      'After Gog falls on the mountains of Israel, Ezekiel 39 describes the aftermath — the ' +
+      'cleansing of the land, the vindication of God’s holy name, and the full restoration of ' +
+      'His people. The chapter moves from battlefield to blessing.',
+    intro:
+      '“I will make my holy name known among my people Israel… and the nations will know that I am the LORD, the Holy One in Israel.” — Ezekiel 39:7',
+    items: [
+      {
+        text: 'God turns Gog back and strikes the weapons from his hand; he falls on the mountains of Israel.',
+        ref: 'Ezekiel 39:2–4',
+      },
+      {
+        text: 'The slain are given to the birds and wild beasts — a great sacrificial feast.',
+        ref: 'Ezekiel 39:4, 17–20',
+      },
+      {
+        text: 'Israel burns the weapons of war for seven years, needing no other fuel.',
+        ref: 'Ezekiel 39:9–10',
+      },
+      {
+        text: 'For seven months they bury the dead to cleanse the land — a valley named Hamon-Gog, “the multitude of Gog.”',
+        ref: 'Ezekiel 39:11–16',
+      },
+      {
+        text: 'God’s holy name is made known, no longer to be profaned among His people or the nations.',
+        ref: 'Ezekiel 39:7, 21–24',
+      },
+      {
+        text: 'The LORD restores Jacob, gathers His people home, and pours out His Spirit upon them.',
+        ref: 'Ezekiel 39:25–29',
+      },
+    ],
+    note:
+      'The seven years’ fuel and seven months’ burial picture the totality of God’s victory; the ' +
+      'chapter ends not in carnage but in covenant — “I will pour out my Spirit on the house of Israel.”',
+  },
+  {
+    id: 'gog-magog-revelation',
+    title: 'Gog and Magog in Revelation',
+    reference: 'Revelation 20:7–9',
+    overview:
+      'The names Gog and Magog return at the very end of the age. After the thousand years, Satan ' +
+      'is released and gathers the nations — “Gog and Magog” — from the four corners of the earth ' +
+      'for one last assault on God’s people, only to be devoured by fire from heaven.',
+    intro:
+      '“…to deceive the nations… Gog and Magog, to gather them together to the war…” — Revelation 20:8',
+    layout: 'mapping',
+    items: [
+      {
+        term: 'In Ezekiel 38–39',
+        text:
+          'A coalition of named nations invades a regathered, peaceful Israel in the latter years; ' +
+          'God destroys them on the mountains of Israel, then restores His people and pours out His Spirit.',
+        ref: 'Ezekiel 38–39',
+      },
+      {
+        term: 'In Revelation 20:7–9',
+        text:
+          'After the thousand-year reign, Satan is loosed and deceives the nations of the whole ' +
+          'earth (“Gog and Magog”) for a final revolt; fire comes down from heaven and consumes ' +
+          'them, and the last judgment follows.',
+        ref: 'Revelation 20:7–9',
+      },
+      {
+        term: 'How they relate',
+        text:
+          'Same names, same theme — the nations’ futile rage against God, ending in His decisive ' +
+          'victory. Many teachers hold them to be two distinct events separated by the millennium ' +
+          '(Ezekiel’s named coalition earlier, Revelation’s global uprising at the very end); ' +
+          'others read them as one symbolic picture.',
+      },
+    ],
+    note:
+      'Whether one war or two, the message is settled: no gathering of the nations can stand ' +
+      'against the Lord — “they will know that I am the LORD.”',
+  },
 ]
