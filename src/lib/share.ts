@@ -5,8 +5,8 @@
 // Open Graph tags in index.html (og:image → /og-card.png), so a shared link
 // unfurls with the Quiet Waters card in Messages, WhatsApp, etc.
 
-export const APP_URL = 'https://quiet-waters-meditation.vercel.app'
-export const DISPLAY_URL = 'quiet-waters-meditation.vercel.app'
+export const APP_URL = 'https://quiet-waters-meditation.com'
+export const DISPLAY_URL = 'quiet-waters-meditation.com'
 
 export const SHARE_TITLE = 'Quiet Waters · Christian Meditation'
 export const SHARE_TEXT =

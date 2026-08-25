@@ -7,7 +7,7 @@
 // Optional env:
 //   BROADCAST_BASE  site origin to hit (default: production domain below)
 
-const BASE = process.env.BROADCAST_BASE || 'https://quiet-waters-meditation.vercel.app'
+const BASE = process.env.BROADCAST_BASE || 'https://quiet-waters-meditation.com'
 const TOKEN = process.env.PUSH_ADMIN_TOKEN
 
 if (!TOKEN) {
