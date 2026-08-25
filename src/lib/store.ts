@@ -48,6 +48,10 @@ interface State {
   bibleChapter: number
   bibleTranslation: string // bible-api.com translation id
 
+  // ── enoch study ──
+  enochBook: string // book id (see ENOCH_BOOKS)
+  enochChapter: number
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -61,6 +65,7 @@ interface State {
   removeSavedVerse: (ref: string) => void
   setBibleRef: (book: string, chapter: number) => void
   setBibleTranslation: (id: string) => void
+  setEnochRef: (book: string, chapter: number) => void
   setName: (name: string) => void
   setOnboarded: (v: boolean) => void
   addSession: (s: Session) => void
@@ -128,6 +133,9 @@ export const useStore = create<State>()(
       bibleChapter: 1,
       bibleTranslation: 'web',
 
+      enochBook: '1-enoch',
+      enochChapter: 1,
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -174,6 +182,7 @@ export const useStore = create<State>()(
         }),
       setBibleRef: (book, chapter) => set({ bibleBook: book, bibleChapter: chapter }),
       setBibleTranslation: (id) => set({ bibleTranslation: id }),
+      setEnochRef: (book, chapter) => set({ enochBook: book, enochChapter: chapter }),
     }),
     {
       name: 'quiet-waters-v1',

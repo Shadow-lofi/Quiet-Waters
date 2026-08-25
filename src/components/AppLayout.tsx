@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
-import { Waves, CalendarHeart, BookOpen, Book, Settings as SettingsIcon } from 'lucide-react'
+import { Waves, CalendarHeart, BookOpen, Book, ScrollText, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
 import { PullToRefresh } from './PullToRefresh'
@@ -11,6 +11,7 @@ const tabs = [
   { to: '/journey', label: 'Journey', Icon: CalendarHeart, end: false },
   { to: '/study', label: 'Study', Icon: BookOpen, end: false },
   { to: '/bible', label: 'Bible', Icon: Book, end: false },
+  { to: '/enoch', label: 'Enoch', Icon: ScrollText, end: false },
   { to: '/settings', label: 'Settings', Icon: SettingsIcon, end: false },
 ]
 
