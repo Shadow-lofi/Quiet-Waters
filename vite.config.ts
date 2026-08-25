@@ -11,6 +11,7 @@ const APP_VERSION = (
   JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
 ).version
 const BUILD_TIME = new Date().toISOString()
+const BUILD_DATE = BUILD_TIME.slice(0, 10) // YYYY-MM-DD, for the sitemap lastmod
 
 // Stamp a content-derived build id into the service worker's cache name, so a
 // deploy that actually changes assets gets a new cache — which is what lets the
@@ -50,9 +51,39 @@ function stampServiceWorker(): Plugin {
   }
 }
 
+// Stamp today's date into the built sitemap's <lastmod>, so each deploy tells
+// search engines the site was freshly updated. The source public/sitemap.xml
+// keeps a static date; only the emitted copy is rewritten.
+function stampSitemap(): Plugin {
+  let root = process.cwd()
+  let outDir = 'dist'
+  return {
+    name: 'stamp-sitemap',
+    apply: 'build',
+    configResolved(cfg) {
+      root = cfg.root
+      outDir = cfg.build.outDir
+    },
+    closeBundle() {
+      const path = resolve(root, outDir, 'sitemap.xml')
+      try {
+        const xml = readFileSync(path, 'utf8').replace(
+          /<lastmod>.*?<\/lastmod>/g,
+          `<lastmod>${BUILD_DATE}</lastmod>`,
+        )
+        writeFileSync(path, xml)
+        // eslint-disable-next-line no-console
+        console.log(`sitemap.xml: lastmod ${BUILD_DATE}`)
+      } catch {
+        // no sitemap emitted — nothing to stamp
+      }
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), stampServiceWorker()],
+  plugins: [react(), tailwindcss(), stampServiceWorker(), stampSitemap()],
   define: {
     __APP_VERSION__: JSON.stringify(APP_VERSION),
     __BUILD_TIME__: JSON.stringify(BUILD_TIME),
