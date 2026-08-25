@@ -22,3 +22,27 @@ export interface Session {
   completed: boolean // reached the closing chime (vs. ended early)
   verseRef?: string // the Scripture they dwelt on
 }
+
+// A verse the reader has marked — highlight color, a note, a label, and/or a
+// plain bookmark, all on one record keyed by the canonical reference. A record
+// with none of those is pruned. Local-first: lives in the persisted store.
+export interface SavedVerse {
+  ref: string // "Book Chapter:Verse", e.g. "John 3:16" — the key
+  text: string // verse text at save time
+  translation: string // translation id it was first saved from
+  color?: string // highlight color id (see HIGHLIGHT_COLORS)
+  note?: string
+  label?: string
+  bookmarked?: boolean // a plain save with no color/note
+  createdAt: number
+}
+
+// A verse tapped in the reader — the working target for the verse action sheet.
+export interface SelectedVerse {
+  ref: string
+  text: string
+  translation: string
+  book: string
+  chapter: number
+  verse: number
+}

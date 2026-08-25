@@ -7,6 +7,7 @@ import { Settings } from './pages/Settings'
 import { Updates } from './pages/Updates'
 import { Notifications } from './pages/Notifications'
 import { Study } from './pages/Study'
+import { Bible } from './pages/Bible'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/meditate" element={<Meditate />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/study" element={<Study />} />
+          <Route path="/bible" element={<Bible />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/notifications" element={<Notifications />} />
