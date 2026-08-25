@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { dayKey } from './date'
-import type { BreathPace, MotionPref, Session, Soundscape, ThemePref } from './types'
+import type { BreathPace, MotionPref, SavedVerse, Session, Soundscape, ThemePref } from './types'
 
 // The whole app is local-first: everything lives in this one persisted store,
 // so it works fully offline and keeps no account. (Cloud sync can come later.)
@@ -42,11 +42,25 @@ interface State {
   // for the local "on this day" card. Kept bounded.
   dismissedNotices: string[]
 
+  // ── bible reader ──
+  savedVerses: Record<string, SavedVerse> // highlights/notes/bookmarks, keyed by ref
+  bibleBook: string // resume where you left off
+  bibleChapter: number
+  bibleTranslation: string // bible-api.com translation id
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
 
   // ── actions ──
+  updateVerse: (
+    ref: string,
+    meta: { text: string; translation: string },
+    patch: Partial<Pick<SavedVerse, 'color' | 'note' | 'label' | 'bookmarked'>>,
+  ) => void
+  removeSavedVerse: (ref: string) => void
+  setBibleRef: (book: string, chapter: number) => void
+  setBibleTranslation: (id: string) => void
   setName: (name: string) => void
   setOnboarded: (v: boolean) => void
   addSession: (s: Session) => void
@@ -109,6 +123,11 @@ export const useStore = create<State>()(
 
       dismissedNotices: [],
 
+      savedVerses: {},
+      bibleBook: 'John',
+      bibleChapter: 1,
+      bibleTranslation: 'web',
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -129,6 +148,32 @@ export const useStore = create<State>()(
             ? st
             : { dismissedNotices: [...st.dismissedNotices, id].slice(-200) },
         ),
+
+      // Upsert a verse's highlight/note/label/bookmark; prune the record when
+      // nothing is left on it.
+      updateVerse: (ref, meta, patch) =>
+        set((st) => {
+          const prev =
+            st.savedVerses[ref] ??
+            ({ ref, text: meta.text, translation: meta.translation, createdAt: Date.now() } as SavedVerse)
+          const next: SavedVerse = { ...prev, ...patch }
+          if (!next.note?.trim()) delete next.note
+          if (!next.label?.trim()) delete next.label
+          if (!next.color) delete next.color
+          if (!next.bookmarked) delete next.bookmarked
+          const map = { ...st.savedVerses }
+          if (next.color || next.note || next.label || next.bookmarked) map[ref] = next
+          else delete map[ref]
+          return { savedVerses: map }
+        }),
+      removeSavedVerse: (ref) =>
+        set((st) => {
+          const map = { ...st.savedVerses }
+          delete map[ref]
+          return { savedVerses: map }
+        }),
+      setBibleRef: (book, chapter) => set({ bibleBook: book, bibleChapter: chapter }),
+      setBibleTranslation: (id) => set({ bibleTranslation: id }),
     }),
     {
       name: 'quiet-waters-v1',
