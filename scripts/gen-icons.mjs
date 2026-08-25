@@ -34,6 +34,7 @@ const jobs = [
   { file: 'icon-maskable-512.png', size: 512, svg: svg({ rx: 0, scale: 0.62 }) },
   { file: 'apple-touch-icon.png', size: 180, svg: svg({ rx: 0, scale: 0.82 }) },
   { file: 'favicon-32.png', size: 32, svg: svg({ rx: 14, scale: 0.86 }) },
+  { file: 'favicon-16.png', size: 16, svg: svg({ rx: 8, scale: 0.9 }) },
 ]
 
 for (const job of jobs) {

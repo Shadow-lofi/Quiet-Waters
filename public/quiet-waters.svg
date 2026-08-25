@@ -1,6 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <ellipse cx="32" cy="43" rx="21" ry="6.5" fill="none" stroke="#4dacbc" stroke-width="2.5" opacity="0.4" />
-  <ellipse cx="32" cy="43" rx="12.5" ry="4.5" fill="none" stroke="#2f8ba0" stroke-width="2.5" opacity="0.75" />
-  <path d="M32 8C32 8 44 22 44 31a12 12 0 1 1-24 0C20 22 32 8 32 8z" fill="#2f8ba0" />
-  <circle cx="27.5" cy="28" r="3.2" fill="#eef4f7" opacity="0.6" />
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46b0c3" />
+      <stop offset="1" stop-color="#215f70" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)" />
+  <g transform="translate(32 33) scale(0.86) translate(-32 -33)">
+    <ellipse cx="32" cy="45" rx="19" ry="5.5" fill="none" stroke="#dff2f6" stroke-width="2.4" opacity="0.5" />
+    <ellipse cx="32" cy="45" rx="11" ry="3.8" fill="none" stroke="#ffffff" stroke-width="2.4" opacity="0.85" />
+    <path d="M32 11C32 11 43 24 43 32a11 11 0 1 1-22 0C21 24 32 11 32 11z" fill="#ffffff" />
+    <circle cx="27.5" cy="29" r="3" fill="#9bd6e1" opacity="0.7" />
+  </g>
 </svg>
