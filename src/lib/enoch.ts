@@ -50,6 +50,21 @@ export const ENOCH_BOOKS: EnochBook[] = [
       { label: 'The Epistle of Enoch', from: 91, to: 108 },
     ],
   },
+  {
+    id: '2-enoch',
+    title: '2 Enoch',
+    subtitle: 'The Slavonic Book of Enoch',
+    attribution: 'Translated by W. R. Morfill & R. H. Charles · Public Domain',
+    file: '/enoch/2-enoch.json',
+    chapters: 68,
+    // The longer (Slavonic) recension, grouped by its narrative arc.
+    sections: [
+      { label: 'The Ascent Through the Heavens', from: 1, to: 21 },
+      { label: 'Before the Face of the Lord', from: 22, to: 38 },
+      { label: 'Enoch’s Admonitions to His Sons', from: 39, to: 66 },
+      { label: 'Enoch’s Assumption', from: 67, to: 68 },
+    ],
+  },
 ]
 
 export const enochBookById = (id: string): EnochBook =>
