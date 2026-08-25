@@ -17,10 +17,28 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 24 (v1.12.0) ─────────────────────────────────
+  {
+    date: 'August 24, 2026',
+    tag: 'New',
+    title: 'An in-app Bible',
+    detail:
+      'Read any chapter (World English Bible, KJV, and more), and tap a verse to highlight it, add a note, a label, or a bookmark — all kept on your device. It gathers under the new Bible tab, with a Saved view for everything you’ve marked.',
+    to: '/bible',
+  },
+  {
+    date: 'August 24, 2026',
+    tag: 'New',
+    title: 'The Book of Enoch',
+    detail:
+      'The complete Book of Enoch (1 Enoch) — all 108 chapters in R. H. Charles’s public-domain translation — now under a new Enoch tab, grouped by its five divisions and readable offline.',
+    to: '/enoch',
+  },
+
   // ── August 23 (v1.11.0) ─────────────────────────────────
   {
     date: 'August 23, 2026',
