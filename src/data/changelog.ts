@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 25 (v1.13.0) ─────────────────────────────────
+  {
+    date: 'August 25, 2026',
+    tag: 'New',
+    title: '2 Enoch joins the Enoch tab',
+    detail:
+      'The Slavonic Book of Enoch (2 Enoch) — all 68 chapters in the Morfill/Charles public-domain translation — now sits alongside 1 Enoch under the Enoch tab. A toggle at the top switches between the two books, and it reads offline like the rest.',
+    to: '/enoch',
+  },
+
   // ── August 24 (v1.12.0) ─────────────────────────────────
   {
     date: 'August 24, 2026',

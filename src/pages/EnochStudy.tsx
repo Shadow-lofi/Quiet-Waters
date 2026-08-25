@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, X, Loader2, RefreshCw } from 'lucide-react'
-import { enochBookById, useEnoch, type EnochBook } from '../lib/enoch'
+import { ENOCH_BOOKS, enochBookById, useEnoch, type EnochBook } from '../lib/enoch'
 import { useStore } from '../lib/store'
 
 /** A reader for the Books of Enoch — public-domain text served as static JSON,
- *  fetched once and cached for offline reading. Currently 1 Enoch (R. H.
- *  Charles, 1917); the picker groups its 108 chapters by their five divisions. */
+ *  fetched once and cached for offline reading. Holds 1 Enoch (R. H. Charles,
+ *  1917) and 2 Enoch (Morfill/Charles); a toggle switches between them and the
+ *  picker groups each book's chapters by its divisions. */
 export function EnochStudy() {
   const bookId = useStore((s) => s.enochBook)
   const chapter = useStore((s) => s.enochChapter)
@@ -28,6 +29,11 @@ export function EnochStudy() {
     setPickerOpen(false)
     window.scrollTo({ top: 0 })
   }
+  const switchBook = (id: string) => {
+    if (id === book.id) return
+    setRef(id, 1)
+    window.scrollTo({ top: 0 })
+  }
   const step = (dir: -1 | 1) => {
     const c = chapter + dir
     if (c >= 1 && c <= book.chapters) go(book.id, c)
@@ -45,6 +51,26 @@ export function EnochStudy() {
         </p>
         <p className="mt-0.5 text-xs text-deep-400">{book.attribution}</p>
       </header>
+
+      {ENOCH_BOOKS.length > 1 && (
+        <div className="flex gap-1 rounded-full bg-mist-100 p-1 ring-1 ring-line" role="tablist" aria-label="Choose a book">
+          {ENOCH_BOOKS.map((b) => (
+            <button
+              key={b.id}
+              role="tab"
+              aria-selected={b.id === book.id}
+              onClick={() => switchBook(b.id)}
+              className={`flex-1 rounded-full py-2 text-sm font-medium transition-colors ${
+                b.id === book.id
+                  ? 'bg-water-500 text-onwater shadow-sm'
+                  : 'text-deep-600 hover:bg-mist-200'
+              }`}
+            >
+              {b.title}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-center gap-2">
         <button
