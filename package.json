@@ -13,7 +13,8 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "verify": "npm run lint && npm run typecheck",
-    "gen:icons": "node scripts/gen-icons.mjs"
+    "gen:icons": "node scripts/gen-icons.mjs",
+    "gen:qr": "node scripts/gen-qr.mjs"
   },
   "dependencies": {
     "@fontsource-variable/newsreader": "^5.2.5",
@@ -37,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "qrcode": "^1.5.4",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
