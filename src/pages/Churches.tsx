@@ -1,8 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
   Printer,
+  Presentation,
+  Copy,
+  Check,
   HandHeart,
   Lock,
   Smartphone,
@@ -76,6 +79,50 @@ const USES: { Icon: typeof Users; title: string; body: string }[] = [
     body: 'A gentle daily habit of being with God in His Word.',
   },
 ]
+
+// Ready-to-paste copy for a printed bulletin, newsletter, or group message.
+const BLURBS: { label: string; text: string }[] = [
+  {
+    label: 'Short — for a bulletin line',
+    text: 'Be still before God. Quiet Waters is a free app for Christian meditation — Scripture, a breath prayer, and stillness. No sign-up, works offline: quiet-waters-meditation.com',
+  },
+  {
+    label: 'Longer — for a newsletter',
+    text: 'Looking for a few quiet minutes with God in a busy week? Quiet Waters is a free app for Christian meditation — with Scripture to dwell on, a gentle breath-prayer guide, an offline Bible, and soft chimes to keep the time. There’s no sign-up and nothing is tracked, and it works on any phone, even offline. Add it to your home screen and be still: quiet-waters-meditation.com',
+  },
+]
+
+function CopyBlurb({ label, text }: { label: string; text: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      /* clipboard blocked — the text is right there to select by hand */
+    }
+  }
+  return (
+    <div className="rounded-2xl bg-mist-200/50 p-5">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="text-xs uppercase tracking-[0.16em] text-deep-400">{label}</p>
+        <button
+          onClick={copy}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
+            copied
+              ? 'text-water-600 ring-water-500'
+              : 'text-deep-600 ring-line hover:bg-mist-200'
+          }`}
+        >
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <p className="text-sm leading-relaxed text-deep-700">{text}</p>
+    </div>
+  )
+}
 
 export function Churches() {
   useEffect(() => {
@@ -198,13 +245,36 @@ export function Churches() {
                 in your group chat.
               </li>
             </ol>
-            <Link
-              to="/churches/flyer"
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-water-500 px-6 py-3 text-sm font-semibold text-onwater shadow-sm transition-transform active:scale-[0.98]"
-            >
-              <Printer size={16} /> Open the printable flyer
-            </Link>
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <Link
+                to="/churches/flyer"
+                className="inline-flex items-center gap-2 rounded-full bg-water-500 px-5 py-2.5 text-sm font-semibold text-onwater shadow-sm transition-transform active:scale-[0.98]"
+              >
+                <Printer size={16} /> Printable flyer
+              </Link>
+              <Link
+                to="/churches/slide"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-water-600 ring-1 ring-line transition hover:bg-mist-200"
+              >
+                <Presentation size={16} /> Projector slide
+              </Link>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* bulletin blurb */}
+      <section className="mt-16">
+        <p className="text-center text-xs uppercase tracking-[0.2em] text-deep-500">
+          Bulletin & newsletter blurbs
+        </p>
+        <p className="mx-auto mt-2 max-w-md text-center text-sm text-deep-500">
+          Copy a line into your bulletin, newsletter, or group chat.
+        </p>
+        <div className="mt-6 grid gap-3">
+          {BLURBS.map((b) => (
+            <CopyBlurb key={b.label} label={b.label} text={b.text} />
+          ))}
         </div>
       </section>
 
