@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 26 (v1.14.0) ─────────────────────────────────
+  {
+    date: 'August 26, 2026',
+    tag: 'New',
+    title: 'Share a verse as an image',
+    detail:
+      'Turn any verse into a quiet Still Waters image to share — tap Share on the daily verse, or on any verse in the Bible tab, choose a background, and send it or save it. A gentle way to pass along the Word.',
+    to: '/meditate',
+  },
+
   // ── August 25 (v1.13.0) ─────────────────────────────────
   {
     date: 'August 25, 2026',

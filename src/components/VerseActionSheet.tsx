@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { X, Check, Bookmark, Copy, Trash2 } from 'lucide-react'
+import { X, Check, Bookmark, Copy, Trash2, Share2 } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
 import { HIGHLIGHT_COLORS, translationById } from '../data/bible'
 import type { SelectedVerse } from '../lib/types'
+import { VerseShareSheet } from './VerseShareSheet'
 
 /** A gentle bottom sheet for a tapped verse: highlight, note, label, bookmark,
  *  copy, or clear — all saved locally in the store, keyed by reference. */
@@ -15,6 +16,7 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
 
   const [note, setNote] = useState(saved?.note ?? '')
   const [label, setLabel] = useState(saved?.label ?? '')
+  const [showShare, setShowShare] = useState(false)
 
   const meta = { text: verse.text, translation: verse.translation }
 
@@ -102,6 +104,13 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
           <Check size={18} /> Save
         </button>
 
+        <button
+          onClick={() => setShowShare(true)}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium text-water-600 ring-1 ring-line transition hover:bg-mist-200"
+        >
+          <Share2 size={16} /> Share as image
+        </button>
+
         <div className="mt-3 flex items-center gap-2">
           <button
             onClick={() => updateVerse(verse.ref, meta, { bookmarked: !saved?.bookmarked })}
@@ -133,6 +142,17 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
           )}
         </div>
       </div>
+
+      {showShare && (
+        <VerseShareSheet
+          verse={{
+            ref: verse.ref,
+            text: verse.text,
+            translationShort: translationById(verse.translation).short,
+          }}
+          onClose={() => setShowShare(false)}
+        />
+      )}
     </div>
   )
 }

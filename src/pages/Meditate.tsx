@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   RefreshCw,
+  Share2,
   Minus,
   Plus,
   Flame,
@@ -17,6 +18,7 @@ import { ReminderBanner } from '../components/ReminderBanner'
 import { InstallBanner } from '../components/InstallBanner'
 import { NotificationsBell } from '../components/NotificationsBell'
 import { SessionOverlay } from '../components/SessionOverlay'
+import { VerseShareSheet } from '../components/VerseShareSheet'
 import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
 import { computeStats } from '../lib/streak'
@@ -47,6 +49,7 @@ export function Meditate() {
   const [minutes, setMinutes] = useState(lastDurationMin)
   const [active, setActive] = useState(false)
   const [guided, setGuided] = useState<GuidedSession | null>(null)
+  const [sharing, setSharing] = useState(false)
 
   const clamp = (n: number) => Math.max(1, Math.min(120, n))
 
@@ -91,19 +94,35 @@ export function Meditate() {
       <section className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Dwell on this</p>
-          <button
-            onClick={() => nextVerse(VERSES.length)}
-            className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-deep-500 hover:bg-mist-200 hover:text-deep-700"
-            aria-label="Show another verse"
-          >
-            <RefreshCw size={13} /> New
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSharing(true)}
+              className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-deep-500 hover:bg-mist-200 hover:text-deep-700"
+              aria-label="Share this verse as an image"
+            >
+              <Share2 size={13} /> Share
+            </button>
+            <button
+              onClick={() => nextVerse(VERSES.length)}
+              className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-deep-500 hover:bg-mist-200 hover:text-deep-700"
+              aria-label="Show another verse"
+            >
+              <RefreshCw size={13} /> New
+            </button>
+          </div>
         </div>
         <blockquote className="font-serif text-2xl leading-relaxed text-deep-900">
           “{verse.text}”
         </blockquote>
         <p className="mt-3 text-sm uppercase tracking-[0.18em] text-water-600">{verse.ref}</p>
       </section>
+
+      {sharing && (
+        <VerseShareSheet
+          verse={{ ref: verse.ref, text: verse.text }}
+          onClose={() => setSharing(false)}
+        />
+      )}
 
       {/* what to carry on the breath */}
       <section>
