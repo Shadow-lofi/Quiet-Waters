@@ -3,6 +3,7 @@ import { AppLayout } from './components/AppLayout'
 import { Landing } from './pages/Landing'
 import { Churches } from './pages/Churches'
 import { ChurchesFlyer } from './pages/ChurchesFlyer'
+import { ChurchesSlide } from './pages/ChurchesSlide'
 import { Meditate } from './pages/Meditate'
 import { Journey } from './pages/Journey'
 import { Settings } from './pages/Settings'
@@ -21,6 +22,7 @@ export default function App() {
         {/* Outreach pages for church & group leaders — standalone, no tab bar. */}
         <Route path="/churches" element={<Churches />} />
         <Route path="/churches/flyer" element={<ChurchesFlyer />} />
+        <Route path="/churches/slide" element={<ChurchesSlide />} />
         {/* The app itself lives under the bottom-tab layout. */}
         <Route element={<AppLayout />}>
           <Route path="/meditate" element={<Meditate />} />

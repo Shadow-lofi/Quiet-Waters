@@ -9,14 +9,14 @@ import { writeFileSync } from 'node:fs'
 const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
 const URL = 'https://quiet-waters-meditation.com'
 
-// Deep "Still Waters" modules on white — high contrast for reliable scanning,
-// crisp at any print size because it's vector.
-const svg = await QRCode.toString(URL, {
-  type: 'svg',
-  errorCorrectionLevel: 'M',
-  margin: 1,
-  color: { dark: '#15303a', light: '#ffffff' },
-})
+// Deep "Still Waters" modules on white — high contrast for reliable scanning.
+const opts = { errorCorrectionLevel: 'M', margin: 1, color: { dark: '#15303a', light: '#ffffff' } }
 
+// SVG: crisp at any print size (used by the /churches page and the flyer).
+const svg = await QRCode.toString(URL, { type: 'svg', ...opts })
 writeFileSync(resolve(publicDir, 'qr-quiet-waters.svg'), svg)
-console.log('wrote public/qr-quiet-waters.svg →', URL)
+
+// PNG: a raster copy the canvas-rendered projector slide can draw reliably.
+await QRCode.toFile(resolve(publicDir, 'qr-quiet-waters.png'), URL, { type: 'png', width: 600, ...opts })
+
+console.log('wrote public/qr-quiet-waters.svg + .png →', URL)
