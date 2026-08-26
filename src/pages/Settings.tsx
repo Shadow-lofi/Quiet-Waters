@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Flame, VolumeX, Play, Square, Share2, Sparkles, ChevronRight, Smartphone } from 'lucide-react'
+import {
+  Flame,
+  VolumeX,
+  Play,
+  Square,
+  Share2,
+  Sparkles,
+  ChevronRight,
+  Smartphone,
+  Church,
+} from 'lucide-react'
 import { useStore } from '../lib/store'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
@@ -524,6 +534,24 @@ export function Settings() {
             </span>
             <ChevronRight size={17} className="shrink-0 text-deep-300" />
           </button>
+
+          <Link
+            to="/churches"
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Church size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">For churches & groups</span>
+                <span className="block text-xs text-deep-500">
+                  A flyer, slide & QR to share it
+                </span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </Link>
 
           <Link
             to="/updates"
