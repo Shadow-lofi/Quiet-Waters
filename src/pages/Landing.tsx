@@ -155,6 +155,14 @@ export function Landing() {
 
       {/* footer */}
       <footer className="mt-20 text-center text-xs leading-relaxed text-deep-400">
+        <p className="mb-3">
+          <Link
+            to="/churches"
+            className="text-water-600 underline-offset-2 hover:underline"
+          >
+            For churches & small groups →
+          </Link>
+        </p>
         <p>
           Developed by <span className="text-deep-500">Tavaris Freeman</span> · Midnight Codex
         </p>

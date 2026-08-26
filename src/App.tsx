@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import { Landing } from './pages/Landing'
+import { Churches } from './pages/Churches'
+import { ChurchesFlyer } from './pages/ChurchesFlyer'
 import { Meditate } from './pages/Meditate'
 import { Journey } from './pages/Journey'
 import { Settings } from './pages/Settings'
@@ -16,6 +18,9 @@ export default function App() {
       <Routes>
         {/* Public landing / SEO front door (returning visitors auto-continue). */}
         <Route path="/" element={<Landing />} />
+        {/* Outreach pages for church & group leaders — standalone, no tab bar. */}
+        <Route path="/churches" element={<Churches />} />
+        <Route path="/churches/flyer" element={<ChurchesFlyer />} />
         {/* The app itself lives under the bottom-tab layout. */}
         <Route element={<AppLayout />}>
           <Route path="/meditate" element={<Meditate />} />

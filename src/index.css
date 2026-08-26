@@ -373,3 +373,32 @@ html[data-motion='reduce'] .qw-title {
 html[data-motion='reduce'] .qw-water {
   display: none;
 }
+
+/* ── Printable flyer (/churches/flyer) ───────────────────────────────
+   The sheet keeps its own fixed colors; make sure they actually print, and
+   at print time drop the screen chrome so it fills a letter page. */
+.flyer-sheet {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 0.35in;
+  }
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+  }
+  .flyer-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    aspect-ratio: auto !important;
+    min-height: auto !important;
+  }
+}
