@@ -9,7 +9,7 @@ export function Study() {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="text-2xl">Dive Deeper into His Living Water</h1>
+        <h1 className="text-2xl">Deep Dive</h1>
         <p className="mt-1 text-sm text-deep-500">Scripture to sit with, and to return to.</p>
       </header>
 
