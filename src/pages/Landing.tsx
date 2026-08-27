@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { WaterBackground } from '../components/WaterBackground'
+import { Seo } from '../components/Seo'
 import { APP_VERSION } from '../lib/version'
 
 // The landing is the public front door — for first-time visitors and for
@@ -90,6 +91,7 @@ export function Landing() {
 
   return (
     <div className="relative mx-auto w-full max-w-2xl px-5 pb-16">
+      <Seo path="/" />
       <WaterBackground />
 
       {/* hero */}
@@ -155,6 +157,18 @@ export function Landing() {
 
       {/* footer */}
       <footer className="mt-20 text-center text-xs leading-relaxed text-deep-400">
+        {/* Full-page links (<a>, not <Link>) — the guides and reading pages live
+            outside the SPA as their own static, search-indexed documents. */}
+        <p className="mb-2">
+          <a href="/learn" className="text-water-600 underline-offset-2 hover:underline">
+            Guides: Christian meditation & breath prayer →
+          </a>
+        </p>
+        <p className="mb-2">
+          <a href="/read/1-enoch" className="text-water-600 underline-offset-2 hover:underline">
+            Read the Books of Enoch online →
+          </a>
+        </p>
         <p className="mb-3">
           <Link
             to="/churches"

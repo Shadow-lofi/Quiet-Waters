@@ -1,4 +1,5 @@
 import { STUDY_MATERIAL, type StudyPiece } from '../data/study'
+import { Seo } from '../components/Seo'
 
 /**
  * Study material — Scripture to sit with and return to. Renders each piece from
@@ -8,6 +9,7 @@ import { STUDY_MATERIAL, type StudyPiece } from '../data/study'
 export function Study() {
   return (
     <div className="flex flex-col gap-8">
+      <Seo path="/study" />
       <header>
         <h1 className="text-2xl">Deep Dive</h1>
         <p className="mt-1 text-sm text-deep-500">Scripture to sit with, and to return to.</p>

@@ -7,6 +7,13 @@
 const CACHE = 'quiet-waters-dev'
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg', '/announcements.json']
 
+// Routes that are their own static HTML documents (built by buildContentSite in
+// vite.config.ts), NOT screens of the single-page app. The fetch handler serves
+// these from the network so the cached app shell never shadows them.
+function isContentPath(pathname) {
+  return pathname === '/learn' || pathname.startsWith('/learn/') || pathname.startsWith('/read/')
+}
+
 self.addEventListener('install', (event) => {
   // Precache the shell, but DON'T skipWaiting: a fresh build waits so the app can
   // surface a gentle "a new version is ready" prompt instead of swapping the
@@ -104,11 +111,37 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // App navigations: serve the installed shell from THIS worker's OWN cache, so a
-  // reload keeps running the exact version the user is on. A newer build precaches
-  // its own shell but stays "waiting" — the app only swaps to it when the user
-  // accepts (Update now → SKIP_WAITING). The network is only a first-load fallback.
   if (req.mode === 'navigate') {
+    // The static content pages (the Books of Enoch reading pages under /read/* and
+    // the guides under /learn/*) live OUTSIDE the single-page app — each is its own
+    // real HTML document. They must be served as themselves, never shadowed by the
+    // cached app shell (which would boot the SPA, fail to match the route, and
+    // bounce to /meditate). Network-first, cached for offline, shell as last resort.
+    if (isContentPath(url.pathname)) {
+      event.respondWith(
+        fetch(req)
+          .then((res) => {
+            if (res.ok) {
+              const copy = res.clone()
+              caches.open(CACHE).then((c) => c.put(req, copy))
+            }
+            return res
+          })
+          .catch(() =>
+            caches.match(req).then(
+              (cached) =>
+                cached ||
+                caches.open(CACHE).then((c) => c.match('/index.html').then((s) => s || fetch(req))),
+            ),
+          ),
+      )
+      return
+    }
+
+    // App navigations: serve the installed shell from THIS worker's OWN cache, so a
+    // reload keeps running the exact version the user is on. A newer build precaches
+    // its own shell but stays "waiting" — the app only swaps to it when the user
+    // accepts (Update now → SKIP_WAITING). The network is only a first-load fallback.
     event.respondWith(
       caches.open(CACHE).then(async (cache) => {
         const cached = (await cache.match('/index.html')) || (await cache.match('/'))
