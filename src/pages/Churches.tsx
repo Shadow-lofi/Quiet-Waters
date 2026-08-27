@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { WaterBackground } from '../components/WaterBackground'
+import { Seo } from '../components/Seo'
 
 // A front door for pastors and small-group leaders — the case for bringing
 // Quiet Waters to a congregation, plus the QR and a printable flyer. Standalone
@@ -125,16 +126,9 @@ function CopyBlurb({ label, text }: { label: string; text: string }) {
 }
 
 export function Churches() {
-  useEffect(() => {
-    const prev = document.title
-    document.title = 'Quiet Waters for Churches & Small Groups'
-    return () => {
-      document.title = prev
-    }
-  }, [])
-
   return (
     <div className="relative mx-auto w-full max-w-2xl px-5 pb-16">
+      <Seo path="/churches" />
       <WaterBackground />
 
       {/* hero */}

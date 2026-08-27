@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, X, Loader2, RefreshCw } from 'lucide-react'
 import { ENOCH_BOOKS, enochBookById, useEnoch, type EnochBook } from '../lib/enoch'
 import { useStore } from '../lib/store'
+import { Seo } from '../components/Seo'
 
 /** A reader for the Books of Enoch — public-domain text served as static JSON,
  *  fetched once and cached for offline reading. Holds 1 Enoch (R. H. Charles,
@@ -44,6 +45,7 @@ export function EnochStudy() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Seo path="/enoch" />
       <header>
         <h1 className="text-2xl">Enoch Study</h1>
         <p className="mt-1 text-sm text-deep-500">

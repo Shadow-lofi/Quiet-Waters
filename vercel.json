@@ -1,6 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/churches", "destination": "/churches/index.html" },
+    { "source": "/study", "destination": "/study/index.html" },
+    { "source": "/enoch", "destination": "/enoch/index.html" },
+    { "source": "/learn", "destination": "/learn/index.html" },
+    { "source": "/learn/christian-meditation", "destination": "/learn/christian-meditation/index.html" },
+    { "source": "/learn/how-to-meditate-on-scripture", "destination": "/learn/how-to-meditate-on-scripture/index.html" },
+    { "source": "/learn/breath-prayer", "destination": "/learn/breath-prayer/index.html" },
+    { "source": "/read/1-enoch", "destination": "/read/1-enoch/index.html" },
+    { "source": "/read/2-enoch", "destination": "/read/2-enoch/index.html" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
   "crons": [{ "path": "/api/daily-verse", "schedule": "0 13 * * *" }],
   "headers": [
     {
