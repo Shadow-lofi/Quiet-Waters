@@ -9,7 +9,7 @@ import { APP_VERSION } from '../lib/version'
 const tabs = [
   { to: '/meditate', label: 'Meditate', Icon: Waves, end: true },
   { to: '/journey', label: 'Journey', Icon: CalendarHeart, end: false },
-  { to: '/study', label: 'Dive Deeper', Icon: BookOpen, end: false },
+  { to: '/study', label: 'Study', Icon: BookOpen, end: false },
   { to: '/bible', label: 'Bible', Icon: Book, end: false },
   { to: '/enoch', label: 'Enoch', Icon: ScrollText, end: false },
   { to: '/settings', label: 'Settings', Icon: SettingsIcon, end: false },
