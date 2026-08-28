@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart, Flame } from 'lucide-react'
+import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart, Flame, Star } from 'lucide-react'
 import { useStore } from './store'
 import { useAppUpdate } from './swUpdate'
 import { useAnnouncements } from './announcements'
@@ -7,6 +7,7 @@ import { isStandalone } from './install'
 import { computeStats } from './streak'
 import { dayKey, dayKeyBefore, formatMinutes } from './date'
 import { hasSatToday, isPastReminderTime, todaysNudge } from './reminders'
+import { currentSeason } from './season'
 
 // Streak days worth a gentle blessing — a curated set, kept sparse on purpose
 // (a celebration, not a badge economy).
@@ -173,6 +174,24 @@ export function useNotifications(): AppNotification[] {
         title: milestoneLabel(milestone),
         body: 'Well done for returning, day after day. Be still, and rest in the quiet.',
         to: '/journey',
+        dismiss: () => useStore.getState().dismissNotice(id),
+      })
+    }
+  }
+
+  // Seasonal invitation — a gentle nod to the church calendar (Advent, Lent,
+  // Holy Week, Eastertide, Pentecost), offered once per occurrence and easily
+  // set aside. Nothing surfaces in Ordinary Time.
+  const season = currentSeason(now)
+  if (season) {
+    const id = `season-${season.key}`
+    if (!dismissedNotices.includes(id)) {
+      list.push({
+        id,
+        Icon: Star,
+        title: season.title,
+        body: season.body,
+        to: season.to,
         dismiss: () => useStore.getState().dismissNotice(id),
       })
     }
