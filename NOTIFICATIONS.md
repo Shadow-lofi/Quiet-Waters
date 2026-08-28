@@ -31,6 +31,7 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
 | **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
 | **Milestone blessing** | inbox | Quiet celebration when the streak reaches a marker (7, 30, 40, 365…) |
+| **Seasonal / liturgical invitations** | inbox | Church-calendar invitation (Advent, Christmas, Lent, Holy Week, Eastertide, Pentecost) via `src/lib/season.ts` — a date-driven derived notice, dismissible per occurrence; nothing in Ordinary Time. Push side can broadcast later when enabled. |
 
 ---
 
@@ -39,9 +40,8 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 1. **New guided-session / series announcement** 🟢 `both`
    "An *Evening Rest* sitting has arrived." Now that the feed is shipped, this is
    just a `public/announcements.json` entry (+ an optional push to ping phones).
-2. **Seasonal / liturgical invitations** 🟡 `both`
-   Advent, Lent, Holy Week, Pentecost. Date-triggered broadcast (cron or manual);
-   can also drop into the announcements feed.
+   (Pairs naturally with actually adding a new guided sitting — e.g. a Compline /
+   evening-rest session — then announcing it.)
 
 ---
 
