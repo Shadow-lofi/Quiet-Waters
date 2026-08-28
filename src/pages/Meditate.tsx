@@ -10,6 +10,7 @@ import {
   Sunrise,
   Wind,
   Moon,
+  MoonStar,
   Hourglass,
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
@@ -38,6 +39,7 @@ const GUIDED_ICON: Record<GuidedSession['icon'], typeof Sunrise> = {
   breath: Wind,
   rest: Moon,
   wait: Hourglass,
+  evening: MoonStar,
 }
 
 export function Meditate() {

@@ -35,6 +35,12 @@ export const VERSES: MeditationVerse[] = [
     breathOut: 'that You are God',
   },
   {
+    ref: 'Psalm 4:8',
+    text: 'In peace I will both lie down and sleep, for You alone, LORD, make me dwell in safety.',
+    breathIn: 'In peace I lie down',
+    breathOut: 'for You keep me safe',
+  },
+  {
     ref: 'Psalm 23:2',
     text: 'He makes me lie down in green pastures. He leads me beside still waters.',
     breathIn: 'You lead me',

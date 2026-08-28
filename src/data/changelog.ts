@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 28 (v1.16.0) ─────────────────────────────────
+  {
+    date: 'August 28, 2026',
+    tag: 'New',
+    title: 'A new guided sitting: Evening Rest',
+    detail:
+      'A gentle Compline to close the day — lay down its weight, entrust what is unfinished to God, and rest in Psalm 4:8, “In peace I will lie down and sleep, for You alone keep me safe.” Find it among the guided sittings on the Meditate page.',
+    to: '/meditate',
+  },
+
   // ── August 28 (v1.15.0) ─────────────────────────────────
   {
     date: 'August 28, 2026',

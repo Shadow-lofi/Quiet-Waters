@@ -10,7 +10,7 @@ export interface GuidedSession {
   id: string
   title: string
   subtitle: string
-  icon: 'still' | 'sunrise' | 'breath' | 'rest' | 'wait'
+  icon: 'still' | 'sunrise' | 'breath' | 'rest' | 'wait' | 'evening'
   durationMin: number
   verseRef: string // must match a ref in VERSES (drives the breath-prayer words)
   pace: BreathPace
@@ -125,6 +125,24 @@ export const GUIDED_SESSIONS: GuidedSession[] = [
       { at: 440, text: 'Waiting is not wasted. It is trust, slowed down.' },
       { at: 620, text: 'Stay. He is worth waiting for.' },
       { at: 690, text: 'Gently begin to return.' },
+    ],
+  },
+  {
+    id: 'evening-rest',
+    title: 'Evening Rest',
+    subtitle: 'Close the day and sleep in peace',
+    icon: 'evening',
+    durationMin: 7,
+    verseRef: 'Psalm 4:8',
+    pace: 'deep',
+    steps: [
+      { at: 0, text: 'The day is nearly done. Let it be enough. Come and lay it down.' },
+      { at: 35, text: 'Let each breath out set something down — a worry, a word, a weight.' },
+      { at: 90, text: '“In peace I will lie down and sleep, for You alone keep me safe.” — Psalm 4:8' },
+      { at: 160, text: 'In: in peace I lie down. Out: for You keep me safe.' },
+      { at: 260, text: 'Whatever is left unfinished, entrust it to Him through the night.' },
+      { at: 350, text: 'You can rest, because He never sleeps. Be still, and be kept.' },
+      { at: 400, text: 'Stay as long as you like — and carry this peace into sleep.' },
     ],
   },
 ]
