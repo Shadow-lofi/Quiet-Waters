@@ -32,16 +32,19 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
 | **Milestone blessing** | inbox | Quiet celebration when the streak reaches a marker (7, 30, 40, 365…) |
 | **Seasonal / liturgical invitations** | inbox | Church-calendar invitation (Advent, Christmas, Lent, Holy Week, Eastertide, Pentecost) via `src/lib/season.ts` — a date-driven derived notice, dismissible per occurrence; nothing in Ordinary Time. Push side can broadcast later when enabled. |
+| **New guided-session announcement** | both | First use: **Evening Rest** (a Compline sitting) — a `public/announcements.json` entry → inbox card. Repeat this for each new sitting/series. |
 
 ---
 
 ## Next up (low infra, high value)
 
-1. **New guided-session / series announcement** 🟢 `both`
-   "An *Evening Rest* sitting has arrived." Now that the feed is shipped, this is
-   just a `public/announcements.json` entry (+ an optional push to ping phones).
-   (Pairs naturally with actually adding a new guided sitting — e.g. a Compline /
-   evening-rest session — then announcing it.)
+_The low-infra inbox items are all shipped. To announce the **next** new sitting
+or series, drop a `public/announcements.json` entry (the pattern used for Evening
+Rest) — and, once web-push is wired up, an optional broadcast to ping phones._
+
+The remaining pulls need the phase-2 backend (per-user schedule + timezone) or
+careful design — see **Later** below. Or add fresh content that carries its own
+announcement (a new guided series, a themed collection).
 
 ---
 
