@@ -51,6 +51,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
       'A calm, distraction-free reader for the complete Books of Enoch (1 & 2 Enoch), the public-domain text. Free, private, and works offline — read a chapter, or sit with it in prayer.',
     type: 'website',
   },
+  {
+    path: '/last-days',
+    title: 'End Times Study — Watchful & Hopeful | Quiet Waters',
+    description:
+      'A watchful, hopeful study of what the New Testament says about the last days — the signs of the times and deep dives into Matthew, Acts, and Revelation. Never date-setting, never fearful.',
+    type: 'article',
+  },
 ]
 
 export function pageMeta(path: string): PublicPageMeta | undefined {
