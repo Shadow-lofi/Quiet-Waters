@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 30 (v1.18.0) ─────────────────────────────────
+  {
+    date: 'August 30, 2026',
+    tag: 'Improved',
+    title: 'Choose your narrator’s voice',
+    detail:
+      'Tap the sliders beside “Listen” to pick which of your device’s voices reads to you and set the pace — slower, natural, or faster. It remembers your choice, and reads with cleaner pauses at each sentence. Installing your system’s “enhanced” or “natural” voices unlocks warmer, more lifelike reading.',
+    to: '/bible',
+  },
+
   // ── August 30 (v1.17.0) ─────────────────────────────────
   {
     date: 'August 30, 2026',

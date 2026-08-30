@@ -2,9 +2,17 @@
 // no audio files, no external service, no API key, and it works offline using
 // the OS voices. One narration plays at a time, tracked here as a tiny store so
 // any reader can drive it and highlight the line currently being read.
+import { useEffect, useState } from 'react'
 import { create } from 'zustand'
 
 export type NarrationStatus = 'idle' | 'playing' | 'paused'
+
+export interface NarrationOptions {
+  /** A specific speechSynthesis voiceURI to use; falls back to the best pick. */
+  voiceURI?: string | null
+  /** Speaking rate (~0.8 slower … 1.15 faster). */
+  rate?: number
+}
 
 const synth: SpeechSynthesis | undefined =
   typeof window !== 'undefined' ? window.speechSynthesis : undefined
@@ -13,32 +21,78 @@ const synth: SpeechSynthesis | undefined =
 export const narrationSupported =
   !!synth && typeof window !== 'undefined' && 'SpeechSynthesisUtterance' in window
 
-// ── voice selection ─────────────────────────────────────────────────────────
-let cachedVoice: SpeechSynthesisVoice | null = null
+/** The default speaking rate — a touch slower than 1, so it's unhurried. */
+export const DEFAULT_RATE = 0.95
 
-/** Pick a calm, natural English voice, preferring on-device (offline) voices. */
-function chooseVoice(): SpeechSynthesisVoice | null {
-  if (!synth) return null
-  if (cachedVoice) return cachedVoice
-  const voices = synth.getVoices()
-  if (!voices.length) return null // list not ready yet — resolved on voiceschanged
-  const english = voices.filter((v) => /^en/i.test(v.lang || ''))
-  const pool = english.length ? english : voices
-  cachedVoice =
-    pool.find((v) => /natural|enhanced|premium|siri/i.test(v.name)) ??
-    pool.find((v) => v.localService) ??
-    pool[0] ??
-    null
-  return cachedVoice
+// ── voice selection ─────────────────────────────────────────────────────────
+// Apple ships a fixed set of "novelty" voices (sound effects and singing) that
+// read Scripture terribly and just clutter the picker — hide them everywhere.
+const NOVELTY_VOICES = new Set([
+  'bad news', 'bahh', 'bells', 'boing', 'bubbles', 'cellos', 'deranged', 'good news',
+  'hysterical', 'jester', 'organ', 'pipe organ', 'superstar', 'trinoids', 'whisper',
+  'wobble', 'zarvox', 'albert',
+])
+function isNovelty(v: SpeechSynthesisVoice): boolean {
+  const base = (v.name || '').replace(/\s*\(.*\)\s*$/, '').trim().toLowerCase()
+  return NOVELTY_VOICES.has(base)
 }
 
-// Voice lists load asynchronously on Chrome/Safari; warm it up and refresh.
-if (synth) {
-  chooseVoice()
-  synth.addEventListener?.('voiceschanged', () => {
-    cachedVoice = null
-    chooseVoice()
-  })
+// Rank the installed voices so the best one is picked automatically. Neural /
+// "natural" and the platform premium voices (Apple Enhanced/Siri, Google,
+// Microsoft Natural) sound far warmer than the basic defaults like Samantha.
+function scoreVoice(v: SpeechSynthesisVoice): number {
+  const name = v.name || ''
+  let score = 0
+  if (/natural|neural/i.test(name)) score += 6
+  if (/enhanced|premium/i.test(name)) score += 5
+  if (/google/i.test(name)) score += 4
+  if (/siri/i.test(name)) score += 4
+  if (/microsoft/i.test(name)) score += 2
+  // A few voices that are known to be pleasant, calm reading voices.
+  if (/\b(ava|samantha|jenny|aria|allison|serena|zoe|joelle|nathan|evan)\b/i.test(name)) score += 2
+  if (v.localService) score += 1 // works offline
+  if (/en[-_]us/i.test(v.lang || '')) score += 1
+  return score
+}
+
+/** All usable voices, English first, sorted best-sounding first. */
+export function listVoices(): SpeechSynthesisVoice[] {
+  if (!synth) return []
+  const all = synth.getVoices().filter((v) => !isNovelty(v))
+  const english = all.filter((v) => /^en/i.test(v.lang || ''))
+  const pool = english.length ? english : all
+  return [...pool].sort((a, b) => scoreVoice(b) - scoreVoice(a))
+}
+
+/** Resolve a voice: the chosen one if still present, else the best available. */
+function chooseVoice(preferredURI?: string | null): SpeechSynthesisVoice | null {
+  if (!synth) return null
+  const all = synth.getVoices()
+  if (!all.length) return null // list not ready yet — resolved on voiceschanged
+  if (preferredURI) {
+    const picked = all.find((v) => v.voiceURI === preferredURI)
+    if (picked) return picked
+  }
+  return listVoices()[0] ?? null
+}
+
+// Voice lists load asynchronously on Chrome/Safari — nudge the load once.
+if (synth) void synth.getVoices()
+
+/**
+ * React hook: the current list of voices (best-sounding first), kept in sync as
+ * the browser finishes loading them. Empty when speech isn't supported.
+ */
+export function useVoiceList(): SpeechSynthesisVoice[] {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>(() => listVoices())
+  useEffect(() => {
+    if (!synth) return
+    const update = () => setVoices(listVoices())
+    update()
+    synth.addEventListener?.('voiceschanged', update)
+    return () => synth.removeEventListener?.('voiceschanged', update)
+  }, [])
+  return voices
 }
 
 // ── keepalive ────────────────────────────────────────────────────────────────
@@ -67,12 +121,12 @@ interface NarrationState {
   session: string | null
   /** Index of the segment being spoken, or -1 when idle. */
   index: number
-  play: (session: string, segments: string[]) => void
+  play: (session: string, segments: string[], opts?: NarrationOptions) => void
   pause: () => void
   resume: () => void
   stop: () => void
   /** Play / pause / resume depending on the current state for this session. */
-  toggle: (session: string, segments: string[]) => void
+  toggle: (session: string, segments: string[], opts?: NarrationOptions) => void
 }
 
 export const useNarration = create<NarrationState>((set, get) => ({
@@ -80,7 +134,7 @@ export const useNarration = create<NarrationState>((set, get) => ({
   session: null,
   index: -1,
 
-  play: (session, segments) => {
+  play: (session, segments, opts) => {
     if (!synth) return
     synth.cancel()
     stopKeepAlive()
@@ -89,13 +143,14 @@ export const useNarration = create<NarrationState>((set, get) => ({
     if (!clean.length) return
 
     const mine = ++token
-    const voice = chooseVoice()
+    const voice = chooseVoice(opts?.voiceURI)
+    const rate = opts?.rate ?? DEFAULT_RATE
     set({ status: 'playing', session, index: 0 })
 
     clean.forEach((text, i) => {
       const u = new SpeechSynthesisUtterance(text)
       if (voice) u.voice = voice
-      u.rate = 0.95 // a touch slower — unhurried and easy to follow
+      u.rate = rate
       u.pitch = 1
       u.onstart = () => {
         if (token === mine) set({ index: i })
@@ -135,20 +190,23 @@ export const useNarration = create<NarrationState>((set, get) => ({
     set({ status: 'idle', session: null, index: -1 })
   },
 
-  toggle: (session, segments) => {
+  toggle: (session, segments, opts) => {
     const { status, session: active } = get()
     if (active === session && status === 'playing') return get().pause()
     if (active === session && status === 'paused') return get().resume()
-    return get().play(session, segments)
+    return get().play(session, segments, opts)
   },
 }))
 
-/** Split a block of prose into short, sentence-sized chunks for smooth
- *  narration (short utterances dodge engine length limits and pause cleanly). */
+/** Split a block of prose into short chunks at sentence-ending punctuation, so
+ *  narration pauses cleanly at each period, question, exclamation, colon, or
+ *  semicolon. Commas are kept within a chunk — the voice's own prosody gives
+ *  them a lighter, natural pause. Short utterances also dodge engine length
+ *  limits and let pause/resume land between sentences. */
 export function chunkText(text: string): string[] {
   return text
     .split(/\n+/)
-    .flatMap((line) => line.match(/[^.!?]+[.!?]*\s*/g) ?? [line])
+    .flatMap((line) => line.match(/[^.!?;:]+[.!?;:]*\s*/g) ?? [line])
     .map((s) => s.trim())
     .filter(Boolean)
 }

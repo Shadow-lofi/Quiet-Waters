@@ -27,6 +27,10 @@ interface State {
   motion: MotionPref // whether the gentle animations run
   breatheName: boolean // free timer: pray the Name (Yah/weh) instead of the verse
 
+  // ── reader narration (text-to-speech) ──
+  narrationVoiceURI: string | null // chosen speechSynthesis voiceURI, null = auto-pick
+  narrationRate: number // speaking rate (0.8 slower … 1.15 faster)
+
   // ── gentle reminder (local, no server) ──
   reminderOn: boolean
   reminderTime: string // 'HH:MM' 24-hour, local time
@@ -94,6 +98,8 @@ type Prefs = Pick<
   | 'ambientVolume'
   | 'motion'
   | 'breatheName'
+  | 'narrationVoiceURI'
+  | 'narrationRate'
   | 'reminderOn'
   | 'reminderTime'
 >
@@ -117,6 +123,9 @@ export const useStore = create<State>()(
       ambientVolume: 0.6,
       motion: 'on',
       breatheName: false,
+
+      narrationVoiceURI: null,
+      narrationRate: 0.95,
 
       reminderOn: false,
       reminderTime: '08:00',
