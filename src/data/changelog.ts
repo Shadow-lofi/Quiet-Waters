@@ -17,10 +17,20 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 30 (v1.17.0) ─────────────────────────────────
+  {
+    date: 'August 30, 2026',
+    tag: 'New',
+    title: 'Hear the Word read aloud',
+    detail:
+      'A “Listen” button now sits atop each chapter in the Bible and Enoch readers. Tap it and a calm narrator voice reads the passage to you — the verse being read glows softly as it goes. Pause, resume, or stop anytime. It uses your device’s own voice, so it works offline and needs no account.',
+    to: '/bible',
+  },
+
   // ── August 28 (v1.16.0) ─────────────────────────────────
   {
     date: 'August 28, 2026',

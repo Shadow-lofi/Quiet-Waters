@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, X, Loader2, RefreshCw } from 'lucide-react'
 import { ENOCH_BOOKS, enochBookById, useEnoch, type EnochBook } from '../lib/enoch'
 import { useStore } from '../lib/store'
+import { chunkText } from '../lib/narration'
+import { NarrationButton } from '../components/NarrationButton'
 import { Seo } from '../components/Seo'
 
 /** A reader for the Books of Enoch — public-domain text served as static JSON,
@@ -103,7 +105,15 @@ export function EnochStudy() {
         {section && (
           <p className="mb-3 text-xs uppercase tracking-[0.18em] text-water-600">{section.label}</p>
         )}
-        <h2 className="mb-4 font-serif text-2xl text-deep-900">Chapter {chapter}</h2>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="font-serif text-2xl text-deep-900">Chapter {chapter}</h2>
+          {current && (
+            <NarrationButton
+              session={`enoch:${book.id}:${chapter}`}
+              segments={chunkText(current.text)}
+            />
+          )}
+        </div>
 
         {loading && !current && (
           <div className="grid place-items-center gap-3 py-12 text-deep-400">
