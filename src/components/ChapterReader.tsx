@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { fetchPassage, type Passage } from '../lib/bible'
 import { useStore } from '../lib/store'
+import { useNarration } from '../lib/narration'
+import { NarrationButton } from './NarrationButton'
 import { highlightById } from '../data/bible'
 import type { SelectedVerse } from '../lib/types'
 
@@ -24,6 +26,9 @@ export function ChapterReader({
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [attempt, setAttempt] = useState(0)
   const savedVerses = useStore((s) => s.savedVerses)
+
+  const session = `bible:${reference}:${translation}`
+  const readingIndex = useNarration((s) => (s.session === session ? s.index : -1))
 
   useEffect(() => {
     let cancelled = false
@@ -70,11 +75,15 @@ export function ChapterReader({
 
   return (
     <div>
+      <div className="mb-4 flex justify-end">
+        <NarrationButton session={session} segments={passage.verses.map((v) => v.text)} />
+      </div>
       <p className="font-serif text-[1.15rem] leading-9 text-deep-800">
-        {passage.verses.map((v) => {
+        {passage.verses.map((v, i) => {
           const ref = `${v.book_name} ${v.chapter}:${v.verse}`
           const saved = savedVerses[ref]
           const color = highlightById(saved?.color)
+          const isReading = i === readingIndex
           return (
             <span
               key={`${v.chapter}:${v.verse}`}
@@ -89,10 +98,12 @@ export function ChapterReader({
                 })
               }
               className={`cursor-pointer rounded-[3px] px-0.5 transition hover:bg-mist-200/70 ${
+                isReading ? 'bg-water-500/15 text-deep-900' : ''
+              } ${
                 saved?.note ? 'underline decoration-dotted decoration-water-500/70 underline-offset-[5px]' : ''
               }`}
               style={
-                color
+                !isReading && color
                   ? {
                       backgroundColor: color.bg,
                       boxDecorationBreak: 'clone',
