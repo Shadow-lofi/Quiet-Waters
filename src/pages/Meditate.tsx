@@ -12,12 +12,15 @@ import {
   Moon,
   MoonStar,
   Hourglass,
+  BookOpen,
+  ArrowRight,
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { ReminderBanner } from '../components/ReminderBanner'
 import { InstallBanner } from '../components/InstallBanner'
 import { NotificationsBell } from '../components/NotificationsBell'
+import { SoulCheck } from '../components/SoulCheck'
 import { SessionOverlay } from '../components/SessionOverlay'
 import { VerseShareSheet } from '../components/VerseShareSheet'
 import { useStore } from '../lib/store'
@@ -91,6 +94,9 @@ export function Meditate() {
 
       <ReminderBanner onBegin={begin} />
       <InstallBanner />
+
+      {/* how is your soul today? — a gentle check-in before sitting */}
+      <SoulCheck />
 
       {/* verse to dwell on */}
       <section className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
@@ -203,6 +209,21 @@ export function Meditate() {
       >
         Begin
       </button>
+
+      {/* Lectio Divina — pray the Scriptures slowly (own page) */}
+      <Link
+        to="/lectio"
+        className="group flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+          <BookOpen size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-deep-900">Lectio Divina</p>
+          <p className="truncate text-sm text-deep-500">Pray the Scriptures, slowly</p>
+        </div>
+        <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+      </Link>
 
       {/* guided sessions */}
       <section>

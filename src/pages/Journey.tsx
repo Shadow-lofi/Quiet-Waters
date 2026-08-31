@@ -1,13 +1,20 @@
-import { Flame, Trophy, Timer, Sprout } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Flame, Trophy, Timer, Sprout, HandHeart, ArrowRight } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { computeStats } from '../lib/streak'
 import { formatMinutes } from '../lib/date'
+import { soulById } from '../data/soul'
 
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 export function Journey() {
   const sessions = useStore((s) => s.sessions)
+  const prayers = useStore((s) => s.prayers)
+  const soulLog = useStore((s) => s.soulLog)
   const stats = computeStats(sessions)
+
+  const openPrayers = prayers.filter((p) => !p.answeredAt).length
+  const answeredPrayers = prayers.filter((p) => p.answeredAt).length
 
   const stat = [
     { Icon: Flame, label: 'Day streak', value: String(stats.currentStreak) },
@@ -61,6 +68,47 @@ export function Journey() {
           </div>
         ))}
       </section>
+
+      {/* soul lately — gentle reflection of the check-ins */}
+      {soulLog.length > 0 && (
+        <section>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-deep-500">Your soul lately</p>
+          <div className="flex flex-wrap gap-2">
+            {soulLog.slice(0, 10).map((c) => (
+              <span
+                key={c.at}
+                className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-sm text-deep-700 ring-1 ring-line"
+              >
+                {soulById(c.state)?.label ?? c.state}
+                <span className="text-xs text-deep-400">
+                  {new Date(c.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </span>
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* prayer list (own page) */}
+      <Link
+        to="/prayers"
+        className="group flex items-center gap-4 rounded-card bg-card p-5 shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+          <HandHeart size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-deep-900">Prayers</p>
+          <p className="truncate text-sm text-deep-500">
+            {openPrayers > 0
+              ? `${openPrayers} held${answeredPrayers > 0 ? ` · ${answeredPrayers} answered` : ''}`
+              : answeredPrayers > 0
+                ? `${answeredPrayers} answered`
+                : 'Hold a request, and mark it answered in His time'}
+          </p>
+        </div>
+        <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+      </Link>
 
       {/* recent sittings */}
       <section>

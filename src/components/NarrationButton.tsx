@@ -23,11 +23,17 @@ export function NarrationButton({
   segments,
   label = 'Listen',
   className = '',
+  onEnd,
+  showContinuous = false,
 }: {
   session: string
   segments: string[]
   label?: string
   className?: string
+  /** Fired when the passage finishes on its own — used for continuous reading. */
+  onEnd?: () => void
+  /** Show the "Keep reading" (auto-advance) toggle in the settings menu. */
+  showContinuous?: boolean
 }) {
   const status = useNarration((s) => s.status)
   const active = useNarration((s) => s.session)
@@ -37,6 +43,7 @@ export function NarrationButton({
 
   const voiceURI = useStore((s) => s.narrationVoiceURI)
   const rate = useStore((s) => s.narrationRate)
+  const continuous = useStore((s) => s.narrationContinuous)
   const setPref = useStore((s) => s.setPref)
 
   const voices = useVoiceList()
@@ -46,7 +53,7 @@ export function NarrationButton({
   const isActive = active === session
   const isPlaying = isActive && status === 'playing'
 
-  const opts = { voiceURI, rate }
+  const opts = { voiceURI, rate, onEnd }
 
   // Stop reading when the content changes out from under us, or on unmount.
   useEffect(() => {
@@ -144,6 +151,31 @@ export function NarrationButton({
               )
             })}
           </div>
+
+          {showContinuous && (
+            <button
+              onClick={() => setPref('narrationContinuous', !continuous)}
+              role="switch"
+              aria-checked={continuous}
+              className="mt-4 flex w-full items-center justify-between gap-3 rounded-xl bg-mist-100 px-3 py-2.5 text-left ring-1 ring-line"
+            >
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-deep-800">Keep reading</span>
+                <span className="block text-xs text-deep-500">Continue into the next chapter</span>
+              </span>
+              <span
+                className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+                  continuous ? 'bg-water-500' : 'bg-mist-300'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-card shadow transition-all ${
+                    continuous ? 'left-4' : 'left-0.5'
+                  }`}
+                />
+              </span>
+            </button>
+          )}
 
           <button
             onClick={() => play('narration:preview', [SAMPLE], { voiceURI, rate })}

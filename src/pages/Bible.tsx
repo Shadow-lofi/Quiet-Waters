@@ -43,6 +43,21 @@ export function Bible() {
     openChapter(BOOKS[bi].name, ch)
   }
 
+  // Continuous reading: move to the next chapter, but never wrap past the end of
+  // Scripture — returns false there so narration simply comes to rest.
+  const advance = (): boolean => {
+    const idx = BOOKS.findIndex((b) => b.name === book)
+    if (chapter < current.chapters) {
+      openChapter(book, chapter + 1)
+      return true
+    }
+    if (idx < BOOKS.length - 1) {
+      openChapter(BOOKS[idx + 1].name, 1)
+      return true
+    }
+    return false
+  }
+
   const savedList = Object.values(savedVerses).sort((a, b) => b.createdAt - a.createdAt)
 
   return (
@@ -109,6 +124,7 @@ export function Bible() {
               reference={`${book} ${chapter}`}
               translation={translation}
               onSelectVerse={setSelected}
+              onAdvance={advance}
             />
           </section>
 

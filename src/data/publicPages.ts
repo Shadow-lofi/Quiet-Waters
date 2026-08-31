@@ -58,6 +58,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
       'A watchful, hopeful study of what the New Testament says about the last days — the signs of the times and deep dives into Matthew, Acts, and Revelation. Never date-setting, never fearful.',
     type: 'article',
   },
+  {
+    path: '/lectio',
+    title: 'Lectio Divina — Pray the Scriptures Slowly | Quiet Waters',
+    description:
+      'A guided Lectio Divina — the ancient four-movement practice of praying a short passage of Scripture: read, reflect, pray, and rest. Free, private, and unhurried.',
+    type: 'article',
+  },
 ]
 
 export function pageMeta(path: string): PublicPageMeta | undefined {

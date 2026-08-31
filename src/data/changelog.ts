@@ -17,10 +17,44 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── August 31 (v1.21.0) ─────────────────────────────────
+  {
+    date: 'August 31, 2026',
+    tag: 'New',
+    title: 'Listen straight through — chapter after chapter',
+    detail:
+      'The narrator can now keep reading into the next chapter on its own, like an audiobook — for walks, chores, or resting with your eyes closed. Turn on “Keep reading” in the voice menu beside Listen, in both the Bible and Enoch readers.',
+    to: '/bible',
+  },
+  {
+    date: 'August 31, 2026',
+    tag: 'New',
+    title: 'Lectio Divina — pray the Scriptures slowly',
+    detail:
+      'An ancient, unhurried way of praying a short passage in four movements — read, reflect, pray, and rest. The words stay before you the whole way, with a gentle prompt for each movement. Find it on the Meditate page.',
+    to: '/lectio',
+  },
+  {
+    date: 'August 31, 2026',
+    tag: 'New',
+    title: 'A prayer list — and a record of answered prayer',
+    detail:
+      'Lay your requests before God and hold them in one quiet place, then mark them answered in His time — the answered ones settle into a record of His faithfulness. Private and on-device. Find it on your Journey.',
+    to: '/prayers',
+  },
+  {
+    date: 'August 31, 2026',
+    tag: 'New',
+    title: 'How is your soul today?',
+    detail:
+      'A gentle one-tap check-in on the Meditate page. Name where your soul is — weary, anxious, grateful, and more — and be met with a fitting word of Scripture. Your Journey quietly remembers, so you can see how your soul has been over time.',
+    to: '/meditate',
+  },
+
   // ── August 30 (v1.20.0) ─────────────────────────────────
   {
     date: 'August 30, 2026',
