@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { fetchPassage, type Passage } from '../lib/bible'
 import { useStore } from '../lib/store'
@@ -11,24 +11,47 @@ import type { SelectedVerse } from '../lib/types'
  * Fetches and renders a single chapter as flowing serif text with superscript
  * verse numbers. Text comes from bible-api.com via lib/bible (cached in
  * localStorage after the first read). Each verse is tappable for the study tools,
- * and any saved highlight color / note is shown inline.
+ * and any saved highlight color / note is shown inline. With "Keep reading" on,
+ * finishing a chapter's narration calls `onAdvance` and auto-plays the next.
  */
 export function ChapterReader({
   reference,
   translation,
   onSelectVerse,
+  onAdvance,
 }: {
   reference: string
   translation: string
   onSelectVerse: (v: SelectedVerse) => void
+  /** Advance to the next chapter for continuous reading; returns false at the
+   *  very end of Scripture (so narration simply stops). */
+  onAdvance?: () => boolean
 }) {
   const [passage, setPassage] = useState<Passage | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [attempt, setAttempt] = useState(0)
   const savedVerses = useStore((s) => s.savedVerses)
 
+  const continuous = useStore((s) => s.narrationContinuous)
+  const voiceURI = useStore((s) => s.narrationVoiceURI)
+  const rate = useStore((s) => s.narrationRate)
+
   const session = `bible:${reference}:${translation}`
   const readingIndex = useNarration((s) => (s.session === session ? s.index : -1))
+
+  const segments = passage ? passage.verses.map((v) => v.text) : []
+
+  // Keep the latest values where the stable end-handler / auto-play can read them.
+  const latest = useRef({ continuous, onAdvance, voiceURI, rate, session, segments })
+  latest.current = { continuous, onAdvance, voiceURI, rate, session, segments }
+  const pendingAutoPlay = useRef(false)
+
+  // Fired when a chapter finishes reading on its own — advance if continuous.
+  const handleEnd = useRef(() => {
+    const l = latest.current
+    if (!l.continuous) return
+    if (l.onAdvance?.()) pendingAutoPlay.current = true
+  }).current
 
   useEffect(() => {
     let cancelled = false
@@ -47,6 +70,20 @@ export function ChapterReader({
       cancelled = true
     }
   }, [reference, translation, attempt])
+
+  // Once the freshly-advanced chapter has loaded, keep the narration going.
+  useEffect(() => {
+    if (status === 'ready' && passage && pendingAutoPlay.current) {
+      pendingAutoPlay.current = false
+      const l = latest.current
+      if (!l.continuous) return
+      useNarration.getState().play(l.session, l.segments, {
+        voiceURI: l.voiceURI,
+        rate: l.rate,
+        onEnd: handleEnd,
+      })
+    }
+  }, [status, passage, handleEnd])
 
   if (status === 'loading') {
     return (
@@ -76,7 +113,12 @@ export function ChapterReader({
   return (
     <div>
       <div className="mb-4 flex justify-end">
-        <NarrationButton session={session} segments={passage.verses.map((v) => v.text)} />
+        <NarrationButton
+          session={session}
+          segments={segments}
+          onEnd={handleEnd}
+          showContinuous={!!onAdvance}
+        />
       </div>
       <p className="font-serif text-[1.15rem] leading-9 text-deep-800">
         {passage.verses.map((v, i) => {

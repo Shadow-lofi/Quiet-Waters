@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, X, Loader2, RefreshCw } from 'lucide-react'
 import { ENOCH_BOOKS, enochBookById, useEnoch, type EnochBook } from '../lib/enoch'
 import { useStore } from '../lib/store'
-import { chunkText } from '../lib/narration'
+import { chunkText, useNarration } from '../lib/narration'
 import { NarrationButton } from '../components/NarrationButton'
 import { Seo } from '../components/Seo'
 
@@ -22,6 +22,25 @@ export function EnochStudy() {
   const load = useEnoch((s) => s.load)
 
   const [pickerOpen, setPickerOpen] = useState(false)
+
+  const continuous = useStore((s) => s.narrationContinuous)
+  const voiceURI = useStore((s) => s.narrationVoiceURI)
+  const rate = useStore((s) => s.narrationRate)
+  const latest = useRef({
+    continuous,
+    voiceURI,
+    rate,
+    session: '',
+    segments: [] as string[],
+    advance: (): boolean => false,
+  })
+  const pendingAutoPlay = useRef(false)
+  // Fired when a chapter finishes reading on its own — advance if continuous.
+  const handleEnd = useRef(() => {
+    const l = latest.current
+    if (!l.continuous) return
+    if (l.advance()) pendingAutoPlay.current = true
+  }).current
 
   useEffect(() => {
     void load(book)
@@ -44,6 +63,33 @@ export function EnochStudy() {
 
   const section = book.sections.find((s) => chapter >= s.from && chapter <= s.to)
   const current = data?.chapters.find((c) => c.n === chapter)
+
+  // Continuous reading: move to the next chapter within this book, stopping at
+  // its end (we don't auto-jump between 1 & 2 Enoch).
+  const session = `enoch:${book.id}:${chapter}`
+  const segments = current ? chunkText(current.text) : []
+  const advance = (): boolean => {
+    if (chapter < book.chapters) {
+      go(book.id, chapter + 1)
+      return true
+    }
+    return false
+  }
+  latest.current = { continuous, voiceURI, rate, session, segments, advance }
+
+  // Once the freshly-advanced chapter is in view, keep the narration going.
+  useEffect(() => {
+    if (current && pendingAutoPlay.current) {
+      pendingAutoPlay.current = false
+      const l = latest.current
+      if (!l.continuous) return
+      useNarration.getState().play(l.session, l.segments, {
+        voiceURI: l.voiceURI,
+        rate: l.rate,
+        onEnd: handleEnd,
+      })
+    }
+  }, [current, handleEnd])
 
   return (
     <div className="flex flex-col gap-6">
@@ -109,8 +155,10 @@ export function EnochStudy() {
           <h2 className="font-serif text-2xl text-deep-900">Chapter {chapter}</h2>
           {current && (
             <NarrationButton
-              session={`enoch:${book.id}:${chapter}`}
-              segments={chunkText(current.text)}
+              session={session}
+              segments={segments}
+              onEnd={handleEnd}
+              showContinuous
             />
           )}
         </div>

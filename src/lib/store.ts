@@ -30,6 +30,7 @@ interface State {
   // ── reader narration (text-to-speech) ──
   narrationVoiceURI: string | null // chosen speechSynthesis voiceURI, null = auto-pick
   narrationRate: number // speaking rate (0.8 slower … 1.15 faster)
+  narrationContinuous: boolean // keep reading into the next chapter when one ends
 
   // ── gentle reminder (local, no server) ──
   reminderOn: boolean
@@ -100,6 +101,7 @@ type Prefs = Pick<
   | 'breatheName'
   | 'narrationVoiceURI'
   | 'narrationRate'
+  | 'narrationContinuous'
   | 'reminderOn'
   | 'reminderTime'
 >
@@ -126,6 +128,7 @@ export const useStore = create<State>()(
 
       narrationVoiceURI: null,
       narrationRate: 0.95,
+      narrationContinuous: false,
 
       reminderOn: false,
       reminderTime: '08:00',

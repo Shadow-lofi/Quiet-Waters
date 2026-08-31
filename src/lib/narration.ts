@@ -12,6 +12,9 @@ export interface NarrationOptions {
   voiceURI?: string | null
   /** Speaking rate (~0.8 slower … 1.15 faster). */
   rate?: number
+  /** Called once the whole passage finishes on its own (never on stop/pause).
+   *  Used for continuous reading — advancing to the next chapter. */
+  onEnd?: () => void
 }
 
 const synth: SpeechSynthesis | undefined =
@@ -160,6 +163,7 @@ export const useNarration = create<NarrationState>((set, get) => ({
           if (token !== mine) return
           stopKeepAlive()
           set({ status: 'idle', session: null, index: -1 })
+          opts?.onEnd?.() // natural completion only — stop() bumps the token first
         }
       }
       synth.speak(u)
