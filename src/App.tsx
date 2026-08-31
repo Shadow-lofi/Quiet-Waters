@@ -6,11 +6,13 @@ import { ChurchesFlyer } from './pages/ChurchesFlyer'
 import { ChurchesSlide } from './pages/ChurchesSlide'
 import { Meditate } from './pages/Meditate'
 import { Journey } from './pages/Journey'
+import { Prayers } from './pages/Prayers'
 import { Settings } from './pages/Settings'
 import { Updates } from './pages/Updates'
 import { Notifications } from './pages/Notifications'
 import { Study } from './pages/Study'
 import { LastDays } from './pages/LastDays'
+import { Lectio } from './pages/Lectio'
 import { Bible } from './pages/Bible'
 import { EnochStudy } from './pages/EnochStudy'
 
@@ -28,8 +30,10 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/meditate" element={<Meditate />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/prayers" element={<Prayers />} />
           <Route path="/study" element={<Study />} />
           <Route path="/last-days" element={<LastDays />} />
+          <Route path="/lectio" element={<Lectio />} />
           <Route path="/bible" element={<Bible />} />
           <Route path="/enoch" element={<EnochStudy />} />
           <Route path="/settings" element={<Settings />} />

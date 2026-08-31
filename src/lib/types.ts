@@ -37,6 +37,24 @@ export interface SavedVerse {
   createdAt: number
 }
 
+// A prayer the user is holding before God. When answered, `answeredAt` is set
+// and it settles into the "answered" record — a quiet history of faithfulness.
+// Local-first: lives in the persisted store.
+export interface PrayerRequest {
+  id: string
+  text: string
+  createdAt: number
+  answeredAt?: number // set when marked answered
+}
+
+// A one-tap check-in on the state of one's soul before a sitting. `state` is a
+// SoulState id (see data/soul.ts). Kept as a bounded local log so the Journey
+// can gently reflect how the soul has been lately. Local-first.
+export interface SoulCheckin {
+  state: string
+  at: number
+}
+
 // A verse tapped in the reader — the working target for the verse action sheet.
 export interface SelectedVerse {
   ref: string

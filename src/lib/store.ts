@@ -1,7 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { dayKey } from './date'
-import type { BreathPace, MotionPref, SavedVerse, Session, Soundscape, ThemePref } from './types'
+import type {
+  BreathPace,
+  MotionPref,
+  PrayerRequest,
+  SavedVerse,
+  Session,
+  SoulCheckin,
+  Soundscape,
+  ThemePref,
+} from './types'
 
 // The whole app is local-first: everything lives in this one persisted store,
 // so it works fully offline and keeps no account. (Cloud sync can come later.)
@@ -57,6 +66,12 @@ interface State {
   enochBook: string // book id (see ENOCH_BOOKS)
   enochChapter: number
 
+  // ── prayer list (local, private) ──
+  prayers: PrayerRequest[]
+
+  // ── soul check-ins (local, private) ──
+  soulLog: SoulCheckin[]
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -71,6 +86,11 @@ interface State {
   setBibleRef: (book: string, chapter: number) => void
   setBibleTranslation: (id: string) => void
   setEnochRef: (book: string, chapter: number) => void
+  addPrayer: (text: string) => void
+  answerPrayer: (id: string) => void
+  reopenPrayer: (id: string) => void
+  removePrayer: (id: string) => void
+  logSoul: (state: string) => void
   setName: (name: string) => void
   setOnboarded: (v: boolean) => void
   addSession: (s: Session) => void
@@ -148,6 +168,9 @@ export const useStore = create<State>()(
       enochBook: '1-enoch',
       enochChapter: 1,
 
+      prayers: [],
+      soulLog: [],
+
       lastDurationMin: 10,
       verseCursor: 0,
 
@@ -195,6 +218,33 @@ export const useStore = create<State>()(
       setBibleRef: (book, chapter) => set({ bibleBook: book, bibleChapter: chapter }),
       setBibleTranslation: (id) => set({ bibleTranslation: id }),
       setEnochRef: (book, chapter) => set({ enochBook: book, enochChapter: chapter }),
+
+      addPrayer: (text) =>
+        set((st) => {
+          const t = text.trim()
+          if (!t) return st
+          const prayer: PrayerRequest = {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            text: t.slice(0, 500),
+            createdAt: Date.now(),
+          }
+          return { prayers: [prayer, ...st.prayers].slice(0, 500) }
+        }),
+      answerPrayer: (id) =>
+        set((st) => ({
+          prayers: st.prayers.map((p) => (p.id === id ? { ...p, answeredAt: Date.now() } : p)),
+        })),
+      reopenPrayer: (id) =>
+        set((st) => ({
+          prayers: st.prayers.map((p) => {
+            if (p.id !== id) return p
+            const { answeredAt: _answeredAt, ...rest } = p
+            return rest
+          }),
+        })),
+      removePrayer: (id) => set((st) => ({ prayers: st.prayers.filter((p) => p.id !== id) })),
+      logSoul: (state) =>
+        set((st) => ({ soulLog: [{ state, at: Date.now() }, ...st.soulLog].slice(0, 200) })),
     }),
     {
       name: 'quiet-waters-v1',
