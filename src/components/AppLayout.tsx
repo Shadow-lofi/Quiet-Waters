@@ -1,5 +1,5 @@
-import { NavLink, Outlet, Link } from 'react-router-dom'
-import { Waves, CalendarHeart, BookOpen, Book, ScrollText, Settings as SettingsIcon } from 'lucide-react'
+import { NavLink, Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Waves, CalendarHeart, BookOpen, Book, ScrollText, ChevronLeft, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
 import { PullToRefresh } from './PullToRefresh'
@@ -15,7 +15,27 @@ const tabs = [
   { to: '/settings', label: 'Settings', Icon: SettingsIcon, end: false },
 ]
 
+// Where a sub-page's Back button lands when it was opened directly (no in-app
+// history to pop) — its natural parent, defaulting to the app home.
+const BACK_FALLBACK: Record<string, string> = {
+  '/last-days': '/study',
+  '/updates': '/meditate',
+  '/notifications': '/meditate',
+}
+
 export function AppLayout() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  // Tabs live in the bottom bar; only the deeper pages need a Back affordance —
+  // which matters most for installed PWAs, where there's no browser back button.
+  const isTab = tabs.some((t) => t.to === location.pathname)
+  const goBack = () => {
+    // A real in-app history entry pops back to it; a direct load falls back to
+    // the page's natural parent so Back never dead-ends or leaves the app.
+    if (location.key !== 'default') navigate(-1)
+    else navigate(BACK_FALLBACK[location.pathname] ?? '/meditate')
+  }
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
       <WaterBackground />
@@ -23,6 +43,15 @@ export function AppLayout() {
       <PullToRefresh />
       <Toaster />
       <main className="flex-1 px-5 pb-28 pt-6">
+        {!isTab && (
+          <button
+            onClick={goBack}
+            className="mb-4 -ml-1.5 inline-flex items-center gap-0.5 rounded-full py-1.5 pl-1.5 pr-3 text-sm font-medium text-deep-500 transition hover:bg-mist-200 hover:text-deep-700"
+          >
+            <ChevronLeft size={18} />
+            Back
+          </button>
+        )}
         <Outlet />
         <footer className="mt-12 text-center text-xs leading-relaxed text-deep-400">
           <p>
