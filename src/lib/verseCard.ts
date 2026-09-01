@@ -28,10 +28,17 @@ export const CARD_BACKGROUNDS: CardBackground[] = [
 
 const TEXT_COLOR = '#f3fbfd' // onwater — light in both themes
 
-/** Plain-text form for copy / text-share. */
-export function verseShareText(ref: string, text: string, translationShort?: string): string {
+/** Plain-text form for copy / text-share. An optional personal `note` (e.g. an
+ *  encouragement) is placed first, like a greeting before the verse. */
+export function verseShareText(
+  ref: string,
+  text: string,
+  translationShort?: string,
+  note?: string,
+): string {
   const tag = translationShort ? ` (${translationShort})` : ''
-  return `“${text}”\n— ${ref}${tag}\n\nvia Quiet Waters · ${DISPLAY_URL}`
+  const head = note?.trim() ? `${note.trim()}\n\n` : ''
+  return `${head}“${text}”\n— ${ref}${tag}\n\nvia Quiet Waters · ${DISPLAY_URL}`
 }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
@@ -51,9 +58,9 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines
 }
 
-// Largest font (within a range) whose wrapped block still fits the card.
-function fitVerse(ctx: CanvasRenderingContext2D, quoted: string, maxWidth: number) {
-  const maxBlock = SIZE - 420
+// Largest font (within a range) whose wrapped block still fits the card. A
+// `maxBlock` override leaves headroom for a note above the verse.
+function fitVerse(ctx: CanvasRenderingContext2D, quoted: string, maxWidth: number, maxBlock = SIZE - 420) {
   for (let fs = 64; fs >= 26; fs -= 2) {
     ctx.font = `italic 500 ${fs}px Georgia, 'Times New Roman', serif`
     const lines = wrapText(ctx, quoted, maxWidth)
@@ -68,11 +75,13 @@ interface RenderOpts {
   ref: string
   translationShort?: string
   background: CardBackground
+  /** An optional personal message, rendered as a warm opener near the top. */
+  note?: string
 }
 
 /** Render the verse card and return it as a JPEG blob (1080×1080). */
 export async function renderVerseImage(opts: RenderOpts): Promise<Blob> {
-  const { text, ref, translationShort, background } = opts
+  const { text, ref, translationShort, background, note } = opts
   const canvas = document.createElement('canvas')
   canvas.width = SIZE
   canvas.height = SIZE
@@ -99,10 +108,24 @@ export async function renderVerseImage(opts: RenderOpts): Promise<Blob> {
   ctx.shadowColor = 'rgba(0,0,0,0.28)'
   ctx.shadowBlur = 12
 
+  // Optional personal note — a warm opener near the top, above the verse.
+  if (note?.trim()) {
+    ctx.font = `italic 500 42px Georgia, 'Times New Roman', serif`
+    const noteLines = wrapText(ctx, note.trim(), SIZE - 260).slice(0, 2)
+    let ny = 168
+    for (const l of noteLines) {
+      ctx.fillText(l, SIZE / 2, ny)
+      ny += 56
+    }
+  }
+
   const maxWidth = SIZE - 220
-  const { fs, lines } = fitVerse(ctx, `“${text}”`, maxWidth)
+  // Reserve headroom at the top when a note is present, and nudge the verse down
+  // so the two never collide — even for the longest passages.
+  const topReserve = note?.trim() ? 160 : 0
+  const { fs, lines } = fitVerse(ctx, `“${text}”`, maxWidth, SIZE - 420 - topReserve)
   const lineHeight = fs * 1.42
-  let y = SIZE / 2 - (lines.length * lineHeight) / 2 + lineHeight / 2 - 20
+  let y = SIZE / 2 - (lines.length * lineHeight) / 2 + lineHeight / 2 - 20 + topReserve / 2
   for (const line of lines) {
     ctx.fillText(line, SIZE / 2, y)
     y += lineHeight
@@ -127,17 +150,19 @@ export async function renderVerseImage(opts: RenderOpts): Promise<Blob> {
   })
 }
 
-/** Share the rendered card via the native sheet, or download it as a fallback. */
+/** Share the rendered card via the native sheet, or download it as a fallback.
+ *  An optional `text` rides along in the share (the accompanying message). */
 export async function shareOrDownloadImage(
   blob: Blob,
   ref: string,
+  text?: string,
 ): Promise<'shared' | 'downloaded'> {
   const filename = `${ref.replace(/[^\w]+/g, '-').toLowerCase() || 'verse'}.jpg`
   const file = new File([blob], filename, { type: 'image/jpeg' })
   const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean }
   if (typeof nav.share === 'function' && nav.canShare?.({ files: [file] })) {
     try {
-      await nav.share({ files: [file], title: ref })
+      await nav.share(text ? { files: [file], title: ref, text } : { files: [file], title: ref })
       return 'shared'
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') return 'shared' // cancelled — don't also download

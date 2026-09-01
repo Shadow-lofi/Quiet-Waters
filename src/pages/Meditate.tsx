@@ -13,6 +13,7 @@ import {
   MoonStar,
   Hourglass,
   BookOpen,
+  HeartHandshake,
   ArrowRight,
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
@@ -221,6 +222,21 @@ export function Meditate() {
         <div className="min-w-0 flex-1">
           <p className="font-medium text-deep-900">Lectio Divina</p>
           <p className="truncate text-sm text-deep-500">Pray the Scriptures, slowly</p>
+        </div>
+        <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+      </Link>
+
+      {/* Send an encouragement — a verse card for someone (own page) */}
+      <Link
+        to="/encourage"
+        className="group flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+          <HeartHandshake size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-deep-900">Send an encouragement</p>
+          <p className="truncate text-sm text-deep-500">A verse for someone you love</p>
         </div>
         <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
       </Link>
