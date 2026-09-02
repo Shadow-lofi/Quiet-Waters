@@ -80,6 +80,17 @@ export const BOOKS: BibleBook[] = [
 
 export const bookByName = (name: string): BibleBook | undefined => BOOKS.find((b) => b.name === name)
 
+// Single-chapter books need an explicit verse range from bible-api.com: it reads
+// "Jude 1" as verse 1, not the whole book, so we request "Jude 1:1-<verses>".
+// Traditional verse counts, stable across the public-domain translations here.
+export const SINGLE_CHAPTER_VERSES: Record<string, number> = {
+  Obadiah: 21,
+  Philemon: 25,
+  '2 John': 13,
+  '3 John': 14,
+  Jude: 25,
+}
+
 // Public-domain translations offered in the reader (bible-api.com identifiers).
 export interface Translation {
   id: string
