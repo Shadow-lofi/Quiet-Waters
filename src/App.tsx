@@ -18,6 +18,8 @@ import { Encourage } from './pages/Encourage'
 import { Bible } from './pages/Bible'
 import { EnochStudy } from './pages/EnochStudy'
 import { Memory } from './pages/Memory'
+import { Devotional } from './pages/Devotional'
+import { DevotionalSeries } from './pages/DevotionalSeries'
 
 export default function App() {
   return (
@@ -39,6 +41,8 @@ export default function App() {
           <Route path="/lectio" element={<Lectio />} />
           <Route path="/kids" element={<KidsStudy />} />
           <Route path="/memory" element={<Memory />} />
+          <Route path="/devotional" element={<Devotional />} />
+          <Route path="/devotional/:id" element={<DevotionalSeries />} />
           <Route path="/encourage" element={<Encourage />} />
           <Route path="/bible" element={<Bible />} />
           <Route path="/enoch" element={<EnochStudy />} />

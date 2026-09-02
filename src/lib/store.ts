@@ -6,6 +6,7 @@ import type {
   BreathPace,
   MemoryVerse,
   MotionPref,
+  PrayerCategory,
   PrayerRequest,
   SavedVerse,
   Session,
@@ -84,6 +85,10 @@ interface State {
   // ── scripture memory (local, private) — verses hidden in the heart ──
   memoryVerses: MemoryVerse[]
 
+  // ── devotional series (local) ──
+  devotionalProgress: Record<string, number[]> // seriesId → completed day indices
+  devotionalActive: string | null // the series to resume on the home screen
+
   // ── kids Bible study — ids of stories the child has finished ──
   kidStudiesDone: string[]
 
@@ -101,10 +106,13 @@ interface State {
   setBibleRef: (book: string, chapter: number) => void
   setBibleTranslation: (id: string) => void
   setEnochRef: (book: string, chapter: number) => void
-  addPrayer: (text: string) => void
-  answerPrayer: (id: string) => void
+  addPrayer: (text: string, category?: PrayerCategory) => void
+  answerPrayer: (id: string, note?: string) => void
   reopenPrayer: (id: string) => void
   removePrayer: (id: string) => void
+  startDevotional: (seriesId: string) => void
+  completeDevotionalDay: (seriesId: string, day: number) => void
+  resetDevotional: (seriesId: string) => void
   logSoul: (state: string) => void
   addMemoryVerse: (ref: string, text: string, translation?: string) => void
   removeMemoryVerse: (ref: string) => void
@@ -201,6 +209,8 @@ export const useStore = create<State>()(
       prayers: [],
       soulLog: [],
       memoryVerses: [],
+      devotionalProgress: {},
+      devotionalActive: null,
       kidStudiesDone: [],
 
       lastDurationMin: 10,
@@ -262,7 +272,7 @@ export const useStore = create<State>()(
       setBibleTranslation: (id) => set({ bibleTranslation: id }),
       setEnochRef: (book, chapter) => set({ enochBook: book, enochChapter: chapter }),
 
-      addPrayer: (text) =>
+      addPrayer: (text, category) =>
         set((st) => {
           const t = text.trim()
           if (!t) return st
@@ -270,24 +280,52 @@ export const useStore = create<State>()(
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             text: t.slice(0, 500),
             createdAt: Date.now(),
+            ...(category ? { category } : {}),
           }
           return { prayers: [prayer, ...st.prayers].slice(0, 500) }
         }),
-      answerPrayer: (id) =>
+      answerPrayer: (id, note) =>
         set((st) => ({
-          prayers: st.prayers.map((p) => (p.id === id ? { ...p, answeredAt: Date.now() } : p)),
+          prayers: st.prayers.map((p) =>
+            p.id === id
+              ? { ...p, answeredAt: Date.now(), ...(note?.trim() ? { answeredNote: note.trim().slice(0, 300) } : {}) }
+              : p,
+          ),
         })),
       reopenPrayer: (id) =>
         set((st) => ({
           prayers: st.prayers.map((p) => {
             if (p.id !== id) return p
-            const { answeredAt: _answeredAt, ...rest } = p
+            const { answeredAt: _answeredAt, answeredNote: _answeredNote, ...rest } = p
             return rest
           }),
         })),
       removePrayer: (id) => set((st) => ({ prayers: st.prayers.filter((p) => p.id !== id) })),
       logSoul: (state) =>
         set((st) => ({ soulLog: [{ state, at: Date.now() }, ...st.soulLog].slice(0, 200) })),
+
+      startDevotional: (seriesId) => set({ devotionalActive: seriesId }),
+      completeDevotionalDay: (seriesId, day) =>
+        set((st) => {
+          const done = st.devotionalProgress[seriesId] ?? []
+          if (done.includes(day)) return st
+          return {
+            devotionalActive: seriesId,
+            devotionalProgress: {
+              ...st.devotionalProgress,
+              [seriesId]: [...done, day].sort((a, b) => a - b),
+            },
+          }
+        }),
+      resetDevotional: (seriesId) =>
+        set((st) => {
+          const next = { ...st.devotionalProgress }
+          delete next[seriesId]
+          return {
+            devotionalProgress: next,
+            devotionalActive: st.devotionalActive === seriesId ? null : st.devotionalActive,
+          }
+        }),
 
       addMemoryVerse: (ref, text, translation) =>
         set((st) => {

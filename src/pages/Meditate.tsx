@@ -30,6 +30,7 @@ import { primeAudio } from '../lib/audio'
 import { computeStats } from '../lib/streak'
 import { VERSES, verseByRef, YAHWEH_BREATH } from '../data/verses'
 import { dueVerses } from '../data/memory'
+import { seriesById, nextIncompleteDay } from '../data/devotionals'
 import { DURATION_PRESETS } from '../data/presets'
 import { GUIDED_SESSIONS, type GuidedSession } from '../data/guided'
 
@@ -51,9 +52,18 @@ const GUIDED_ICON: Record<GuidedSession['icon'], typeof Sunrise> = {
 export function Meditate() {
   const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions, breatheName, setPref, memoryVerses } =
     useStore()
+  const devotionalActive = useStore((s) => s.devotionalActive)
+  const devotionalProgress = useStore((s) => s.devotionalProgress)
   const verse = VERSES[verseCursor % VERSES.length]
   const streak = computeStats(sessions).currentStreak
   const memoryDue = dueVerses(memoryVerses).length
+
+  // Resume the active devotional, if one is under way and not yet finished.
+  const activeSeries = devotionalActive ? seriesById(devotionalActive) : undefined
+  const devNextDay = activeSeries
+    ? nextIncompleteDay(activeSeries.days.length, devotionalProgress[activeSeries.id] ?? [])
+    : 0
+  const showDevResume = activeSeries && devNextDay < activeSeries.days.length
 
   const [minutes, setMinutes] = useState(lastDurationMin)
   const [active, setActive] = useState(false)
@@ -115,6 +125,25 @@ export function Meditate() {
               {memoryDue} verse{memoryDue > 1 ? 's' : ''} to review
             </p>
             <p className="truncate text-sm text-deep-500">Hide the Word in your heart</p>
+          </div>
+          <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+        </Link>
+      )}
+
+      {/* resume the devotional you're in the middle of */}
+      {showDevResume && activeSeries && (
+        <Link
+          to={`/devotional/${activeSeries.id}`}
+          className="group flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+            <Sunrise size={20} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-deep-900">Continue · {activeSeries.title}</p>
+            <p className="truncate text-sm text-deep-500">
+              Day {devNextDay + 1} of {activeSeries.days.length}
+            </p>
           </div>
           <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
         </Link>
