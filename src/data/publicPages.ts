@@ -65,6 +65,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
       'A guided Lectio Divina — the ancient four-movement practice of praying a short passage of Scripture: read, reflect, pray, and rest. Free, private, and unhurried.',
     type: 'article',
   },
+  {
+    path: '/kids',
+    title: 'Kids Bible Study — Animated Bible Stories | Quiet Waters',
+    description:
+      'Animated Bible stories for little ones — Creation, Noah, David & Goliath, and Jonah. Read along or tap “Read to me,” with a memory verse at the end. Free, private, works offline.',
+    type: 'website',
+  },
 ]
 
 export function pageMeta(path: string): PublicPageMeta | undefined {

@@ -72,6 +72,9 @@ interface State {
   // ── soul check-ins (local, private) ──
   soulLog: SoulCheckin[]
 
+  // ── kids Bible study — ids of stories the child has finished ──
+  kidStudiesDone: string[]
+
   // ── setup memory ──
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
@@ -91,6 +94,7 @@ interface State {
   reopenPrayer: (id: string) => void
   removePrayer: (id: string) => void
   logSoul: (state: string) => void
+  completeStudy: (id: string) => void
   setName: (name: string) => void
   setOnboarded: (v: boolean) => void
   addSession: (s: Session) => void
@@ -170,6 +174,7 @@ export const useStore = create<State>()(
 
       prayers: [],
       soulLog: [],
+      kidStudiesDone: [],
 
       lastDurationMin: 10,
       verseCursor: 0,
@@ -245,6 +250,12 @@ export const useStore = create<State>()(
       removePrayer: (id) => set((st) => ({ prayers: st.prayers.filter((p) => p.id !== id) })),
       logSoul: (state) =>
         set((st) => ({ soulLog: [{ state, at: Date.now() }, ...st.soulLog].slice(0, 200) })),
+      completeStudy: (id) =>
+        set((st) =>
+          st.kidStudiesDone.includes(id)
+            ? st
+            : { kidStudiesDone: [id, ...st.kidStudiesDone] },
+        ),
     }),
     {
       name: 'quiet-waters-v1',
