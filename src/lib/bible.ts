@@ -41,19 +41,28 @@ function writeCache(ref: string, translation: string, passage: Passage) {
  * localStorage cache when available; throws on network/API error so the caller
  * can show a retry state.
  */
-export async function fetchPassage(ref: string, translation = DEFAULT_TRANSLATION): Promise<Passage> {
-  // For a single-chapter book, `ref` is "Book 1"; bible-api needs the full verse
-  // range or it returns only verse 1. `need` is that book's verse count.
+/** Verse count for a single-chapter book referenced as "Book 1", else undefined. */
+export function expectedVerseCount(ref: string): number | undefined {
   const m = ref.match(/^(.+) 1$/)
-  const need = m ? SINGLE_CHAPTER_VERSES[m[1]] : undefined
+  return m ? SINGLE_CHAPTER_VERSES[m[1]] : undefined
+}
+
+/** The reference to request from bible-api. Single-chapter books ("Jude 1") need
+ *  an explicit verse range ("Jude 1:1-25") or the API returns only verse 1. */
+export function apiReference(ref: string): string {
+  const need = expectedVerseCount(ref)
+  return need ? `${ref}:1-${need}` : ref
+}
+
+export async function fetchPassage(ref: string, translation = DEFAULT_TRANSLATION): Promise<Passage> {
+  const need = expectedVerseCount(ref)
 
   const cached = readCache(ref, translation)
-  // Serve the cache, except a single-chapter entry saved before this fix (which
-  // holds only verse 1) — re-fetch it in full.
+  // Serve the cache, except a single-chapter entry saved before the range fix
+  // (which holds only verse 1) — re-fetch it in full.
   if (cached && (need === undefined || cached.verses.length >= need)) return cached
 
-  const query = need ? `${ref}:1-${need}` : ref
-  const url = `https://bible-api.com/${encodeURIComponent(query)}?translation=${encodeURIComponent(translation)}`
+  const url = `https://bible-api.com/${encodeURIComponent(apiReference(ref))}?translation=${encodeURIComponent(translation)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Could not load ${ref} (${res.status})`)
   const data = await res.json()
