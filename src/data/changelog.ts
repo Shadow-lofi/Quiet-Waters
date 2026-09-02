@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 2 (v1.26.0) ────────────────────────────────
+  {
+    date: 'September 2, 2026',
+    tag: 'New',
+    title: 'Keeping the Sabbath — a weekly rest',
+    detail:
+      'Set apart one day a week to rest in the Lord. On your Sabbath, the home screen greets you with a rest Scripture and an “I’m resting today” blessing — rest as worship, never a day missed. Turn on a gentle weekly reminder in Settings to be invited even when the app is closed in the background.',
+    to: '/meditate',
+  },
   // ── September 2 (v1.25.0) ────────────────────────────────
   {
     date: 'September 2, 2026',

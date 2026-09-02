@@ -12,6 +12,7 @@ import {
   Church,
 } from 'lucide-react'
 import { useStore } from '../lib/store'
+import { DOW_LETTER, DOW_FULL } from '../lib/date'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
 import { startAmbient, stopAmbient, setAmbientVolume } from '../lib/ambient'
@@ -205,6 +206,25 @@ export function Settings() {
     return 'Allow notifications to be nudged while the app is in the background'
   }
 
+  const toggleSabbathReminder = async (on: boolean) => {
+    s.setPref('sabbathReminderOn', on)
+    // Ask for notification permission the first time it's switched on (a user
+    // gesture, so the prompt is allowed). Without it the Sabbath card in the app
+    // still greets you — the notification just adds the backgrounded invitation.
+    if (on && NOTIFICATIONS_SUPPORTED && notificationPermission() === 'default') {
+      setPerm(await requestNotificationPermission())
+    }
+  }
+
+  const sabbathHint = (): string => {
+    const day = DOW_FULL[s.sabbathDay]
+    if (!s.sabbathReminderOn) return `A weekly invitation to rest on ${day}`
+    if (!NOTIFICATIONS_SUPPORTED) return `The Sabbath card greets you on ${day}`
+    if (perm === 'granted') return `A gentle nudge on ${day}, and on your device when backgrounded`
+    if (perm === 'denied') return 'Notifications are blocked — you’ll still see the Sabbath card'
+    return 'Allow notifications to be invited while the app is in the background'
+  }
+
   const pickScape = (id: Soundscape) => {
     s.setPref('soundscape', id)
     if (id === 'off') {
@@ -300,6 +320,49 @@ export function Settings() {
                 className="rounded-full bg-mist-100 px-3.5 py-1.5 text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
               />
             </Row>
+          )}
+        </div>
+      </section>
+
+      {/* weekly Sabbath — a once-a-week invitation to rest as worship */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <div className={s.sabbathReminderOn ? 'divide-y divide-line' : ''}>
+          <Row label="Weekly Sabbath" hint={sabbathHint()}>
+            <Toggle checked={s.sabbathReminderOn} onChange={toggleSabbathReminder} />
+          </Row>
+          {s.sabbathReminderOn && (
+            <>
+              <Row label="Time" hint="When to invite you to rest">
+                <input
+                  type="time"
+                  value={s.sabbathReminderTime}
+                  onChange={(e) => s.setPref('sabbathReminderTime', e.target.value)}
+                  aria-label="Sabbath reminder time"
+                  className="rounded-full bg-mist-100 px-3.5 py-1.5 text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
+                />
+              </Row>
+              <div className="py-3.5">
+                <p className="mb-2 text-deep-800">Which day is your Sabbath?</p>
+                <div className="flex gap-1.5">
+                  {DOW_LETTER.map((letter, i) => {
+                    const on = i === s.sabbathDay
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => s.setSabbathDay(i)}
+                        aria-label={DOW_FULL[i]}
+                        aria-pressed={on}
+                        className={`h-10 flex-1 rounded-xl text-sm font-semibold transition ${
+                          on ? 'bg-water-500 text-onwater' : 'bg-mist-200 text-deep-600 hover:bg-mist-300'
+                        }`}
+                      >
+                        {letter}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </section>

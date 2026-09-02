@@ -19,6 +19,7 @@ import {
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { ReminderBanner } from '../components/ReminderBanner'
+import { SabbathCard } from '../components/SabbathCard'
 import { NotificationsBell } from '../components/NotificationsBell'
 import { SoulCheck } from '../components/SoulCheck'
 import { SessionOverlay } from '../components/SessionOverlay'
@@ -93,6 +94,9 @@ export function Meditate() {
       </header>
 
       <ReminderBanner onBegin={begin} />
+
+      {/* weekly Sabbath — a warm invitation to rest as worship */}
+      <SabbathCard />
 
       {/* how is your soul today? — a gentle check-in before sitting */}
       <SoulCheck />
