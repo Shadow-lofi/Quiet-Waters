@@ -13,6 +13,7 @@ import { Notifications } from './pages/Notifications'
 import { Study } from './pages/Study'
 import { LastDays } from './pages/LastDays'
 import { Lectio } from './pages/Lectio'
+import { KidsStudy } from './pages/KidsStudy'
 import { Encourage } from './pages/Encourage'
 import { Bible } from './pages/Bible'
 import { EnochStudy } from './pages/EnochStudy'
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/study" element={<Study />} />
           <Route path="/last-days" element={<LastDays />} />
           <Route path="/lectio" element={<Lectio />} />
+          <Route path="/kids" element={<KidsStudy />} />
           <Route path="/encourage" element={<Encourage />} />
           <Route path="/bible" element={<Bible />} />
           <Route path="/enoch" element={<EnochStudy />} />

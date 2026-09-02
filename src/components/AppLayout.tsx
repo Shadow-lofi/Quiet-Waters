@@ -21,6 +21,7 @@ const tabs = [
 const BACK_FALLBACK: Record<string, string> = {
   '/last-days': '/study',
   '/lectio': '/meditate',
+  '/kids': '/study',
   '/encourage': '/meditate',
   '/prayers': '/journey',
   '/updates': '/meditate',
