@@ -47,6 +47,13 @@ interface State {
   reminderDismissedDay: string // dayKey the in-app banner was last dismissed
   reminderNotifiedDay: string // dayKey a device notification last fired
 
+  // ── weekly Sabbath rhythm (local) ──
+  sabbathDay: number // 0=Sun..6=Sat (JS getDay); the day set apart to rest
+  sabbathLog: string[] // dayKeys the user chose to "keep the Sabbath"
+  sabbathReminderOn: boolean // a gentle device notification on the Sabbath
+  sabbathReminderTime: string // 'HH:MM' 24-hour, local time
+  sabbathNotifiedDay: string // dayKey a Sabbath notification last fired
+
   // ── install invite (browser only) ──
   installPromptDismissed: boolean // user tapped X — hide the banner for good
   installCompleted: boolean // the app was actually installed — stop prompting
@@ -104,6 +111,9 @@ interface State {
   nextVerse: (total: number) => void
   dismissReminderToday: () => void
   markReminderNotified: () => void
+  setSabbathDay: (day: number) => void
+  keepSabbath: (dateKey: string) => void
+  markSabbathNotified: () => void
   dismissInstallPrompt: () => void
   markInstalled: () => void
   dismissNotice: (id: string) => void
@@ -128,6 +138,8 @@ type Prefs = Pick<
   | 'narrationContinuous'
   | 'reminderOn'
   | 'reminderTime'
+  | 'sabbathReminderOn'
+  | 'sabbathReminderTime'
 >
 
 export const useStore = create<State>()(
@@ -159,6 +171,12 @@ export const useStore = create<State>()(
       reminderDismissedDay: '',
       reminderNotifiedDay: '',
 
+      sabbathDay: 0, // Sunday by default
+      sabbathLog: [],
+      sabbathReminderOn: false,
+      sabbathReminderTime: '09:00',
+      sabbathNotifiedDay: '',
+
       installPromptDismissed: false,
       installCompleted: false,
 
@@ -188,6 +206,17 @@ export const useStore = create<State>()(
       nextVerse: (total) => set((st) => ({ verseCursor: (st.verseCursor + 1) % Math.max(1, total) })),
       dismissReminderToday: () => set({ reminderDismissedDay: dayKey() }),
       markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
+
+      setSabbathDay: (day) => set({ sabbathDay: day }),
+      // Toggle whether the given day was kept as a Sabbath rest — a gentle count,
+      // never a streak to fail.
+      keepSabbath: (dateKey) =>
+        set((st) => ({
+          sabbathLog: st.sabbathLog.includes(dateKey)
+            ? st.sabbathLog.filter((d) => d !== dateKey)
+            : [dateKey, ...st.sabbathLog].slice(0, 500),
+        })),
+      markSabbathNotified: () => set({ sabbathNotifiedDay: dayKey() }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       markInstalled: () => set({ installCompleted: true }),
       dismissNotice: (id) =>

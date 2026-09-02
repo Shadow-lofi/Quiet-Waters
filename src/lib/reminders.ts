@@ -110,3 +110,57 @@ export async function fireReminderNotification(): Promise<void> {
     // notifications unavailable — the in-app banner still covers the user
   }
 }
+
+// ── Weekly Sabbath reminder ────────────────────────────────────────────────
+// A once-a-week invitation to rest on the user's chosen Sabbath day. It reaches
+// you the same two ways the daily nudge does: the SabbathCard on the home screen
+// (always), plus a soft device notification (if allowed) when the app is
+// backgrounded on the Sabbath. Rest is worship — the tone is invitation, never
+// alarm. At most one notification per Sabbath. No server: nothing fires while
+// the app is fully closed (by design).
+
+const SABBATH_NUDGES: Nudge[] = [
+  { title: 'Today is your Sabbath', body: 'Come to me, and I will give you rest.', ref: 'Matthew 11:28' },
+  { title: 'Rest is worship', body: 'The Sabbath was made for man, not man for the Sabbath.', ref: 'Mark 2:27' },
+  { title: 'Lay down the striving', body: 'There remains a Sabbath rest for the people of God.', ref: 'Hebrews 4:9' },
+  { title: 'Be restored', body: 'He makes me lie down in green pastures; he restores my soul.', ref: 'Psalm 23:2–3' },
+  { title: 'A holy rest', body: 'God blessed the seventh day and made it holy.', ref: 'Genesis 2:3' },
+  { title: 'His presence, His rest', body: 'My presence will go with you, and I will give you rest.', ref: 'Exodus 33:14' },
+]
+
+/** The Sabbath invitation for today — stable within the day, rotates weekly. */
+export function todaysSabbathNudge(now: Date = new Date()): Nudge {
+  const week = Math.floor(now.getTime() / (7 * 86_400_000))
+  return SABBATH_NUDGES[((week % SABBATH_NUDGES.length) + SABBATH_NUDGES.length) % SABBATH_NUDGES.length]
+}
+
+/**
+ * Show the weekly Sabbath invitation as a device notification. Like the daily
+ * reminder, it prefers the service-worker registration (fires when backgrounded)
+ * and falls back to a plain Notification. Its own tag so it never collides with
+ * the daily nudge.
+ */
+export async function fireSabbathNotification(): Promise<void> {
+  if (notificationPermission() !== 'granted') return
+  const nudge = todaysSabbathNudge()
+  const options: NotificationOptions = {
+    body: `“${nudge.body}” — ${nudge.ref}`,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'quiet-waters-sabbath', // replaces any earlier one; never stacks
+  }
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration()
+    if (reg) {
+      await reg.showNotification(nudge.title, options)
+      return
+    }
+  } catch {
+    // fall through to the plain Notification path
+  }
+  try {
+    new Notification(nudge.title, options)
+  } catch {
+    // notifications unavailable — the in-app SabbathCard still covers the user
+  }
+}

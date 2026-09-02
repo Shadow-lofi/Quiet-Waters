@@ -1,6 +1,18 @@
 // Local-day helpers. Streaks are counted by the user's local calendar day, so
 // a late-night sitting still lands on the right day.
 
+// Day-of-week initials, Sunday-first (matches JS getDay: 0=Sun..6=Sat).
+export const DOW_LETTER = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+export const DOW_FULL = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+]
+
 /** YYYY-MM-DD for the given date in the local timezone. */
 export function dayKey(d: Date = new Date()): string {
   const y = d.getFullYear()
