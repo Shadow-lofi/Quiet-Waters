@@ -3,6 +3,7 @@ import { Waves, CalendarHeart, BookOpen, Book, ScrollText, ChevronLeft, Settings
 import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
 import { PullToRefresh } from './PullToRefresh'
+import { InstallBar } from './InstallBar'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 
@@ -49,6 +50,7 @@ export function AppLayout() {
         className="flex-1 px-5 pb-28"
         style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}
       >
+        <InstallBar />
         {!isTab && (
           <button
             onClick={goBack}

@@ -19,7 +19,6 @@ import {
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { ReminderBanner } from '../components/ReminderBanner'
-import { InstallBanner } from '../components/InstallBanner'
 import { NotificationsBell } from '../components/NotificationsBell'
 import { SoulCheck } from '../components/SoulCheck'
 import { SessionOverlay } from '../components/SessionOverlay'
@@ -94,7 +93,6 @@ export function Meditate() {
       </header>
 
       <ReminderBanner onBegin={begin} />
-      <InstallBanner />
 
       {/* how is your soul today? — a gentle check-in before sitting */}
       <SoulCheck />
