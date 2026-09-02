@@ -55,6 +55,32 @@ export interface SoulCheckin {
   at: number
 }
 
+// A reverent symbol shown on the face of a memory flashcard (see MemorySymbol).
+export type MemorySymbol =
+  | 'drop'
+  | 'cross'
+  | 'flame'
+  | 'crown'
+  | 'star'
+  | 'book'
+  | 'heart'
+  | 'anchor'
+
+// A verse the user is hiding in their heart. Practiced as a flip flashcard and
+// resurfaced on a gentle spaced-repetition schedule: each recall pushes `dueAt`
+// further out (by `level`); a miss brings it back to learning. Local-first.
+export interface MemoryVerse {
+  ref: string // canonical reference, the key ("Psalm 46:10")
+  text: string
+  translation?: string // translation id/short it was added from, if known
+  addedAt: number
+  level: number // 0 = learning; higher boxes = longer intervals
+  dueAt: number // ms timestamp of the next review
+  lastReviewedAt?: number
+  reviewCount: number
+  symbol: MemorySymbol // the face shown on the card front
+}
+
 // A verse tapped in the reader — the working target for the verse action sheet.
 export interface SelectedVerse {
   ref: string

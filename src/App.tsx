@@ -17,6 +17,7 @@ import { KidsStudy } from './pages/KidsStudy'
 import { Encourage } from './pages/Encourage'
 import { Bible } from './pages/Bible'
 import { EnochStudy } from './pages/EnochStudy'
+import { Memory } from './pages/Memory'
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/last-days" element={<LastDays />} />
           <Route path="/lectio" element={<Lectio />} />
           <Route path="/kids" element={<KidsStudy />} />
+          <Route path="/memory" element={<Memory />} />
           <Route path="/encourage" element={<Encourage />} />
           <Route path="/bible" element={<Bible />} />
           <Route path="/enoch" element={<EnochStudy />} />
