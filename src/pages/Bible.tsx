@@ -144,13 +144,22 @@ export function Bible() {
           </div>
         </>
       ) : (
-        <SavedList
-          list={savedList}
-          onOpen={(sv) => {
-            const m = sv.ref.match(/^(.*) (\d+):\d+$/)
-            if (m) openChapter(m[1], Number(m[2]))
-          }}
-        />
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={() => setTab('read')}
+            className="inline-flex items-center gap-1 self-start rounded-full py-1.5 pl-1.5 pr-3 text-sm font-medium text-deep-500 transition hover:bg-mist-200 hover:text-deep-700"
+          >
+            <ChevronLeft size={18} />
+            Back to {book} {chapter}
+          </button>
+          <SavedList
+            list={savedList}
+            onOpen={(sv) => {
+              const m = sv.ref.match(/^(.*) (\d+):\d+$/)
+              if (m) openChapter(m[1], Number(m[2]))
+            }}
+          />
+        </div>
       )}
 
       {pickerOpen && (

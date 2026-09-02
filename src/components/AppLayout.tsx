@@ -45,7 +45,10 @@ export function AppLayout() {
       <ReminderScheduler />
       <PullToRefresh />
       <Toaster />
-      <main className="flex-1 px-5 pb-28 pt-6">
+      <main
+        className="flex-1 px-5 pb-28"
+        style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}
+      >
         {!isTab && (
           <button
             onClick={goBack}
