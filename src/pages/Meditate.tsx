@@ -15,6 +15,7 @@ import {
   BookOpen,
   HeartHandshake,
   ArrowRight,
+  Brain,
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
@@ -28,6 +29,7 @@ import { useStore } from '../lib/store'
 import { primeAudio } from '../lib/audio'
 import { computeStats } from '../lib/streak'
 import { VERSES, verseByRef, YAHWEH_BREATH } from '../data/verses'
+import { dueVerses } from '../data/memory'
 import { DURATION_PRESETS } from '../data/presets'
 import { GUIDED_SESSIONS, type GuidedSession } from '../data/guided'
 
@@ -47,10 +49,11 @@ const GUIDED_ICON: Record<GuidedSession['icon'], typeof Sunrise> = {
 }
 
 export function Meditate() {
-  const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions, breatheName, setPref } =
+  const { name, verseCursor, nextVerse, lastDurationMin, setLastDuration, sessions, breatheName, setPref, memoryVerses } =
     useStore()
   const verse = VERSES[verseCursor % VERSES.length]
   const streak = computeStats(sessions).currentStreak
+  const memoryDue = dueVerses(memoryVerses).length
 
   const [minutes, setMinutes] = useState(lastDurationMin)
   const [active, setActive] = useState(false)
@@ -97,6 +100,25 @@ export function Meditate() {
 
       {/* weekly Sabbath — a warm invitation to rest as worship */}
       <SabbathCard />
+
+      {/* scripture memory — a gentle nudge when verses are due to review */}
+      {memoryDue > 0 && (
+        <Link
+          to="/memory"
+          className="group flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+            <Brain size={20} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-deep-900">
+              {memoryDue} verse{memoryDue > 1 ? 's' : ''} to review
+            </p>
+            <p className="truncate text-sm text-deep-500">Hide the Word in your heart</p>
+          </div>
+          <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+        </Link>
+      )}
 
       {/* how is your soul today? — a gentle check-in before sitting */}
       <SoulCheck />

@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { dayKey } from './date'
+import { newMemoryVerse, reviewOutcome } from '../data/memory'
 import type {
   BreathPace,
+  MemoryVerse,
   MotionPref,
   PrayerRequest,
   SavedVerse,
@@ -79,6 +81,9 @@ interface State {
   // ── soul check-ins (local, private) ──
   soulLog: SoulCheckin[]
 
+  // ── scripture memory (local, private) — verses hidden in the heart ──
+  memoryVerses: MemoryVerse[]
+
   // ── kids Bible study — ids of stories the child has finished ──
   kidStudiesDone: string[]
 
@@ -101,6 +106,9 @@ interface State {
   reopenPrayer: (id: string) => void
   removePrayer: (id: string) => void
   logSoul: (state: string) => void
+  addMemoryVerse: (ref: string, text: string, translation?: string) => void
+  removeMemoryVerse: (ref: string) => void
+  reviewMemoryVerse: (ref: string, recalled: boolean) => void
   completeStudy: (id: string) => void
   setName: (name: string) => void
   setOnboarded: (v: boolean) => void
@@ -192,6 +200,7 @@ export const useStore = create<State>()(
 
       prayers: [],
       soulLog: [],
+      memoryVerses: [],
       kidStudiesDone: [],
 
       lastDurationMin: 10,
@@ -279,6 +288,24 @@ export const useStore = create<State>()(
       removePrayer: (id) => set((st) => ({ prayers: st.prayers.filter((p) => p.id !== id) })),
       logSoul: (state) =>
         set((st) => ({ soulLog: [{ state, at: Date.now() }, ...st.soulLog].slice(0, 200) })),
+
+      addMemoryVerse: (ref, text, translation) =>
+        set((st) => {
+          const r = ref.trim()
+          const t = text.trim()
+          if (!r || !t || st.memoryVerses.some((v) => v.ref === r)) return st
+          return {
+            memoryVerses: [newMemoryVerse(r, t, translation), ...st.memoryVerses].slice(0, 500),
+          }
+        }),
+      removeMemoryVerse: (ref) =>
+        set((st) => ({ memoryVerses: st.memoryVerses.filter((v) => v.ref !== ref) })),
+      reviewMemoryVerse: (ref, recalled) =>
+        set((st) => ({
+          memoryVerses: st.memoryVerses.map((v) =>
+            v.ref === ref ? reviewOutcome(v, recalled) : v,
+          ),
+        })),
       completeStudy: (id) =>
         set((st) =>
           st.kidStudiesDone.includes(id)

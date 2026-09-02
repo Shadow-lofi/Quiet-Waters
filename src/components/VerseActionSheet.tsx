@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Check, Bookmark, Copy, Trash2, Share2 } from 'lucide-react'
+import { X, Check, Bookmark, Copy, Trash2, Share2, Brain } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
 import { HIGHLIGHT_COLORS, translationById } from '../data/bible'
@@ -12,6 +12,8 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
   const saved = useStore((s) => s.savedVerses[verse.ref])
   const updateVerse = useStore((s) => s.updateVerse)
   const removeSavedVerse = useStore((s) => s.removeSavedVerse)
+  const addMemoryVerse = useStore((s) => s.addMemoryVerse)
+  const inMemory = useStore((s) => s.memoryVerses.some((v) => v.ref === verse.ref))
   const pushToast = useToast((t) => t.push)
 
   const [note, setNote] = useState(saved?.note ?? '')
@@ -38,6 +40,15 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
     } catch {
       pushToast({ title: 'Couldn’t copy' })
     }
+  }
+
+  const memorize = () => {
+    addMemoryVerse(verse.ref, verse.text, translationById(verse.translation).short)
+    pushToast({
+      tone: 'success',
+      title: 'Added to Scripture Memory',
+      message: verse.ref,
+    })
   }
 
   const hasSaved = Boolean(saved?.color || saved?.note || saved?.label || saved?.bookmarked)
@@ -109,6 +120,15 @@ export function VerseActionSheet({ verse, onClose }: { verse: SelectedVerse; onC
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium text-water-600 ring-1 ring-line transition hover:bg-mist-200"
         >
           <Share2 size={16} /> Share as image
+        </button>
+
+        <button
+          onClick={memorize}
+          disabled={inMemory}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium text-water-600 ring-1 ring-line transition hover:bg-mist-200 disabled:opacity-60 disabled:hover:bg-transparent"
+        >
+          {inMemory ? <Check size={16} /> : <Brain size={16} />}
+          {inMemory ? 'In Scripture Memory' : 'Memorize this verse'}
         </button>
 
         <div className="mt-3 flex items-center gap-2">
