@@ -1,7 +1,7 @@
 // Fetches passage text from bible-api.com (public-domain translations, CORS
 // enabled). One chapter per request. Fetched chapters are cached in localStorage
 // so re-reads are instant, work offline, and stay light on the free API.
-import { DEFAULT_TRANSLATION } from '../data/bible'
+import { DEFAULT_TRANSLATION, SINGLE_CHAPTER_VERSES } from '../data/bible'
 
 export interface BibleVerse {
   book_name: string
@@ -42,10 +42,18 @@ function writeCache(ref: string, translation: string, passage: Passage) {
  * can show a retry state.
  */
 export async function fetchPassage(ref: string, translation = DEFAULT_TRANSLATION): Promise<Passage> {
-  const cached = readCache(ref, translation)
-  if (cached) return cached
+  // For a single-chapter book, `ref` is "Book 1"; bible-api needs the full verse
+  // range or it returns only verse 1. `need` is that book's verse count.
+  const m = ref.match(/^(.+) 1$/)
+  const need = m ? SINGLE_CHAPTER_VERSES[m[1]] : undefined
 
-  const url = `https://bible-api.com/${encodeURIComponent(ref)}?translation=${encodeURIComponent(translation)}`
+  const cached = readCache(ref, translation)
+  // Serve the cache, except a single-chapter entry saved before this fix (which
+  // holds only verse 1) — re-fetch it in full.
+  if (cached && (need === undefined || cached.verses.length >= need)) return cached
+
+  const query = need ? `${ref}:1-${need}` : ref
+  const url = `https://bible-api.com/${encodeURIComponent(query)}?translation=${encodeURIComponent(translation)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Could not load ${ref} (${res.status})`)
   const data = await res.json()
