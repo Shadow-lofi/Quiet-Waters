@@ -17,10 +17,27 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 2 (v1.23.0) ────────────────────────────────
+  {
+    date: 'September 2, 2026',
+    tag: 'New',
+    title: 'A way back from your saved verses',
+    detail:
+      'The Saved tab in the Bible now has a “Back to …” button that returns you to right where you were reading.',
+    to: '/bible',
+  },
+  {
+    date: 'September 2, 2026',
+    tag: 'Fixed',
+    title: 'Room to breathe at the top on phones',
+    detail:
+      'On phones with a notch or rounded top, the buttons up top — the bell, the Read/Saved tabs, the End button while meditating — no longer tuck under the status bar. They now sit clear of it.',
+  },
+
   // ── September 2 (v1.22.1) ────────────────────────────────
   {
     date: 'September 2, 2026',

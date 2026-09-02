@@ -150,7 +150,13 @@ export function SessionOverlay({
   const meditatedSec = Math.min(elapsedRef.current, totalSec)
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-mist-100 px-5 py-6">
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-mist-100 px-5"
+      style={{
+        paddingTop: 'calc(1.5rem + env(safe-area-inset-top))',
+        paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
+      }}
+    >
       {done ? (
         <CompleteView
           meditatedSec={meditatedSec}
