@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Check, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useStore } from '../lib/store'
+import { PRAYER_CATEGORIES, type PrayerCategory } from '../lib/types'
 
 const fmt = (ts: number) =>
   new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 
 /**
- * A private, on-device prayer list. Lay requests before God, then mark them
- * answered in His time — the answered ones settle into a quiet record of His
+ * A private, on-device prayer journal. Lay requests before God, sort them gently
+ * if you like, then mark them answered in His time — recording, if you wish, a
+ * line of how He answered. The answered ones settle into a quiet record of His
  * faithfulness. Everything lives in the local store; nothing leaves the device.
  */
 export function Prayers() {
@@ -18,6 +20,11 @@ export function Prayers() {
   const removePrayer = useStore((s) => s.removePrayer)
 
   const [draft, setDraft] = useState('')
+  const [category, setCategory] = useState<PrayerCategory>('Requests')
+
+  // The prayer currently being marked answered (its optional note in progress).
+  const [answering, setAnswering] = useState<string | null>(null)
+  const [note, setNote] = useState('')
 
   const open = prayers.filter((p) => !p.answeredAt)
   const answered = prayers
@@ -26,14 +33,33 @@ export function Prayers() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    addPrayer(draft)
+    addPrayer(draft, category)
     setDraft('')
+    setCategory('Requests')
   }
+
+  const beginAnswer = (id: string) => {
+    setAnswering(id)
+    setNote('')
+  }
+
+  const confirmAnswer = (id: string) => {
+    answerPrayer(id, note)
+    setAnswering(null)
+    setNote('')
+  }
+
+  const CategoryChip = ({ c }: { c?: PrayerCategory }) =>
+    c && c !== 'Requests' ? (
+      <span className="rounded-full bg-mist-200 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-water-600">
+        {c}
+      </span>
+    ) : null
 
   return (
     <div className="flex flex-col gap-7">
       <header>
-        <h1 className="text-2xl">Prayers</h1>
+        <h1 className="text-2xl">Prayer Journal</h1>
         <p className="mt-1 text-sm text-deep-500">
           Cast your cares on Him. Hold them here, and mark them answered in His time.
         </p>
@@ -47,7 +73,23 @@ export function Prayers() {
           placeholder="Lay a request before God…"
           className="w-full resize-none rounded-xl bg-mist-100 px-3 py-2.5 text-[0.95rem] leading-relaxed text-deep-800 outline-none ring-1 ring-line placeholder:text-deep-400"
         />
-        <div className="mt-2 flex justify-end">
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          {PRAYER_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                category === c
+                  ? 'bg-water-500 text-onwater shadow-sm'
+                  : 'bg-mist-200 text-deep-600 hover:bg-mist-300'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex justify-end">
           <button
             type="submit"
             disabled={!draft.trim()}
@@ -75,25 +117,56 @@ export function Prayers() {
           <ul className="flex flex-col gap-2.5">
             {open.map((p) => (
               <li key={p.id} className="rounded-card bg-card p-4 shadow-sm ring-1 ring-line">
-                <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-deep-800">{p.text}</p>
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <span className="text-xs text-deep-400">{fmt(p.createdAt)}</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => answerPrayer(p.id)}
-                      className="inline-flex items-center gap-1 rounded-full bg-reed-500/15 px-3 py-1.5 text-xs font-semibold text-reed-500 transition hover:bg-reed-500/25"
-                    >
-                      <Check size={14} /> Answered
-                    </button>
-                    <button
-                      onClick={() => removePrayer(p.id)}
-                      aria-label="Remove prayer"
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-deep-400 transition hover:bg-mist-200 hover:text-deep-600"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <CategoryChip c={p.category} />
                 </div>
+                <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-deep-800">{p.text}</p>
+
+                {answering === p.id ? (
+                  <div className="mt-3">
+                    <textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={2}
+                      autoFocus
+                      placeholder="How did God answer? (optional)"
+                      className="w-full resize-none rounded-xl bg-mist-100 px-3 py-2.5 text-sm leading-relaxed text-deep-800 outline-none ring-1 ring-line placeholder:text-deep-400"
+                    />
+                    <div className="mt-2 flex justify-end gap-2">
+                      <button
+                        onClick={() => setAnswering(null)}
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-deep-500 transition hover:bg-mist-200"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => confirmAnswer(p.id)}
+                        className="inline-flex items-center gap-1 rounded-full bg-reed-500/15 px-3 py-1.5 text-xs font-semibold text-reed-500 transition hover:bg-reed-500/25"
+                      >
+                        <Check size={14} /> Mark answered
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <span className="text-xs text-deep-400">{fmt(p.createdAt)}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => beginAnswer(p.id)}
+                        className="inline-flex items-center gap-1 rounded-full bg-reed-500/15 px-3 py-1.5 text-xs font-semibold text-reed-500 transition hover:bg-reed-500/25"
+                      >
+                        <Check size={14} /> Answered
+                      </button>
+                      <button
+                        onClick={() => removePrayer(p.id)}
+                        aria-label="Remove prayer"
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-deep-400 transition hover:bg-mist-200 hover:text-deep-600"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -112,7 +185,15 @@ export function Prayers() {
                 <div className="flex items-start gap-2.5">
                   <Check size={16} className="mt-0.5 shrink-0 text-reed-500" />
                   <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <CategoryChip c={p.category} />
+                    </div>
                     <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-deep-800">{p.text}</p>
+                    {p.answeredNote && (
+                      <p className="mt-2 border-l-2 border-reed-400/40 pl-3 font-serif text-[0.95rem] italic leading-relaxed text-deep-600">
+                        {p.answeredNote}
+                      </p>
+                    )}
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <span className="text-xs font-medium text-reed-500">
                         Answered {fmt(p.answeredAt ?? p.createdAt)}

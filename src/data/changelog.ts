@@ -17,10 +17,27 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 2 (v1.28.0) ────────────────────────────────
+  {
+    date: 'September 2, 2026',
+    tag: 'New',
+    title: 'Devotionals — a few unhurried days in the Word',
+    detail:
+      'Multi-day devotional paths that move gently: a verse to dwell on, a short reflection, an optional pause to be still with the words, and a written prayer you can carry into your journal. Start with Be Still, Peace Over Anxiety, or Waiting on God. Find them on the Study page.',
+    to: '/devotional',
+  },
+  {
+    date: 'September 2, 2026',
+    tag: 'Improved',
+    title: 'A fuller prayer journal',
+    detail:
+      'Sort prayers gently by kind — Requests, Thanksgiving, For others, Guidance — and, when God answers, record a line of how. The answered prayers become a quiet record of His faithfulness.',
+    to: '/prayers',
+  },
   // ── September 2 (v1.27.0) ────────────────────────────────
   {
     date: 'September 2, 2026',

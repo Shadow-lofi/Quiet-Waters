@@ -23,10 +23,19 @@ const BACK_FALLBACK: Record<string, string> = {
   '/lectio': '/meditate',
   '/kids': '/study',
   '/memory': '/study',
+  '/devotional': '/study',
   '/encourage': '/meditate',
   '/prayers': '/journey',
   '/updates': '/meditate',
   '/notifications': '/meditate',
+}
+
+// A direct-load Back target for a deeper path with no exact fallback above —
+// e.g. a series page /devotional/<id> should fall back to the library.
+function fallbackFor(pathname: string): string {
+  if (BACK_FALLBACK[pathname]) return BACK_FALLBACK[pathname]
+  if (pathname.startsWith('/devotional/')) return '/devotional'
+  return '/meditate'
 }
 
 export function AppLayout() {
@@ -39,7 +48,7 @@ export function AppLayout() {
     // A real in-app history entry pops back to it; a direct load falls back to
     // the page's natural parent so Back never dead-ends or leaves the app.
     if (location.key !== 'default') navigate(-1)
-    else navigate(BACK_FALLBACK[location.pathname] ?? '/meditate')
+    else navigate(fallbackFor(location.pathname))
   }
 
   return (

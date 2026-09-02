@@ -37,14 +37,26 @@ export interface SavedVerse {
   createdAt: number
 }
 
+// A gentle way to sort prayers. Optional — older prayers have none, and are
+// treated as plain "Requests".
+export type PrayerCategory = 'Requests' | 'Thanksgiving' | 'For others' | 'Guidance'
+export const PRAYER_CATEGORIES: PrayerCategory[] = [
+  'Requests',
+  'Thanksgiving',
+  'For others',
+  'Guidance',
+]
+
 // A prayer the user is holding before God. When answered, `answeredAt` is set
-// and it settles into the "answered" record — a quiet history of faithfulness.
-// Local-first: lives in the persisted store.
+// and it settles into the "answered" record — a quiet history of faithfulness,
+// optionally with a note of how He answered. Local-first: lives in the store.
 export interface PrayerRequest {
   id: string
   text: string
   createdAt: number
+  category?: PrayerCategory
   answeredAt?: number // set when marked answered
+  answeredNote?: string // an optional line on how God answered
 }
 
 // A one-tap check-in on the state of one's soul before a sitting. `state` is a
