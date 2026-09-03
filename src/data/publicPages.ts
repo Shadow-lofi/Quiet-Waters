@@ -59,6 +59,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
     type: 'article',
   },
   {
+    path: '/seven-churches',
+    title: 'The Seven Churches of Revelation — What They Mean Today | Quiet Waters',
+    description:
+      'A reverent study of Christ’s letters to the seven churches of Revelation — Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and Laodicea — and the spiritual mirror each holds up to the church and the heart today.',
+    type: 'article',
+  },
+  {
     path: '/lectio',
     title: 'Lectio Divina — Pray the Scriptures Slowly | Quiet Waters',
     description:
