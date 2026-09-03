@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   BookOpen,
   Brain,
@@ -48,8 +48,17 @@ function churchIcon(name: string) {
   }
 }
 
-function LetterCard({ letter }: { letter: ChurchLetter }) {
-  const [open, setOpen] = useState(false)
+/** A stable anchor id for a church, used for #hash deep-links and scroll-to. */
+const churchId = (name: string) => name.toLowerCase()
+
+function LetterCard({ letter, defaultOpen }: { letter: ChurchLetter; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
+  // The #hash target can arrive a tick after first render (e.g. a full page load
+  // or a shared link), so open this card whenever it becomes the target — without
+  // ever forcing it closed, so manual toggles still work.
+  useEffect(() => {
+    if (defaultOpen) setOpen(true)
+  }, [defaultOpen])
   const navigate = useNavigate()
   const setBibleRef = useStore((s) => s.setBibleRef)
   const addMemoryVerse = useStore((s) => s.addMemoryVerse)
@@ -61,7 +70,8 @@ function LetterCard({ letter }: { letter: ChurchLetter }) {
 
   const readLetter = () => {
     setBibleRef('Revelation', chapter)
-    navigate('/bible')
+    // Carry which church we came from so the Bible reader can offer a way back.
+    navigate('/bible', { state: { fromChurch: letter.name } })
   }
 
   const memorize = () => {
@@ -71,7 +81,10 @@ function LetterCard({ letter }: { letter: ChurchLetter }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-card bg-card shadow-sm ring-1 ring-line">
+    <div
+      id={churchId(letter.name)}
+      className="scroll-mt-24 overflow-hidden rounded-card bg-card shadow-sm ring-1 ring-line"
+    >
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -171,6 +184,21 @@ function LetterCard({ letter }: { letter: ChurchLetter }) {
 }
 
 export function SevenChurches() {
+  const location = useLocation()
+  // A #church hash (e.g. arriving back from the Bible reader) opens that letter
+  // and scrolls it into view, so you return to right where you were studying.
+  const target = location.hash.replace('#', '').toLowerCase()
+
+  useEffect(() => {
+    if (!target) return
+    const el = document.getElementById(target)
+    if (!el) return
+    // Let the target card finish expanding before scrolling, so it lands on the
+    // card's top rather than a stale (collapsed) position.
+    const t = setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 90)
+    return () => clearTimeout(t)
+  }, [target])
+
   return (
     <div className="flex flex-col gap-6">
       <Seo path="/seven-churches" />
@@ -243,7 +271,7 @@ export function SevenChurches() {
         </div>
         <div className="flex flex-col gap-3">
           {LETTERS.map((l) => (
-            <LetterCard key={l.name} letter={l} />
+            <LetterCard key={l.name} letter={l} defaultOpen={target === churchId(l.name)} />
           ))}
         </div>
       </section>

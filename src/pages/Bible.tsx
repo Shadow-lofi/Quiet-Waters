@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, X, Bookmark } from 'lucide-react'
 import { BOOKS, TRANSLATIONS, bookByName, highlightById } from '../data/bible'
 import { ChapterReader } from '../components/ChapterReader'
@@ -15,6 +16,11 @@ export function Bible() {
   const setBibleRef = useStore((s) => s.setBibleRef)
   const setBibleTranslation = useStore((s) => s.setBibleTranslation)
   const savedVerses = useStore((s) => s.savedVerses)
+
+  // When opened from a Seven Churches letter, offer a way back to that church.
+  const location = useLocation()
+  const navigate = useNavigate()
+  const fromChurch = (location.state as { fromChurch?: string } | null)?.fromChurch
 
   const [tab, setTab] = useState<'read' | 'saved'>('read')
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -62,6 +68,15 @@ export function Bible() {
 
   return (
     <div className="flex flex-col gap-6">
+      {fromChurch && (
+        <button
+          onClick={() => navigate(`/seven-churches#${fromChurch.toLowerCase()}`)}
+          className="-mb-2 inline-flex items-center gap-1 self-start rounded-full py-1.5 pl-1.5 pr-3 text-sm font-medium text-deep-500 transition hover:bg-mist-200 hover:text-deep-700"
+        >
+          <ChevronLeft size={18} />
+          Back to {fromChurch}
+        </button>
+      )}
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-2xl">Bible</h1>
         <div className="flex gap-1 rounded-full bg-mist-200 p-1 text-sm">
