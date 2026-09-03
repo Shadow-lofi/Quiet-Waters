@@ -138,11 +138,20 @@ function DayReader({
 
   const completeDevotionalDay = useStore((s) => s.completeDevotionalDay)
   const addPrayer = useStore((s) => s.addPrayer)
+  const setDevotionalReflection = useStore((s) => s.setDevotionalReflection)
+  const savedReflection = useStore((s) => s.devotionalReflections[`${series.id}:${dayIndex}`]) ?? ''
   const push = useToast((s) => s.push)
 
   const [sitting, setSitting] = useState(false)
   const [prayerDraft, setPrayerDraft] = useState(day.prayer)
   const [addedPrayer, setAddedPrayer] = useState(false)
+  const [heard, setHeard] = useState(savedReflection)
+
+  const saveReflection = () => setDevotionalReflection(series.id, dayIndex, heard)
+  const goTo = (i: number | null) => {
+    saveReflection() // don't lose an in-progress line when moving between days
+    onNavigate(i)
+  }
 
   const sitVerse: MeditationVerse = {
     ref: day.verseRef,
@@ -164,6 +173,7 @@ function DayReader({
   }
 
   const complete = () => {
+    saveReflection() // keep any unsaved line before leaving this day
     completeDevotionalDay(series.id, dayIndex)
     onNavigate(isLast ? null : dayIndex + 1) // finish → back to overview; else next day
   }
@@ -173,7 +183,7 @@ function DayReader({
       {/* header row */}
       <div className="flex items-center justify-between gap-3">
         <button
-          onClick={() => onNavigate(null)}
+          onClick={() => goTo(null)}
           className="-ml-1.5 inline-flex items-center gap-0.5 rounded-full py-1.5 pl-1.5 pr-3 text-sm font-medium text-deep-500 transition hover:bg-mist-200 hover:text-deep-700"
         >
           <ChevronLeft size={18} /> All days
@@ -255,6 +265,19 @@ function DayReader({
         </div>
       </section>
 
+      {/* what did you hear? — a private line, saved on-device */}
+      <section>
+        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-deep-500">What did you hear?</p>
+        <textarea
+          value={heard}
+          onChange={(e) => setHeard(e.target.value)}
+          onBlur={saveReflection}
+          rows={3}
+          placeholder="A word, a nudge, a line to carry… (saved just for you)"
+          className="w-full resize-none rounded-2xl bg-card px-4 py-3 text-[0.95rem] leading-relaxed text-deep-800 shadow-sm outline-none ring-1 ring-line transition placeholder:text-deep-400 focus:ring-2 focus:ring-water-500"
+        />
+      </section>
+
       {/* complete + move on */}
       <div className="mt-1 flex flex-col gap-3 border-t border-line pt-5">
         <button
@@ -271,14 +294,14 @@ function DayReader({
         </button>
         <div className="flex items-center justify-between">
           <button
-            onClick={() => onNavigate(dayIndex - 1)}
+            onClick={() => goTo(dayIndex - 1)}
             disabled={dayIndex === 0}
             className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium text-deep-500 transition hover:bg-mist-200 disabled:opacity-30"
           >
             <ChevronLeft size={16} /> Previous
           </button>
           <button
-            onClick={() => onNavigate(dayIndex + 1)}
+            onClick={() => goTo(dayIndex + 1)}
             disabled={isLast}
             className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium text-deep-500 transition hover:bg-mist-200 disabled:opacity-30"
           >

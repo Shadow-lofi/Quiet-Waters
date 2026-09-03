@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
   DEVOTIONAL_SERIES,
   seriesById,
+  seriesForSoul,
   nextIncompleteDay,
   isSeriesComplete,
   completedCount,
 } from './devotionals'
+import { SOUL_STATES } from './soul'
 
 describe('devotional series data', () => {
   it('has unique ids and non-empty days', () => {
@@ -23,6 +25,25 @@ describe('devotional series data', () => {
   it('seriesById finds and misses', () => {
     expect(seriesById('be-still')?.title).toBe('Be Still')
     expect(seriesById('nope')).toBeUndefined()
+  })
+})
+
+describe('seriesForSoul', () => {
+  it('suggests a fitting series for its best-matching state', () => {
+    expect(seriesForSoul('anxious')?.id).toBe('peace-over-anxiety')
+    expect(seriesForSoul('afraid')?.id).toBe('peace-over-anxiety')
+    expect(seriesForSoul('sorrowful')?.id).toBe('comfort-in-grief')
+    expect(seriesForSoul('grateful')?.id).toBe('grateful-heart')
+    expect(seriesForSoul('joyful')?.id).toBe('grateful-heart')
+    expect(seriesForSoul('weary')?.id).toBe('be-still')
+  })
+
+  it('has a series for every soul state', () => {
+    for (const s of SOUL_STATES) expect(seriesForSoul(s.id)).toBeDefined()
+  })
+
+  it('is undefined for an unknown state', () => {
+    expect(seriesForSoul('nope')).toBeUndefined()
   })
 })
 

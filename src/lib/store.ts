@@ -88,6 +88,7 @@ interface State {
   // ── devotional series (local) ──
   devotionalProgress: Record<string, number[]> // seriesId → completed day indices
   devotionalActive: string | null // the series to resume on the home screen
+  devotionalReflections: Record<string, string> // "seriesId:day" → a private line
 
   // ── kids Bible study — ids of stories the child has finished ──
   kidStudiesDone: string[]
@@ -113,6 +114,7 @@ interface State {
   startDevotional: (seriesId: string) => void
   completeDevotionalDay: (seriesId: string, day: number) => void
   resetDevotional: (seriesId: string) => void
+  setDevotionalReflection: (seriesId: string, day: number, text: string) => void
   logSoul: (state: string) => void
   addMemoryVerse: (ref: string, text: string, translation?: string) => void
   removeMemoryVerse: (ref: string) => void
@@ -211,6 +213,7 @@ export const useStore = create<State>()(
       memoryVerses: [],
       devotionalProgress: {},
       devotionalActive: null,
+      devotionalReflections: {},
       kidStudiesDone: [],
 
       lastDurationMin: 10,
@@ -325,6 +328,15 @@ export const useStore = create<State>()(
             devotionalProgress: next,
             devotionalActive: st.devotionalActive === seriesId ? null : st.devotionalActive,
           }
+        }),
+      setDevotionalReflection: (seriesId, day, text) =>
+        set((st) => {
+          const key = `${seriesId}:${day}`
+          const next = { ...st.devotionalReflections }
+          const t = text.trim()
+          if (t) next[key] = t.slice(0, 1000)
+          else delete next[key]
+          return { devotionalReflections: next }
         }),
 
       addMemoryVerse: (ref, text, translation) =>

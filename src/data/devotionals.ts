@@ -161,6 +161,71 @@ export const DEVOTIONAL_SERIES: DevotionalSeries[] = [
     ],
   },
   {
+    id: 'comfort-in-grief',
+    title: 'Comfort in Grief',
+    subtitle: 'Five days of God’s nearness in loss',
+    verseRef: 'Psalm 34:18',
+    verseText: 'The LORD is near to those who have a broken heart, and saves those who have a crushed spirit.',
+    soul: ['sorrowful', 'weary', 'empty'],
+    days: [
+      {
+        title: 'He Is Near',
+        verseRef: 'Psalm 34:18',
+        verseText: 'The LORD is near to those who have a broken heart, and saves those who have a crushed spirit.',
+        reflection:
+          'Grief can make God feel distant, but Scripture says the opposite: He draws nearest to the broken. You do not have to climb your way back to Him. In the very place where your heart is crushed, He is already close.',
+        prayer: 'Lord, I feel the weight of this loss. Draw near to my broken heart, as You have promised.',
+        breathIn: 'You are near',
+        breathOut: 'to the brokenhearted',
+        sitMinutes: 6,
+      },
+      {
+        title: 'He Keeps Your Tears',
+        verseRef: 'Psalm 56:8',
+        verseText: 'You number my wanderings. You put my tears into your container. Aren’t they in your book?',
+        reflection:
+          'Not one of your tears falls unnoticed. God keeps them, as though each were precious to Him — because you are. Your sorrow is not a weakness to hide from Him; it is held, and it is seen.',
+        prayer: 'Father, You see every tear. Thank You that my sorrow is not hidden from You, but held by You.',
+        breathIn: 'You keep my tears',
+        breathOut: 'not one is lost',
+        sitMinutes: 6,
+      },
+      {
+        title: 'Blessed Are Those Who Mourn',
+        verseRef: 'Matthew 5:4',
+        verseText: 'Blessed are those who mourn, for they shall be comforted.',
+        reflection:
+          'Jesus does not rush you past your grief. He calls the mourning “blessed” — not because the pain is good, but because comfort is coming, and it is His to give. Let yourself mourn, and let yourself be comforted.',
+        prayer: 'Jesus, I bring You my mourning. Meet me here with the comfort only You can give.',
+        breathIn: 'As I mourn',
+        breathOut: 'You will comfort me',
+        sitMinutes: 6,
+      },
+      {
+        title: 'He Heals the Brokenhearted',
+        verseRef: 'Psalm 147:3',
+        verseText: 'He heals the broken in heart, and binds up their wounds.',
+        reflection:
+          'The One who made the stars also tends to broken hearts, one by one. Healing may be slow and quiet, more like a wound being bound than a switch being flipped. But it is His work, and He does not leave it half-done.',
+        prayer: 'Lord, bind up what is broken in me. I trust You to heal, gently and in Your time.',
+        breathIn: 'You heal my heart',
+        breathOut: 'and bind my wounds',
+        sitMinutes: 6,
+      },
+      {
+        title: 'Joy Comes in the Morning',
+        verseRef: 'Psalm 30:5',
+        verseText: 'Weeping may stay for the night, but joy comes in the morning.',
+        reflection:
+          'The night of weeping is real, and it can feel long. But it is a night, not the end — and mornings belong to God. Hold on through the dark; the One who keeps the tears also keeps the promise of joy.',
+        prayer: 'God, when the night of weeping feels long, hold me until the morning of joy You have promised.',
+        breathIn: 'Weeping for a night',
+        breathOut: 'joy in the morning',
+        sitMinutes: 6,
+      },
+    ],
+  },
+  {
     id: 'waiting-on-god',
     title: 'Waiting on God',
     subtitle: 'Five days of learning to wait with hope',
@@ -228,6 +293,71 @@ export const DEVOTIONAL_SERIES: DevotionalSeries[] = [
       },
     ],
   },
+  {
+    id: 'grateful-heart',
+    title: 'A Grateful Heart',
+    subtitle: 'Five days of giving thanks',
+    verseRef: 'Psalm 103:2',
+    verseText: 'Praise the LORD, my soul, and don’t forget all his benefits.',
+    soul: ['grateful', 'joyful'],
+    days: [
+      {
+        title: 'Bless the Lord, O My Soul',
+        verseRef: 'Psalm 103:1–2',
+        verseText: 'Praise the LORD, my soul! All that is within me, praise his holy name! Praise the LORD, my soul, and don’t forget all his benefits.',
+        reflection:
+          'Gratitude begins with remembering. The psalmist preaches to his own soul, calling it to recall what God has done. Today, before asking for anything, simply name a few of His benefits — and let thanks rise.',
+        prayer: 'Lord, I bless You with all that is in me. Help me not to forget a single one of Your gifts.',
+        breathIn: 'Bless the Lord, O my soul',
+        breathOut: 'forget not His gifts',
+        sitMinutes: 5,
+      },
+      {
+        title: 'Give Thanks in Everything',
+        verseRef: '1 Thessalonians 5:18',
+        verseText: 'In everything give thanks, for this is the will of God in Christ Jesus toward you.',
+        reflection:
+          'Notice it says in everything, not for everything. You need not pretend hard things are good; you can give thanks in the middle of them, trusting the God who is with you there. Thankfulness is not denial — it is trust.',
+        prayer: 'Father, in the middle of all things, teach me to give thanks, trusting You are near and at work.',
+        breathIn: 'In everything',
+        breathOut: 'I give You thanks',
+        sitMinutes: 5,
+      },
+      {
+        title: 'His Mercies Are New',
+        verseRef: 'Lamentations 3:22–23',
+        verseText: 'It is because of the LORD’s loving kindnesses that we are not consumed, because his compassion doesn’t fail. They are new every morning; great is your faithfulness.',
+        reflection:
+          'Even written from the middle of loss, these words give thanks. Every morning is fresh proof that God’s mercy has not run out. Whatever yesterday held, today His compassion meets you new — and that is reason enough for gratitude.',
+        prayer: 'Lord, thank You that Your mercies are new this morning. Great is Your faithfulness to me.',
+        breathIn: 'New every morning',
+        breathOut: 'great is Your faithfulness',
+        sitMinutes: 5,
+      },
+      {
+        title: 'Every Good Gift',
+        verseRef: 'James 1:17',
+        verseText: 'Every good gift and every perfect gift is from above, coming down from the Father of lights.',
+        reflection:
+          'Trace any good thing back far enough and you arrive at the Giver. The good you enjoy today is not random or earned — it came down from a Father whose goodness does not flicker or change. Receive it as the gift it is.',
+        prayer: 'Father of lights, thank You for every good gift. Let me receive today from Your generous hand.',
+        breathIn: 'Every good gift',
+        breathOut: 'comes down from You',
+        sitMinutes: 5,
+      },
+      {
+        title: 'Enter His Gates with Thanksgiving',
+        verseRef: 'Psalm 100:4–5',
+        verseText: 'Enter into his gates with thanksgiving, and into his courts with praise. Give thanks to him, and bless his name. For the LORD is good.',
+        reflection:
+          'Thanksgiving is the doorway in. We do not come to God to earn our way; we come with thanks, because He is good and His love endures. Let gratitude be how you draw near today — not a duty, but a delight.',
+        prayer: 'Lord, I come to You with thanksgiving and praise. You are good, and Your love endures forever.',
+        breathIn: 'I enter with thanks',
+        breathOut: 'for the Lord is good',
+        sitMinutes: 5,
+      },
+    ],
+  },
 ]
 
 // ── lookups + progress helpers (pure) ──────────────────────────────
@@ -235,6 +365,12 @@ export const DEVOTIONAL_SERIES: DevotionalSeries[] = [
 /** A series by id. */
 export function seriesById(id: string): DevotionalSeries | undefined {
   return DEVOTIONAL_SERIES.find((s) => s.id === id)
+}
+
+/** A devotional that gently suits a soul state (see data/soul.ts), if any.
+ *  First match by array order, so the most fitting series is listed first. */
+export function seriesForSoul(soulId: string): DevotionalSeries | undefined {
+  return DEVOTIONAL_SERIES.find((s) => s.soul?.includes(soulId))
 }
 
 /** The first day index not yet completed (or the length, if all are done). */

@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { X, ArrowRight } from 'lucide-react'
 import { SOUL_STATES, soulById } from '../data/soul'
+import { seriesForSoul } from '../data/devotionals'
 import { useStore } from '../lib/store'
 
 /**
@@ -13,6 +15,7 @@ export function SoulCheck() {
   const logSoul = useStore((s) => s.logSoul)
   const [picked, setPicked] = useState<string | null>(null)
   const state = picked ? soulById(picked) : null
+  const suggested = picked ? seriesForSoul(picked) : undefined
 
   const choose = (id: string) => {
     logSoul(id)
@@ -55,6 +58,24 @@ export function SoulCheck() {
             “{state.verseText}”
           </blockquote>
           <p className="mt-2 pl-4 text-xs uppercase tracking-[0.16em] text-water-600">{state.verseRef}</p>
+
+          {suggested && (
+            <Link
+              to={`/devotional/${suggested.id}`}
+              className="group mt-4 flex items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-sm ring-1 ring-line transition hover:ring-water-400"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-water-600">
+                  A devotional for this
+                </p>
+                <p className="truncate font-medium text-deep-900">{suggested.title}</p>
+              </div>
+              <ArrowRight
+                size={17}
+                className="shrink-0 text-water-600 transition group-hover:translate-x-0.5"
+              />
+            </Link>
+          )}
         </div>
       )}
     </section>
