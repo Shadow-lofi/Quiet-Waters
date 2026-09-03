@@ -66,6 +66,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
     type: 'article',
   },
   {
+    path: '/ten-virgins',
+    title: 'The Parable of the Ten Virgins — A Study for Today | Quiet Waters',
+    description:
+      'A deep, hopeful study of the Parable of the Ten Virgins (Matthew 25:1–13) — the wise and the foolish, the lamps and the oil, the midnight cry and the shut door — and what it means for the world we live in now. Watchful, never date-setting.',
+    type: 'article',
+  },
+  {
     path: '/lectio',
     title: 'Lectio Divina — Pray the Scriptures Slowly | Quiet Waters',
     description:
