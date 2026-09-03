@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.31.0', '1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 3 (v1.31.0) ────────────────────────────────
+  {
+    date: 'September 3, 2026',
+    tag: 'New',
+    title: 'The Ten Virgins — a deep study',
+    detail:
+      'A new study on the Parable of the Ten Virgins (Matthew 25) — the wise and the foolish, the lamps and the oil, the midnight cry and the shut door. Read the parable, see what each symbol means, walk through it movement by movement into our own day, and find gentle ways to keep your lamp full now. Watchful and hopeful — on the Study page.',
+    to: '/ten-virgins',
+  },
   // ── September 3 (v1.30.1) ────────────────────────────────
   {
     date: 'September 3, 2026',

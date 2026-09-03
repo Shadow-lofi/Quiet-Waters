@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Flame, BookHeart, Brain, Sunrise, Church } from 'lucide-react'
+import { ArrowRight, Flame, BookHeart, Brain, Sunrise, Church, Lamp } from 'lucide-react'
 import { STUDY_MATERIAL, type StudyPiece } from '../data/study'
 import { Seo } from '../components/Seo'
 
@@ -58,6 +58,31 @@ export function Study() {
             <h2 className="mt-0.5 text-lg leading-tight text-deep-900">The Seven Churches</h2>
             <p className="mt-1 text-sm leading-snug text-deep-500">
               Christ’s letters to the seven churches of Revelation — and the mirror each one holds up to us today.
+            </p>
+          </div>
+          <ArrowRight
+            size={18}
+            className="shrink-0 text-water-600 transition group-hover:translate-x-0.5"
+          />
+        </div>
+      </Link>
+
+      {/* Featured: The Ten Virgins — the parable, applied to today */}
+      <Link
+        to="/ten-virgins"
+        className="group block rounded-card bg-card p-5 shadow-sm ring-1 ring-line transition hover:shadow-md hover:ring-water-400 sm:p-6"
+      >
+        <div className="flex items-center gap-4">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-mist-200 text-water-600">
+            <Lamp size={20} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-water-600">
+              Featured study
+            </p>
+            <h2 className="mt-0.5 text-lg leading-tight text-deep-900">The Ten Virgins</h2>
+            <p className="mt-1 text-sm leading-snug text-deep-500">
+              The wise and the foolish, the lamps and the oil — Jesus’ parable of readiness, for the world we live in now.
             </p>
           </div>
           <ArrowRight
