@@ -20,6 +20,7 @@ const tabs = [
 // history to pop) — its natural parent, defaulting to the app home.
 const BACK_FALLBACK: Record<string, string> = {
   '/last-days': '/study',
+  '/seven-churches': '/study',
   '/lectio': '/meditate',
   '/kids': '/study',
   '/memory': '/study',
