@@ -207,20 +207,20 @@ export function Settings() {
     setPushBusy(true)
     try {
       if (on) {
-        const result = await enablePush()
-        if (result === 'subscribed') {
+        const { status, detail } = await enablePush()
+        if (status === 'subscribed') {
           setPushOn(true)
           pushToast({
             tone: 'success',
             title: 'Notifications on',
             message: 'You’ll get gentle announcements and the daily verse.',
           })
-        } else if (result === 'denied') {
+        } else if (status === 'denied') {
           pushToast({
             title: 'Notifications are blocked',
             message: 'Allow them for Quiet Waters in your browser settings to turn this on.',
           })
-        } else if (result === 'unsupported') {
+        } else if (status === 'unsupported') {
           pushToast({
             title: 'Not available here',
             message: iosNeedsInstall
@@ -230,8 +230,11 @@ export function Settings() {
         } else {
           pushToast({
             title: 'Couldn’t turn on notifications',
-            message:
-              'Something went wrong on this device. If it keeps happening, remove Quiet Waters and add it to your Home Screen again.',
+            duration: 12000,
+            // Show the real reason so a phone-only failure can be reported back.
+            message: detail
+              ? `Reason: ${detail}. Try removing Quiet Waters from your Home Screen and adding it again.`
+              : 'Something went wrong on this device. Try removing Quiet Waters and adding it to your Home Screen again.',
           })
         }
       } else {
