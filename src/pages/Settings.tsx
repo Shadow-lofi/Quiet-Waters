@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Flame,
@@ -10,6 +10,11 @@ import {
   ChevronRight,
   Smartphone,
   Church,
+  Download,
+  Upload,
+  Shield,
+  ShieldCheck,
+  AlertTriangle,
 } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { DOW_LETTER, DOW_FULL } from '../lib/date'
@@ -33,6 +38,15 @@ import {
 import { InstallGuide } from '../components/InstallGuide'
 import { useToast } from '../lib/toast'
 import { APP_VERSION } from '../lib/version'
+import {
+  buildBackup,
+  parseBackup,
+  writeRestoredStore,
+  shareOrDownloadBackup,
+  storageProtection,
+  requestStoragePersistence,
+  type StorageProtection,
+} from '../lib/backup'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
@@ -125,6 +139,11 @@ export function Settings() {
   const s = useStore()
   const [confirmClear, setConfirmClear] = useState(false)
   const [previewing, setPreviewing] = useState(false)
+
+  // Your data — backup, restore, and storage protection.
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [protection, setProtection] = useState<StorageProtection>('unsupported')
+  const [pendingRestore, setPendingRestore] = useState<{ data: unknown; exportedAt: string | null } | null>(null)
   const [perm, setPerm] = useState(notificationPermission())
   const [showInstall, setShowInstall] = useState(false)
   const [installable] = useState(() => !isStandalone())
@@ -145,6 +164,55 @@ export function Settings() {
 
   // Always silence any preview when leaving Settings.
   useEffect(() => () => stopAmbient(), [])
+
+  // Reflect whether the browser is keeping this device's data (vs. free to evict it).
+  useEffect(() => {
+    void storageProtection().then(setProtection)
+  }, [])
+
+  const backup = async () => {
+    try {
+      const outcome = await shareOrDownloadBackup(buildBackup())
+      pushToast({
+        tone: 'success',
+        title: outcome === 'shared' ? 'Backup ready to save' : 'Backup saved',
+        message: 'Keep this file somewhere safe — it can bring your data back.',
+      })
+    } catch {
+      pushToast({ title: 'Couldn’t create the backup', message: 'Please try again in a moment.' })
+    }
+  }
+
+  const onFilePicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-picking the same file later
+    if (!file) return
+    const parsed = parseBackup(await file.text())
+    if (!parsed.ok) {
+      pushToast({ title: 'That file couldn’t be restored', message: parsed.error })
+      return
+    }
+    setPendingRestore({ data: parsed.data, exportedAt: parsed.exportedAt })
+  }
+
+  const confirmRestore = () => {
+    if (!pendingRestore) return
+    writeRestoredStore(pendingRestore.data)
+    // Reload so the store rehydrates (and migrates) cleanly from the restored data.
+    window.location.reload()
+  }
+
+  const protect = async () => {
+    const result = await requestStoragePersistence()
+    setProtection(result)
+    if (result === 'persisted') {
+      pushToast({ tone: 'success', title: 'Your data is protected', message: 'Your browser will keep it from being cleared automatically.' })
+    } else if (result === 'unprotected') {
+      pushToast({ title: 'Your browser declined', message: 'Back up your data now and then to be safe.' })
+    } else {
+      pushToast({ title: 'Not available on this browser', message: 'Back up your data now and then to be safe.' })
+    }
+  }
 
   const togglePush = async (on: boolean) => {
     if (pushBusy) return
@@ -524,38 +592,113 @@ export function Settings() {
         </div>
       </section>
 
-      {/* data */}
+      {/* your data — backup & restore (the safety net for a local-first app) */}
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
-        <Row label="Clear history" hint={`${s.sessions.length} sittings stored on this device`}>
-          {confirmClear ? (
-            <div className="flex gap-2">
+        <p className="pt-3 text-xs uppercase tracking-[0.2em] text-deep-500">Your data</p>
+        <p className="pb-1 pt-1.5 text-xs leading-relaxed text-deep-500">
+          Everything you do stays on this device — no account, no cloud. Save a backup now and then, so
+          a cleared browser or a new phone can’t take it with them.
+        </p>
+        <div className="divide-y divide-line">
+          <button
+            onClick={backup}
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Download size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">Back up my data</span>
+                <span className="block text-xs text-deep-500">
+                  Save a file with your sittings, notes, prayers &amp; progress
+                </span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </button>
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Upload size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">Restore from a backup</span>
+                <span className="block text-xs text-deep-500">Bring your data back from a saved file</span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </button>
+
+          {protection === 'unprotected' && (
+            <button
+              onClick={protect}
+              className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+            >
+              <span className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                  <Shield size={18} />
+                </span>
+                <span>
+                  <span className="block text-deep-800">Protect my data</span>
+                  <span className="block text-xs text-deep-500">
+                    Ask your browser not to clear it automatically
+                  </span>
+                </span>
+              </span>
+              <ChevronRight size={17} className="shrink-0 text-deep-300" />
+            </button>
+          )}
+
+          {protection === 'persisted' && (
+            <Row label="Protected" hint="Your browser is set to keep this data">
+              <ShieldCheck size={18} className="text-water-600" />
+            </Row>
+          )}
+
+          <Row label="Clear history" hint={`${s.sessions.length} sittings stored on this device`}>
+            {confirmClear ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    s.clearHistory()
+                    setConfirmClear(false)
+                  }}
+                  className="rounded-full px-3 py-1.5 text-sm font-medium text-white"
+                  style={{ backgroundColor: '#b4534a' }}
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => setConfirmClear(false)}
+                  className="rounded-full px-3 py-1.5 text-sm text-deep-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => {
-                  s.clearHistory()
-                  setConfirmClear(false)
-                }}
-                className="rounded-full px-3 py-1.5 text-sm font-medium text-white"
-                style={{ backgroundColor: '#b4534a' }}
+                onClick={() => setConfirmClear(true)}
+                disabled={s.sessions.length === 0}
+                className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-600 ring-1 ring-line hover:bg-mist-200 disabled:opacity-40"
               >
                 Clear
               </button>
-              <button
-                onClick={() => setConfirmClear(false)}
-                className="rounded-full px-3 py-1.5 text-sm text-deep-500"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmClear(true)}
-              disabled={s.sessions.length === 0}
-              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-600 ring-1 ring-line hover:bg-mist-200 disabled:opacity-40"
-            >
-              Clear
-            </button>
-          )}
-        </Row>
+            )}
+          </Row>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          onChange={onFilePicked}
+          className="hidden"
+        />
       </section>
 
       {/* about */}
@@ -637,6 +780,50 @@ export function Settings() {
       </section>
 
       {showInstall && <InstallGuide onClose={() => setShowInstall(false)} />}
+
+      {pendingRestore && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-mist-100/70 p-6 backdrop-blur-md"
+          onClick={() => setPendingRestore(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-card bg-card p-6 shadow-xl ring-1 ring-line"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2.5 text-deep-900">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <AlertTriangle size={17} />
+              </span>
+              <p className="text-lg">Restore this backup?</p>
+            </div>
+            <p className="mt-3 text-sm leading-relaxed text-deep-600">
+              This will replace all data currently on this device with the backup
+              {pendingRestore.exportedAt
+                ? ` from ${new Date(pendingRestore.exportedAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}`
+                : ''}
+              . The app will reload.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setPendingRestore(null)}
+                className="rounded-full px-4 py-2 text-sm font-medium text-deep-500 hover:bg-mist-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRestore}
+                className="rounded-full bg-water-500 px-5 py-2 text-sm font-semibold text-onwater shadow-sm transition-transform active:scale-[0.98]"
+              >
+                Restore
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

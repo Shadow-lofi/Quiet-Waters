@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { NavLink, Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Waves, CalendarHeart, BookOpen, Book, ScrollText, ChevronLeft, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
@@ -6,6 +7,7 @@ import { PullToRefresh } from './PullToRefresh'
 import { InstallBar } from './InstallBar'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
+import { requestStoragePersistence } from '../lib/backup'
 
 const tabs = [
   { to: '/meditate', label: 'Meditate', Icon: Waves, end: true },
@@ -43,6 +45,12 @@ function fallbackFor(pathname: string): string {
 export function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Once, on entering the app, ask the browser to keep this device's data
+  // (best-effort; guards against automatic eviction of the local-first store).
+  useEffect(() => {
+    void requestStoragePersistence()
+  }, [])
   // Tabs live in the bottom bar; only the deeper pages need a Back affordance —
   // which matters most for installed PWAs, where there's no browser back button.
   const isTab = tabs.some((t) => t.to === location.pathname)
