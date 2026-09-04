@@ -39,14 +39,13 @@ import { InstallGuide } from '../components/InstallGuide'
 import { useToast } from '../lib/toast'
 import { APP_VERSION } from '../lib/version'
 import {
-  buildBackup,
   parseBackup,
   writeRestoredStore,
-  shareOrDownloadBackup,
   storageProtection,
   requestStoragePersistence,
   type StorageProtection,
 } from '../lib/backup'
+import { useBackup } from '../lib/useBackup'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
@@ -170,18 +169,7 @@ export function Settings() {
     void storageProtection().then(setProtection)
   }, [])
 
-  const backup = async () => {
-    try {
-      const outcome = await shareOrDownloadBackup(buildBackup())
-      pushToast({
-        tone: 'success',
-        title: outcome === 'shared' ? 'Backup ready to save' : 'Backup saved',
-        message: 'Keep this file somewhere safe — it can bring your data back.',
-      })
-    } catch {
-      pushToast({ title: 'Couldn’t create the backup', message: 'Please try again in a moment.' })
-    }
-  }
+  const backup = useBackup()
 
   const onFilePicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

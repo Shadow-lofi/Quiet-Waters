@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { dayKey } from './date'
+import { SNOOZE_MS } from './backupReminder'
 import { newMemoryVerse, reviewOutcome } from '../data/memory'
 import type {
   BreathPace,
@@ -97,6 +98,10 @@ interface State {
   lastDurationMin: number
   verseCursor: number // which meditation verse is showing
 
+  // ── backup reminder (local-first safety net) ──
+  lastBackupAt: number | null // when the user last saved a backup file
+  backupSnoozedUntil: number | null // hide the backup nudge until this time
+
   // ── actions ──
   updateVerse: (
     ref: string,
@@ -124,6 +129,8 @@ interface State {
   setOnboarded: (v: boolean) => void
   addSession: (s: Session) => void
   clearHistory: () => void
+  markBackedUp: () => void
+  snoozeBackupReminder: () => void
   setPref: <K extends keyof Prefs>(key: K, value: Prefs[K]) => void
   setLastDuration: (min: number) => void
   nextVerse: (total: number) => void
@@ -218,11 +225,15 @@ export const useStore = create<State>()(
 
       lastDurationMin: 10,
       verseCursor: 0,
+      lastBackupAt: null,
+      backupSnoozedUntil: null,
 
       setName: (name) => set({ name: name.slice(0, 40) }),
       setOnboarded: (v) => set({ onboarded: v }),
       addSession: (s) => set((st) => ({ sessions: [s, ...st.sessions].slice(0, 500) })),
       clearHistory: () => set({ sessions: [] }),
+      markBackedUp: () => set({ lastBackupAt: Date.now(), backupSnoozedUntil: null }),
+      snoozeBackupReminder: () => set({ backupSnoozedUntil: Date.now() + SNOOZE_MS }),
       setPref: (key, value) => set({ [key]: value } as Partial<State>),
       setLastDuration: (min) => set({ lastDurationMin: min }),
       nextVerse: (total) => set((st) => ({ verseCursor: (st.verseCursor + 1) % Math.max(1, total) })),

@@ -21,6 +21,7 @@ import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
 import { ReminderBanner } from '../components/ReminderBanner'
 import { SabbathCard } from '../components/SabbathCard'
+import { BackupReminder } from '../components/BackupReminder'
 import { NotificationsBell } from '../components/NotificationsBell'
 import { SoulCheck } from '../components/SoulCheck'
 import { SessionOverlay } from '../components/SessionOverlay'
@@ -113,6 +114,9 @@ export function Meditate() {
 
       {/* weekly Sabbath — a warm invitation to rest as worship */}
       <SabbathCard />
+
+      {/* a gentle nudge to save a backup, so local data is never lost */}
+      <BackupReminder />
 
       {/* scripture memory — a gentle nudge when verses are due to review */}
       {memoryDue > 0 && (
