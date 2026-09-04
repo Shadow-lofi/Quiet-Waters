@@ -65,16 +65,19 @@ export function Meditate() {
     : 0
   const showDevResume = activeSeries && devNextDay < activeSeries.days.length
 
-  const [minutes, setMinutes] = useState(lastDurationMin)
   const [active, setActive] = useState(false)
   const [guided, setGuided] = useState<GuidedSession | null>(null)
   const [sharing, setSharing] = useState(false)
 
   const clamp = (n: number) => Math.max(1, Math.min(120, n))
 
+  // The chosen duration lives in the store, so a picked length is remembered and
+  // stays selected as you navigate away and back — it no longer resets.
+  const minutes = lastDurationMin
+  const setMinutes = (m: number) => setLastDuration(clamp(m))
+
   const begin = () => {
     primeAudio() // unlock audio within the user gesture
-    setLastDuration(minutes)
     setActive(true)
   }
 
@@ -236,7 +239,7 @@ export function Meditate() {
         {/* fine stepper */}
         <div className="mt-4 flex items-center justify-center gap-6">
           <button
-            onClick={() => setMinutes((v) => clamp(v - 1))}
+            onClick={() => setMinutes(minutes - 1)}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-deep-700 ring-1 ring-line hover:bg-mist-200"
             aria-label="One minute less"
           >
@@ -247,7 +250,7 @@ export function Meditate() {
             <span className="ml-1 text-deep-500">min</span>
           </div>
           <button
-            onClick={() => setMinutes((v) => clamp(v + 1))}
+            onClick={() => setMinutes(minutes + 1)}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-deep-700 ring-1 ring-line hover:bg-mist-200"
             aria-label="One minute more"
           >
