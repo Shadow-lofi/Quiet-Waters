@@ -15,14 +15,19 @@ function isContentPath(pathname) {
 }
 
 self.addEventListener('install', (event) => {
-  // Precache the shell, but DON'T skipWaiting: a fresh build waits so the app can
-  // surface a gentle "a new version is ready" prompt instead of swapping the
-  // running assets out mid-sitting. The page tells us to activate via a message.
+  // Precache the shell, then take over immediately (skipWaiting). The ACTIVE
+  // worker must always be the CURRENT deploy: if it lingers on an old build, its
+  // cached index.html keeps pointing at JS chunks that later deploys have
+  // replaced — those 404, and the app white-screens. Self-activating keeps the
+  // cached shell and the live assets in lock-step. Updates then apply on the next
+  // open (with a one-time reload below) instead of waiting for a tap that a
+  // broken screen can't reach.
   event.waitUntil(
     caches
       .open(CACHE)
       .then((c) => c.addAll(SHELL))
-      .catch(() => {}),
+      .catch(() => {})
+      .then(() => self.skipWaiting()),
   )
 })
 
@@ -34,16 +39,25 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((k) => k.startsWith('quiet-waters-') && k !== CACHE)
-            .map((k) => caches.delete(k)),
-        ),
-      )
-      .then(() => self.clients.claim()),
+    (async () => {
+      const keys = await caches.keys()
+      const stale = keys.filter((k) => k.startsWith('quiet-waters-') && k !== CACHE)
+      await Promise.all(stale.map((k) => caches.delete(k)))
+      await self.clients.claim()
+      // On an update (a previous build's cache existed — not a first install),
+      // reload any open windows onto the fresh assets, so a stale or broken shell
+      // heals itself without the user having to do anything.
+      if (stale.length > 0) {
+        const windows = await self.clients.matchAll({ type: 'window' })
+        for (const w of windows) {
+          try {
+            w.navigate(w.url)
+          } catch {
+            /* window can't be navigated — the next open will pick up the new SW */
+          }
+        }
+      }
+    })(),
   )
 })
 
