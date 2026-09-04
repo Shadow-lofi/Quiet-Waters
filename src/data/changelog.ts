@@ -17,10 +17,19 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.32.1', '1.32.0', '1.31.1', '1.31.0', '1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.33.0', '1.32.1', '1.32.0', '1.31.1', '1.31.0', '1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 4 (v1.33.0) ────────────────────────────────
+  {
+    date: 'September 4, 2026',
+    tag: 'New',
+    title: 'A gentle reminder to back up',
+    detail:
+      'Since your data lives only on your device, the home screen now offers a quiet nudge to save a backup — when you’ve never made one, or when it’s been a while and there’s new progress to protect. Back up in a tap, or tap “Not now” to be reminded later.',
+    to: '/meditate',
+  },
   // ── September 4 (v1.32.1) ────────────────────────────────
   {
     date: 'September 4, 2026',
