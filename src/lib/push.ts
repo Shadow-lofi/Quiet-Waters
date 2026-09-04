@@ -52,7 +52,14 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
   return (await reg?.pushManager.getSubscription()) ?? null
 }
 
-export type EnableResult = 'subscribed' | 'denied' | 'unsupported' | 'error'
+export type EnableStatus = 'subscribed' | 'denied' | 'unsupported' | 'error'
+
+/** The result of trying to enable push. `detail` carries the real reason on an
+ *  error, so a device-only failure (no console) can be surfaced to the user. */
+export interface EnableResult {
+  status: EnableStatus
+  detail?: string
+}
 
 /** Base64url encoding of a subscription's applicationServerKey, for comparison. */
 function serverKeyOf(sub: PushSubscription): string | null {
@@ -98,33 +105,41 @@ async function subscribeToPush(reg: ServiceWorkerRegistration): Promise<PushSubs
  * a user gesture (the permission prompt requires it).
  */
 export async function enablePush(): Promise<EnableResult> {
-  if (!isPushSupported() || !PUSH_CONFIGURED) return 'unsupported'
+  if (!isPushSupported() || !PUSH_CONFIGURED) return { status: 'unsupported' }
   let permission: NotificationPermission
   try {
     permission = await Notification.requestPermission()
   } catch {
     permission = Notification.permission
   }
-  if (permission !== 'granted') return 'denied'
+  if (permission !== 'granted') return { status: 'denied' }
 
+  // Track where we are so a failure names the step it happened in.
+  let stage = 'service worker'
   try {
     const reg = await navigator.serviceWorker.ready
+    stage = 'subscribe'
     const sub = await subscribeToPush(reg)
+    stage = 'register'
     const res = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sub),
     })
     if (!res.ok) {
-      console.warn('[push] server rejected the subscription', res.status)
-      return 'error'
+      const body = await res.text().catch(() => '')
+      console.warn('[push] server rejected the subscription', res.status, body)
+      return { status: 'error', detail: `register failed (${res.status})` }
     }
-    return 'subscribed'
+    return { status: 'subscribed' }
   } catch (err) {
-    // Surface the real reason so a persistent failure is debuggable (it otherwise
-    // collapses to one opaque message).
-    console.warn('[push] enable failed', err)
-    return 'error'
+    // Surface the real reason so a persistent failure is debuggable — the flow is
+    // device-only (no console on a phone), so the name/message rides into the UI.
+    const e = err as Error
+    console.warn('[push] enable failed at', stage, e)
+    const name = e?.name || 'Error'
+    const message = e?.message ? `: ${e.message}` : ''
+    return { status: 'error', detail: `${stage} — ${name}${message}` }
   }
 }
 
