@@ -88,15 +88,24 @@ async function subscribeToPush(reg: ServiceWorkerRegistration): Promise<PushSubs
     await existing.unsubscribe().catch(() => {})
   }
 
-  try {
-    return await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
-  } catch (err) {
-    console.warn('[push] first subscribe attempt failed, retrying', err)
-    // Clear anything the failed attempt may have left behind, then retry once.
-    await (await reg.pushManager.getSubscription())?.unsubscribe().catch(() => {})
-    await new Promise((r) => setTimeout(r, 600))
-    return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+  // iOS/Safari commonly throws AbortError ("push service error") from a transient
+  // failure registering with Apple's push service — retrying, with a growing
+  // pause and a clean slate each time, usually succeeds. Persistent failures
+  // still surface (the last error propagates) so the reason reaches the user.
+  const delays = [0, 800, 2000]
+  let lastErr: unknown
+  for (let attempt = 0; attempt < delays.length; attempt++) {
+    if (delays[attempt]) await new Promise((r) => setTimeout(r, delays[attempt]))
+    try {
+      return await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+    } catch (err) {
+      lastErr = err
+      console.warn(`[push] subscribe attempt ${attempt + 1} failed`, err)
+      // Clear anything a failed attempt may have left behind before retrying.
+      await (await reg.pushManager.getSubscription())?.unsubscribe().catch(() => {})
+    }
   }
+  throw lastErr
 }
 
 /**
