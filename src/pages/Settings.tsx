@@ -232,8 +232,19 @@ export function Settings() {
             title: 'Notifications are blocked',
             message: 'Allow them for Quiet Waters in your browser settings to turn this on.',
           })
+        } else if (result === 'unsupported') {
+          pushToast({
+            title: 'Not available here',
+            message: iosNeedsInstall
+              ? 'Add Quiet Waters to your Home Screen first, then try again.'
+              : 'This browser can’t receive notifications.',
+          })
         } else {
-          pushToast({ title: 'Couldn’t enable notifications', message: 'Please try again in a moment.' })
+          pushToast({
+            title: 'Couldn’t turn on notifications',
+            message:
+              'Something went wrong on this device. If it keeps happening, remove Quiet Waters and add it to your Home Screen again.',
+          })
         }
       } else {
         await disablePush()

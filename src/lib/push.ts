@@ -54,6 +54,44 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
 
 export type EnableResult = 'subscribed' | 'denied' | 'unsupported' | 'error'
 
+/** Base64url encoding of a subscription's applicationServerKey, for comparison. */
+function serverKeyOf(sub: PushSubscription): string | null {
+  const raw = sub.options?.applicationServerKey
+  if (!raw) return null
+  const bytes = new Uint8Array(raw)
+  let bin = ''
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i])
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+/**
+ * Subscribe with the push service, recovering from the common failure mode: a
+ * leftover subscription from a previous VAPID key (e.g. after a service-worker
+ * update) makes a fresh `subscribe()` throw. Drop any stale subscription and try
+ * again; retry once more after a short pause for transient (iOS) failures.
+ */
+async function subscribeToPush(reg: ServiceWorkerRegistration): Promise<PushSubscription> {
+  const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+
+  // Reuse an existing subscription only if it was made with the current key;
+  // otherwise it's stale and must be replaced (and the server can't reach it).
+  const existing = await reg.pushManager.getSubscription()
+  if (existing) {
+    if (serverKeyOf(existing) === VAPID_PUBLIC_KEY) return existing
+    await existing.unsubscribe().catch(() => {})
+  }
+
+  try {
+    return await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+  } catch (err) {
+    console.warn('[push] first subscribe attempt failed, retrying', err)
+    // Clear anything the failed attempt may have left behind, then retry once.
+    await (await reg.pushManager.getSubscription())?.unsubscribe().catch(() => {})
+    await new Promise((r) => setTimeout(r, 600))
+    return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+  }
+}
+
 /**
  * Ask permission, subscribe with the browser's push service, and register the
  * subscription with the server so it can receive broadcasts. Must be called from
@@ -71,19 +109,21 @@ export async function enablePush(): Promise<EnableResult> {
 
   try {
     const reg = await navigator.serviceWorker.ready
-    const sub =
-      (await reg.pushManager.getSubscription()) ??
-      (await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-      }))
+    const sub = await subscribeToPush(reg)
     const res = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sub),
     })
-    return res.ok ? 'subscribed' : 'error'
-  } catch {
+    if (!res.ok) {
+      console.warn('[push] server rejected the subscription', res.status)
+      return 'error'
+    }
+    return 'subscribed'
+  } catch (err) {
+    // Surface the real reason so a persistent failure is debuggable (it otherwise
+    // collapses to one opaque message).
+    console.warn('[push] enable failed', err)
     return 'error'
   }
 }
