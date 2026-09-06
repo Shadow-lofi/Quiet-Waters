@@ -25,11 +25,13 @@ const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
 // A slow, consonant progression (frequencies in Hz). Voice 0 is the bass; the
 // upper voices share common tones so changes read as gentle voice-leading, not a
 // smear. Roughly: C · Am7 · Fmaj7 · G6.
+// The last note of each chord is a soft upper voice woven in on top (a gentle
+// high line: G4 · A4 · A4 · B4) for a little more colour.
 const CHORDS: number[][] = [
-  [130.81, 196.0, 261.63, 329.63], // C3  G3  C4  E4
-  [110.0, 164.81, 261.63, 329.63], // A2  E3  C4  E4
-  [174.61, 220.0, 261.63, 329.63], // F3  A3  C4  E4
-  [196.0, 246.94, 293.66, 329.63], // G3  B3  D4  E4
+  [130.81, 196.0, 261.63, 329.63, 392.0], // C3  G3  C4  E4  G4
+  [110.0, 164.81, 261.63, 329.63, 440.0], // A2  E3  C4  E4  A4
+  [174.61, 220.0, 261.63, 329.63, 440.0], // F3  A3  C4  E4  A4
+  [196.0, 246.94, 293.66, 329.63, 493.88], // G3  B3  D4  E4  B4
 ]
 
 // A soft bell picks from the C-major pentatonic, an octave up.
@@ -67,7 +69,7 @@ function schedule(myGen: number, min: number, max: number, fn: () => void) {
 /** A single soft bell — slow attack, long decay, gently panned. Sometimes it
  *  stays silent, so the accents feel unforced. */
 function bell(ctx: AudioContext, out: AudioNode) {
-  if (Math.random() < 0.28) return
+  if (Math.random() < 0.2) return
   const t = ctx.currentTime
   // Bias toward the lower notes of the palette for a warmer, mellower bell.
   const f = BELL_NOTES[Math.floor(Math.random() ** 1.6 * BELL_NOTES.length)]
@@ -75,10 +77,10 @@ function bell(ctx: AudioContext, out: AudioNode) {
   osc.type = 'sine'
   osc.frequency.value = f
   const g = ctx.createGain()
-  const peak = rand(0.038, 0.078)
-  const decay = rand(3.5, 5.5)
+  const peak = rand(0.03, 0.06)
+  const decay = rand(3.8, 5.8)
   g.gain.setValueAtTime(0.0001, t)
-  g.gain.exponentialRampToValueAtTime(peak, t + 0.4) // slow swell in
+  g.gain.exponentialRampToValueAtTime(peak, t + 0.55) // soft swell in
   g.gain.exponentialRampToValueAtTime(0.0001, t + decay) // long tail
   const pan = ctx.createStereoPanner()
   pan.pan.value = rand(-0.4, 0.4)
@@ -126,11 +128,11 @@ export function startAmbient(kind: Soundscape, volume: number): void {
     // A warm lowpass rolls off the highs; it breathes open and closed slowly.
     const lp = biquad('lowpass', 560, 0.6)
     lp.connect(out)
-    lfo(ctx, 0.014, 200, lp.frequency) // ~70s sweep, ±200 Hz around 560 (warmer, slower)
+    lfo(ctx, 0.02, 200, lp.frequency) // ~50s sweep, ±200 Hz around 560 (warmer)
     const pad = gain(1)
     pad.connect(lp)
 
-    const VOICES = 4
+    const VOICES = 5
     const oscs: OscillatorNode[] = []
     const lastFreqs = [...CHORDS[0]]
     for (let i = 0; i < VOICES; i++) {
@@ -141,31 +143,32 @@ export function startAmbient(kind: Soundscape, volume: number): void {
       osc.connect(vg)
       vg.connect(pad)
       osc.start()
-      sources.push(osc)
-      // ease the voice in
+      // ease the voice in — the added top voice sits softer, as colour
+      const level = i === VOICES - 1 ? rand(0.055, 0.08) : rand(0.085, 0.11)
       vg.gain.setValueAtTime(0.0001, now)
-      vg.gain.linearRampToValueAtTime(rand(0.1, 0.13), now + 3)
-      lfo(ctx, rand(0.02, 0.045), 0.045, vg.gain) // slow, gentle swell
-      lfo(ctx, rand(0.04, 0.09), rand(0.6, 1.6), osc.detune) // subtle warmth drift
+      vg.gain.linearRampToValueAtTime(level, now + 3)
+      sources.push(osc)
+      lfo(ctx, rand(0.03, 0.07), 0.045, vg.gain) // gentle swell
+      lfo(ctx, rand(0.05, 0.12), rand(0.6, 1.6), osc.detune) // subtle warmth drift
       oscs.push(osc)
     }
 
-    // Glide the voices to the next chord every ~21s — slow and unhurried.
+    // Glide the voices to the next chord every ~13s.
     let idx = 0
-    schedule(myGen, 18000, 24000, () => {
+    schedule(myGen, 12000, 15000, () => {
       idx = (idx + 1) % CHORDS.length
       const chord = CHORDS[idx]
       const t = ctx.currentTime
       for (let i = 0; i < VOICES; i++) {
         oscs[i].frequency.cancelScheduledValues(t)
         oscs[i].frequency.setValueAtTime(lastFreqs[i], t)
-        oscs[i].frequency.exponentialRampToValueAtTime(chord[i], t + 3)
+        oscs[i].frequency.exponentialRampToValueAtTime(chord[i], t + 2.2)
         lastFreqs[i] = chord[i]
       }
     })
 
     // A soft bell, a little more often now.
-    schedule(myGen, 6000, 13000, () => bell(ctx, out))
+    schedule(myGen, 5000, 11000, () => bell(ctx, out))
   }
 
   const target = clamp01(volume) * trim
