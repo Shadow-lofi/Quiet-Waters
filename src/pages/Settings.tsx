@@ -18,7 +18,8 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { useStore } from '../lib/store'
-import { DOW_LETTER, DOW_FULL } from '../lib/date'
+import { DOW_FULL } from '../lib/date'
+import { SABBATH_DAY } from '../data/sabbath'
 import { BREATH_PATTERNS } from '../data/presets'
 import { SOUNDSCAPES } from '../data/soundscapes'
 import { startAmbient, stopAmbient, setAmbientVolume } from '../lib/ambient'
@@ -289,7 +290,7 @@ export function Settings() {
   }
 
   const sabbathHint = (): string => {
-    const day = DOW_FULL[s.sabbathDay]
+    const day = DOW_FULL[SABBATH_DAY]
     if (!s.sabbathReminderOn) return `A weekly invitation to rest on ${day}`
     if (!NOTIFICATIONS_SUPPORTED) return `The Sabbath card greets you on ${day}`
     if (perm === 'granted') return `A gentle nudge on ${day}, and on your device when backgrounded`
@@ -432,27 +433,6 @@ export function Settings() {
                   className="rounded-full bg-mist-100 px-3.5 py-1.5 text-deep-900 outline-none ring-1 ring-line transition focus:ring-2 focus:ring-water-500"
                 />
               </Row>
-              <div className="py-3.5">
-                <p className="mb-2 text-deep-800">Which day is your Sabbath?</p>
-                <div className="flex gap-1.5">
-                  {DOW_LETTER.map((letter, i) => {
-                    const on = i === s.sabbathDay
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => s.setSabbathDay(i)}
-                        aria-label={DOW_FULL[i]}
-                        aria-pressed={on}
-                        className={`h-10 flex-1 rounded-xl text-sm font-semibold transition ${
-                          on ? 'bg-water-500 text-onwater' : 'bg-mist-200 text-deep-600 hover:bg-mist-300'
-                        }`}
-                      >
-                        {letter}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
             </>
           )}
         </div>
