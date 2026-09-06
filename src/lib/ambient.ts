@@ -67,15 +67,16 @@ function schedule(myGen: number, min: number, max: number, fn: () => void) {
 /** A single soft bell — slow attack, long decay, gently panned. Sometimes it
  *  stays silent, so the accents feel unforced. */
 function bell(ctx: AudioContext, out: AudioNode) {
-  if (Math.random() < 0.4) return
+  if (Math.random() < 0.28) return
   const t = ctx.currentTime
-  const f = BELL_NOTES[Math.floor(Math.random() * BELL_NOTES.length)]
+  // Bias toward the lower notes of the palette for a warmer, mellower bell.
+  const f = BELL_NOTES[Math.floor(Math.random() ** 1.6 * BELL_NOTES.length)]
   const osc = ctx.createOscillator()
   osc.type = 'sine'
   osc.frequency.value = f
   const g = ctx.createGain()
-  const peak = rand(0.04, 0.085)
-  const decay = rand(3, 5)
+  const peak = rand(0.038, 0.078)
+  const decay = rand(3.5, 5.5)
   g.gain.setValueAtTime(0.0001, t)
   g.gain.exponentialRampToValueAtTime(peak, t + 0.4) // slow swell in
   g.gain.exponentialRampToValueAtTime(0.0001, t + decay) // long tail
@@ -123,9 +124,9 @@ export function startAmbient(kind: Soundscape, volume: number): void {
   if (kind === 'music') {
     const now = ctx.currentTime
     // A warm lowpass rolls off the highs; it breathes open and closed slowly.
-    const lp = biquad('lowpass', 720, 0.6)
+    const lp = biquad('lowpass', 560, 0.6)
     lp.connect(out)
-    lfo(ctx, 0.02, 240, lp.frequency) // ~50s sweep, ±240 Hz around 720
+    lfo(ctx, 0.02, 200, lp.frequency) // ~50s sweep, ±200 Hz around 560 (warmer)
     const pad = gain(1)
     pad.connect(lp)
 
@@ -163,8 +164,8 @@ export function startAmbient(kind: Soundscape, volume: number): void {
       }
     })
 
-    // An occasional soft bell.
-    schedule(myGen, 7000, 17000, () => bell(ctx, out))
+    // A soft bell, a little more often now.
+    schedule(myGen, 6000, 13000, () => bell(ctx, out))
   }
 
   const target = clamp01(volume) * trim
