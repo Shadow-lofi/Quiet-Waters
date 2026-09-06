@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Music,
+  Volume2,
   VolumeX,
   Play,
   Square,
@@ -161,8 +162,9 @@ export function Settings() {
     if (showPush && pushSupported) void currentSubscription().then((sub) => setPushOn(Boolean(sub)))
   }, [showPush, pushSupported])
 
-  // Always silence any preview when leaving Settings.
-  useEffect(() => () => stopAmbient(), [])
+  // Silence only a sitting-ambience PREVIEW when leaving Settings — never the
+  // app-wide background music, which is owned separately and keeps playing.
+  useEffect(() => () => stopAmbient(false, 'preview'), [])
 
   // Reflect whether the browser is keeping this device's data (vs. free to evict it).
   useEffect(() => {
@@ -298,26 +300,38 @@ export function Settings() {
   const pickScape = (id: Soundscape) => {
     s.setPref('soundscape', id)
     if (id === 'off') {
-      stopAmbient()
+      stopAmbient(false, 'preview')
       setPreviewing(false)
     } else if (previewing) {
-      startAmbient(id, s.ambientVolume) // switch the running preview
+      startAmbient(id, s.ambientVolume, 'preview') // switch the running preview
     }
   }
 
   const changeVolume = (v: number) => {
     s.setPref('ambientVolume', v)
-    if (previewing) setAmbientVolume(v)
+    setAmbientVolume(v) // affects whatever's live — a preview or the background music
   }
 
   const togglePreview = () => {
     if (previewing) {
-      stopAmbient()
+      stopAmbient(false, 'preview')
       setPreviewing(false)
     } else {
-      startAmbient(s.soundscape, s.ambientVolume)
+      startAmbient(s.soundscape, s.ambientVolume, 'preview')
       setPreviewing(true)
     }
+  }
+
+  // App-wide background music. We're inside the toggle's click gesture here, so
+  // the track can start playing immediately.
+  const toggleBackgroundMusic = (v: boolean) => {
+    if (v) {
+      startAmbient('music', s.ambientVolume, 'background')
+      setPreviewing(false) // a running sitting-ambience preview is now moot
+    } else {
+      stopAmbient(false, 'background')
+    }
+    s.setPref('backgroundMusic', v)
   }
 
   return (
@@ -524,60 +538,88 @@ export function Settings() {
         </div>
       </section>
 
-      {/* ambience */}
-      <section className="rounded-card bg-card px-5 py-4 shadow-sm ring-1 ring-line">
-        <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Ambience</p>
-          <p className="text-xs text-deep-500">
-            {SOUNDSCAPES.find((sc) => sc.id === s.soundscape)?.hint}
-          </p>
+      {/* music & ambience */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <p className="pt-3 text-xs uppercase tracking-[0.2em] text-deep-500">Music &amp; ambience</p>
+        <div className="divide-y divide-line">
+          <Row
+            label="Background music"
+            hint="Play the music throughout the app, not just during a sitting"
+          >
+            <Toggle checked={s.backgroundMusic} onChange={toggleBackgroundMusic} />
+          </Row>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {SOUNDSCAPES.map((sc) => {
-            const Icon = SCAPE_ICON[sc.id]
-            const on = s.soundscape === sc.id
-            return (
-              <button
-                key={sc.id}
-                onClick={() => pickScape(sc.id)}
-                className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                  on
-                    ? 'bg-water-500 text-onwater shadow-sm'
-                    : 'bg-mist-200 text-deep-700 hover:bg-mist-300'
-                }`}
-              >
-                <Icon size={15} strokeWidth={2} />
-                {sc.label}
-              </button>
-            )
-          })}
-        </div>
+        {s.backgroundMusic ? (
+          <div className="pb-4 pt-3">
+            <div className="flex items-center gap-3">
+              <Volume2 size={16} className="shrink-0 text-deep-400" />
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={s.ambientVolume}
+                onChange={(e) => changeVolume(Number(e.target.value))}
+                aria-label="Music volume"
+                className="h-1.5 flex-1 cursor-pointer accent-water-500"
+              />
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-deep-500">
+              A gentle track plays throughout the app. Tap the speaker button (bottom-right) anytime
+              to pause it.
+            </p>
+          </div>
+        ) : (
+          <div className="pb-4 pt-3">
+            <p className="mb-2 text-xs text-deep-500">Sound during a sitting</p>
+            <div className="flex flex-wrap gap-2">
+              {SOUNDSCAPES.map((sc) => {
+                const Icon = SCAPE_ICON[sc.id]
+                const on = s.soundscape === sc.id
+                return (
+                  <button
+                    key={sc.id}
+                    onClick={() => pickScape(sc.id)}
+                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
+                      on
+                        ? 'bg-water-500 text-onwater shadow-sm'
+                        : 'bg-mist-200 text-deep-700 hover:bg-mist-300'
+                    }`}
+                  >
+                    <Icon size={15} strokeWidth={2} />
+                    {sc.label}
+                  </button>
+                )
+              })}
+            </div>
 
-        {s.soundscape !== 'off' && (
-          <div className="mt-4 flex items-center gap-4">
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={s.ambientVolume}
-              onChange={(e) => changeVolume(Number(e.target.value))}
-              aria-label="Ambient volume"
-              className="h-1.5 flex-1 cursor-pointer accent-water-500"
-            />
-            <button
-              onClick={togglePreview}
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-deep-700 ring-1 ring-line hover:bg-mist-200"
-            >
-              {previewing ? <Square size={14} /> : <Play size={14} />}
-              {previewing ? 'Stop' : 'Preview'}
-            </button>
+            {s.soundscape !== 'off' && (
+              <div className="mt-4 flex items-center gap-4">
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={s.ambientVolume}
+                  onChange={(e) => changeVolume(Number(e.target.value))}
+                  aria-label="Ambient volume"
+                  className="h-1.5 flex-1 cursor-pointer accent-water-500"
+                />
+                <button
+                  onClick={togglePreview}
+                  className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-deep-700 ring-1 ring-line hover:bg-mist-200"
+                >
+                  {previewing ? <Square size={14} /> : <Play size={14} />}
+                  {previewing ? 'Stop' : 'Preview'}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
-        {s.soundscape === 'music' && (
-          <p className="mt-3 text-[0.7rem] leading-relaxed text-deep-400">
+        {(s.backgroundMusic || s.soundscape === 'music') && (
+          <p className="pb-3 text-[0.7rem] leading-relaxed text-deep-400">
             Music:{' '}
             <a
               href="https://pixabay.com/music/meditationspiritual-zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403/"

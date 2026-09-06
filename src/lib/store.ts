@@ -36,6 +36,7 @@ interface State {
   breathPace: BreathPace
   keepAwake: boolean
   soundscape: Soundscape // ambient sound during a sitting ('off' = silence)
+  backgroundMusic: boolean // play the ambience track throughout the app, not just in sittings
   ambientVolume: number // 0–1
   motion: MotionPref // whether the gentle animations run
   introOn: boolean // the installed app's opening intro (a tap-to-enter welcome + music swell)
@@ -156,6 +157,7 @@ type Prefs = Pick<
   | 'breathPace'
   | 'keepAwake'
   | 'soundscape'
+  | 'backgroundMusic'
   | 'ambientVolume'
   | 'motion'
   | 'introOn'
@@ -185,6 +187,7 @@ export const useStore = create<State>()(
       breathPace: 'gentle',
       keepAwake: true,
       soundscape: 'off',
+      backgroundMusic: true,
       ambientVolume: 0.6,
       motion: 'on',
       introOn: true,

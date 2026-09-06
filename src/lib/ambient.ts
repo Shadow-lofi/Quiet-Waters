@@ -15,6 +15,14 @@ let timers: number[] = [] // pending loop schedulers
 let gen = 0 // bumped on every stop/start so stale schedulers bail
 let currentKind: Soundscape = 'off'
 
+// Who started the ambience currently playing. There's one shared engine, so this
+// lets a caller release only its own playback: e.g. app-wide "background music"
+// keeps looping while a sitting begins and ends over the top of it, and leaving
+// the Settings preview never silences the background track. See startAmbient /
+// stopAmbient's `who`.
+export type AmbientOwner = 'background' | 'session' | 'preview'
+let owner: AmbientOwner | null = null
+
 // Perceived-loudness trim, applied under the user's 0–1 volume.
 const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
   music: 0.5,
@@ -79,8 +87,9 @@ function startMusicLoop(ctx: AudioContext, buffer: AudioBuffer, out: AudioNode, 
   playFrom(ctx.currentTime + 0.05)
 }
 
-/** Start (or switch to) the ambient track, fading it in. */
-export function startAmbient(kind: Soundscape, volume: number): void {
+/** Start (or switch to) the ambient track, fading it in. `who` records the caller
+ *  so it (and only it) can later stop this playback — defaults to a sitting. */
+export function startAmbient(kind: Soundscape, volume: number, who: AmbientOwner = 'session'): void {
   stopAmbient(true) // tears down anything playing and bumps `gen`
   if (kind === 'off') return
   const trim = TRIM[kind as Exclude<Soundscape, 'off'>]
@@ -103,10 +112,15 @@ export function startAmbient(kind: Soundscape, volume: number): void {
   const target = clamp01(volume) * trim
   master.gain.linearRampToValueAtTime(Math.max(0.0001, target), ctx.currentTime + 2)
   currentKind = kind
+  owner = who
 }
 
-/** Fade out and dispose the current ambience. Pass immediate to skip the fade. */
-export function stopAmbient(immediate = false): void {
+/** Fade out and dispose the current ambience. Pass immediate to skip the fade.
+ *  Pass `who` to release only playback that caller owns — a mismatched owner is a
+ *  no-op, so a sitting or a Settings preview never stops the background music.
+ *  Omitting `who` forces the stop (used internally to tear down before a start). */
+export function stopAmbient(immediate = false, who?: AmbientOwner): void {
+  if (who && owner && owner !== who) return // someone else owns it — leave it playing
   gen++ // any in-flight scheduler now bails
   for (const id of timers) clearTimeout(id)
   timers = []
@@ -116,6 +130,7 @@ export function stopAmbient(immediate = false): void {
   master = null
   sources = []
   currentKind = 'off'
+  owner = null
   if (!m) return
 
   const teardown = () => {
