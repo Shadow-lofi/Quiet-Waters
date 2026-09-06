@@ -36,6 +36,7 @@ export function SessionOverlay({
     breathPace,
     keepAwake,
     soundscape,
+    backgroundMusic,
     ambientVolume,
     addSession,
   } = useStore()
@@ -55,11 +56,14 @@ export function SessionOverlay({
   useEffect(() => {
     primeAudio()
     if (soundOn && openingChime) playChime('open')
-    startAmbient(soundscape, ambientVolume)
+    // When app-wide background music is on, it's already playing — leave it be so
+    // it carries seamlessly through the sitting. Otherwise, start the chosen
+    // sitting-only ambience (tagged 'session' so it stops with the sitting).
+    if (!backgroundMusic) startAmbient(soundscape, ambientVolume, 'session')
     if (keepAwake) void keepScreenAwake()
     return () => {
       releaseScreenAwake()
-      stopAmbient()
+      stopAmbient(false, 'session')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -82,14 +86,14 @@ export function SessionOverlay({
     // Ended almost immediately: just slip back to setup — no chime, no log, no
     // "Amen" celebration for a sitting that never really began.
     if (!completed && actual < 20) {
-      stopAmbient()
+      stopAmbient(false, 'session')
       releaseScreenAwake()
       onClose()
       return
     }
 
     if (completed && flags.current.soundOn && flags.current.closingChime) playChime('close')
-    stopAmbient()
+    stopAmbient(false, 'session')
     const session: Session = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       endedAt: new Date().toISOString(),

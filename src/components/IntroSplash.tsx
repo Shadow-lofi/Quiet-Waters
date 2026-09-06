@@ -55,7 +55,10 @@ export function IntroSplash() {
     if (entered.current) return
     entered.current = true
     // Inside the tap gesture: ring in the music, then dissolve into the app.
-    playIntroSwell(useStore.getState().ambientVolume)
+    // When app-wide background music is on, this same tap starts that continuous
+    // loop (it swells in as the splash dissolves — see BackgroundMusic), so we
+    // skip the one-shot swell to avoid two copies of the track overlapping.
+    if (!useStore.getState().backgroundMusic) playIntroSwell(useStore.getState().ambientVolume)
     setLeaving(true)
     window.setTimeout(() => setDone(true), 900)
   }

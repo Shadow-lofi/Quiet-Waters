@@ -5,6 +5,7 @@ import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
 import { PullToRefresh } from './PullToRefresh'
 import { InstallBar } from './InstallBar'
+import { BackgroundMusic } from './BackgroundMusic'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 import { requestStoragePersistence } from '../lib/backup'
@@ -66,6 +67,7 @@ export function AppLayout() {
       <WaterBackground />
       <ReminderScheduler />
       <PullToRefresh />
+      <BackgroundMusic />
       <Toaster />
       <main
         className="flex-1 px-5 pb-28"
