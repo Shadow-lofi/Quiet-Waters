@@ -126,7 +126,7 @@ export function startAmbient(kind: Soundscape, volume: number): void {
     // A warm lowpass rolls off the highs; it breathes open and closed slowly.
     const lp = biquad('lowpass', 560, 0.6)
     lp.connect(out)
-    lfo(ctx, 0.02, 200, lp.frequency) // ~50s sweep, ±200 Hz around 560 (warmer)
+    lfo(ctx, 0.014, 200, lp.frequency) // ~70s sweep, ±200 Hz around 560 (warmer, slower)
     const pad = gain(1)
     pad.connect(lp)
 
@@ -145,21 +145,21 @@ export function startAmbient(kind: Soundscape, volume: number): void {
       // ease the voice in
       vg.gain.setValueAtTime(0.0001, now)
       vg.gain.linearRampToValueAtTime(rand(0.1, 0.13), now + 3)
-      lfo(ctx, rand(0.03, 0.07), 0.045, vg.gain) // gentle swell
-      lfo(ctx, rand(0.05, 0.12), rand(0.6, 1.6), osc.detune) // subtle warmth drift
+      lfo(ctx, rand(0.02, 0.045), 0.045, vg.gain) // slow, gentle swell
+      lfo(ctx, rand(0.04, 0.09), rand(0.6, 1.6), osc.detune) // subtle warmth drift
       oscs.push(osc)
     }
 
-    // Glide the voices to the next chord every ~13s.
+    // Glide the voices to the next chord every ~21s — slow and unhurried.
     let idx = 0
-    schedule(myGen, 12000, 15000, () => {
+    schedule(myGen, 18000, 24000, () => {
       idx = (idx + 1) % CHORDS.length
       const chord = CHORDS[idx]
       const t = ctx.currentTime
       for (let i = 0; i < VOICES; i++) {
         oscs[i].frequency.cancelScheduledValues(t)
         oscs[i].frequency.setValueAtTime(lastFreqs[i], t)
-        oscs[i].frequency.exponentialRampToValueAtTime(chord[i], t + 2.2)
+        oscs[i].frequency.exponentialRampToValueAtTime(chord[i], t + 3)
         lastFreqs[i] = chord[i]
       }
     })
