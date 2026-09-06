@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Flame,
+  Music,
   VolumeX,
   Play,
   Square,
@@ -48,9 +48,9 @@ import {
 import { useBackup } from '../lib/useBackup'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
-const SCAPE_ICON: Record<Soundscape, typeof Flame> = {
+const SCAPE_ICON: Record<Soundscape, typeof Music> = {
   off: VolumeX,
-  fire: Flame,
+  music: Music,
 }
 
 const APPEARANCE_HINT: Record<ThemePref, string> = {
