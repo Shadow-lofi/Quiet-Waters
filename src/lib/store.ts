@@ -376,12 +376,13 @@ export const useStore = create<State>()(
     }),
     {
       name: 'quiet-waters-v1',
-      version: 7,
-      // Retired soundscapes fall back to off. Dropped over versions: wind, rain,
-      // stream, waves, leaves, bowls, guitar — leaving just fire.
+      version: 8,
+      // Retired soundscapes fall back to off (we never auto-start a sound the
+      // user didn't choose). Dropped over versions: wind, rain, stream, waves,
+      // leaves, bowls, guitar, and now fire — replaced by the "music" pad (v8).
       migrate: (persisted) => {
         const st = persisted as Partial<State>
-        const retired = ['wind', 'rain', 'stream', 'waves', 'leaves', 'bowls', 'guitar']
+        const retired = ['wind', 'rain', 'stream', 'waves', 'leaves', 'bowls', 'guitar', 'fire']
         if (retired.includes(st.soundscape as string)) st.soundscape = 'off'
         return st as State
       },

@@ -4,41 +4,14 @@ import type { Soundscape } from './types'
 // Ambient soundscapes, synthesized entirely with the Web Audio API — no audio
 // files, so they add nothing to the bundle and work fully offline.
 //
-// Fire is noise-based: a continuous warm low "bed" (looping pink noise, lowpassed
-// so there's no airy mid hiss) plus one-shot crackle "pops" fired at random
-// intervals. That irregularity is what makes it read as a real hearth.
-
-let noiseBuffer: AudioBuffer | null = null
-
-function pinkNoise(ctx: AudioContext): AudioBuffer {
-  const frames = ctx.sampleRate * 3
-  const buffer = ctx.createBuffer(1, frames, ctx.sampleRate)
-  const out = buffer.getChannelData(0)
-  // Paul Kellet's pink-noise filter.
-  let b0 = 0,
-    b1 = 0,
-    b2 = 0,
-    b3 = 0,
-    b4 = 0,
-    b5 = 0,
-    b6 = 0
-  for (let i = 0; i < frames; i++) {
-    const white = Math.random() * 2 - 1
-    b0 = 0.99886 * b0 + white * 0.0555179
-    b1 = 0.99332 * b1 + white * 0.0750759
-    b2 = 0.969 * b2 + white * 0.153852
-    b3 = 0.8665 * b3 + white * 0.3104856
-    b4 = 0.55 * b4 + white * 0.5329522
-    b5 = -0.7616 * b5 - white * 0.016898
-    out[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11
-    b6 = white * 0.115926
-  }
-  return buffer
-}
+// "Music" is a soft, prayerful ambient pad: four sine voices that glide gently
+// between the notes of a slow, consonant chord progression (in C major), under a
+// slowly-breathing lowpass filter, with an occasional soft bell tone from a
+// pentatonic scale. No melody to follow — just a warm, evolving wash to rest in.
 
 // The live graph, kept so we can fade out and tear it down cleanly.
 let master: GainNode | null = null
-let sources: AudioScheduledSourceNode[] = [] // long-lived beds + LFO oscillators
+let sources: AudioScheduledSourceNode[] = [] // long-lived voices + LFO oscillators
 let chain: AudioNode[] = [] // long-lived filters/gains to disconnect
 let timers: number[] = [] // pending scheduler timeouts
 let gen = 0 // bumped on every stop/start so stale schedulers bail
@@ -46,8 +19,21 @@ let currentKind: Soundscape = 'off'
 
 // Perceived-loudness trim per scape, applied under the user's 0–1 volume.
 const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
-  fire: 0.5,
+  music: 0.55,
 }
+
+// A slow, consonant progression (frequencies in Hz). Voice 0 is the bass; the
+// upper voices share common tones so changes read as gentle voice-leading, not a
+// smear. Roughly: C · Am7 · Fmaj7 · G6.
+const CHORDS: number[][] = [
+  [130.81, 196.0, 261.63, 329.63], // C3  G3  C4  E4
+  [110.0, 164.81, 261.63, 329.63], // A2  E3  C4  E4
+  [174.61, 220.0, 261.63, 329.63], // F3  A3  C4  E4
+  [196.0, 246.94, 293.66, 329.63], // G3  B3  D4  E4
+]
+
+// A soft bell picks from the C-major pentatonic, an octave up.
+const BELL_NOTES = [523.25, 587.33, 659.25, 783.99, 880.0] // C5 D5 E5 G5 A5
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -78,33 +64,28 @@ function schedule(myGen: number, min: number, max: number, fn: () => void) {
 
 // ── one-shot voices ─────────────────────────────────────────────────────────
 
-/** A burst of fire crackle: one to a few very short, bright pops. */
-function crackle(ctx: AudioContext, out: AudioNode) {
-  if (!noiseBuffer) return
-  const cluster = 1 + Math.floor(Math.random() * Math.random() * 4) // usually 1, rarely up to 4
-  let t = ctx.currentTime
-  for (let i = 0; i < cluster; i++) {
-    const decay = rand(0.006, 0.03)
-    const src = ctx.createBufferSource()
-    src.buffer = noiseBuffer
-    const hp = ctx.createBiquadFilter()
-    hp.type = 'highpass'
-    hp.frequency.value = rand(1300, 3600)
-    const g = ctx.createGain()
-    const v = rand(0.05, 0.4)
-    g.gain.setValueAtTime(0.0001, t)
-    g.gain.exponentialRampToValueAtTime(v, t + 0.001)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + decay)
-    const pan = ctx.createStereoPanner()
-    pan.pan.value = rand(-0.5, 0.5)
-    src.connect(hp)
-    hp.connect(g)
-    g.connect(pan)
-    pan.connect(out)
-    src.start(t, Math.random() * (noiseBuffer.duration - 0.1))
-    src.stop(t + decay + 0.03)
-    t += rand(0.012, 0.05)
-  }
+/** A single soft bell — slow attack, long decay, gently panned. Sometimes it
+ *  stays silent, so the accents feel unforced. */
+function bell(ctx: AudioContext, out: AudioNode) {
+  if (Math.random() < 0.4) return
+  const t = ctx.currentTime
+  const f = BELL_NOTES[Math.floor(Math.random() * BELL_NOTES.length)]
+  const osc = ctx.createOscillator()
+  osc.type = 'sine'
+  osc.frequency.value = f
+  const g = ctx.createGain()
+  const peak = rand(0.04, 0.085)
+  const decay = rand(3, 5)
+  g.gain.setValueAtTime(0.0001, t)
+  g.gain.exponentialRampToValueAtTime(peak, t + 0.4) // slow swell in
+  g.gain.exponentialRampToValueAtTime(0.0001, t + decay) // long tail
+  const pan = ctx.createStereoPanner()
+  pan.pan.value = rand(-0.4, 0.4)
+  osc.connect(g)
+  g.connect(pan)
+  pan.connect(out)
+  osc.start(t)
+  osc.stop(t + decay + 0.5)
 }
 
 // ── control surface ─────────────────────────────────────────────────────────
@@ -117,7 +98,6 @@ export function startAmbient(kind: Soundscape, volume: number): void {
   if (trim === undefined) return // unknown / retired scape → stay silent
   const ctx = getAudioContext()
   if (!ctx) return
-  if (!noiseBuffer) noiseBuffer = pinkNoise(ctx)
 
   const myGen = gen
   master = ctx.createGain()
@@ -125,13 +105,6 @@ export function startAmbient(kind: Soundscape, volume: number): void {
   master.connect(ctx.destination)
   const out = master
 
-  const noiseSource = () => {
-    const s = ctx.createBufferSource()
-    s.buffer = noiseBuffer
-    s.loop = true
-    sources.push(s)
-    return s
-  }
   const biquad = (type: BiquadFilterType, freq: number, q?: number) => {
     const f = ctx.createBiquadFilter()
     f.type = type
@@ -147,21 +120,55 @@ export function startAmbient(kind: Soundscape, volume: number): void {
     return g
   }
 
-  if (kind === 'fire') {
-    // a warm low bed of embers + frequent crackle pops — no airy mid "hiss"
-    const src = noiseSource()
-    const lp = biquad('lowpass', 260)
-    const bed = gain(0.22)
-    src.connect(lp)
-    lp.connect(bed)
-    bed.connect(out)
-    src.start()
-    lfo(ctx, 0.5, 0.03, bed.gain) // subtle ember flicker (small depth = no whoosh)
-    schedule(myGen, 90, 520, () => crackle(ctx, out))
+  if (kind === 'music') {
+    const now = ctx.currentTime
+    // A warm lowpass rolls off the highs; it breathes open and closed slowly.
+    const lp = biquad('lowpass', 720, 0.6)
+    lp.connect(out)
+    lfo(ctx, 0.02, 240, lp.frequency) // ~50s sweep, ±240 Hz around 720
+    const pad = gain(1)
+    pad.connect(lp)
+
+    const VOICES = 4
+    const oscs: OscillatorNode[] = []
+    const lastFreqs = [...CHORDS[0]]
+    for (let i = 0; i < VOICES; i++) {
+      const osc = ctx.createOscillator()
+      osc.type = 'sine'
+      osc.frequency.value = CHORDS[0][i]
+      const vg = gain(0.0001)
+      osc.connect(vg)
+      vg.connect(pad)
+      osc.start()
+      sources.push(osc)
+      // ease the voice in
+      vg.gain.setValueAtTime(0.0001, now)
+      vg.gain.linearRampToValueAtTime(rand(0.1, 0.13), now + 3)
+      lfo(ctx, rand(0.03, 0.07), 0.045, vg.gain) // gentle swell
+      lfo(ctx, rand(0.05, 0.12), rand(0.6, 1.6), osc.detune) // subtle warmth drift
+      oscs.push(osc)
+    }
+
+    // Glide the voices to the next chord every ~13s.
+    let idx = 0
+    schedule(myGen, 12000, 15000, () => {
+      idx = (idx + 1) % CHORDS.length
+      const chord = CHORDS[idx]
+      const t = ctx.currentTime
+      for (let i = 0; i < VOICES; i++) {
+        oscs[i].frequency.cancelScheduledValues(t)
+        oscs[i].frequency.setValueAtTime(lastFreqs[i], t)
+        oscs[i].frequency.exponentialRampToValueAtTime(chord[i], t + 2.2)
+        lastFreqs[i] = chord[i]
+      }
+    })
+
+    // An occasional soft bell.
+    schedule(myGen, 7000, 17000, () => bell(ctx, out))
   }
 
   const target = clamp01(volume) * trim
-  master.gain.linearRampToValueAtTime(Math.max(0.0001, target), ctx.currentTime + 1.8)
+  master.gain.linearRampToValueAtTime(Math.max(0.0001, target), ctx.currentTime + 2)
   currentKind = kind
 }
 
