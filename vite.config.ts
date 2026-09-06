@@ -35,6 +35,7 @@ function stampServiceWorker(): Plugin {
   let root = process.cwd()
   let outDir = 'dist'
   let hash = APP_VERSION
+  let assets: string[] = []
   return {
     name: 'stamp-sw',
     apply: 'build',
@@ -50,16 +51,18 @@ function stampServiceWorker(): Plugin {
         .sort()
       const digest = createHash('sha256').update(names.join('|')).digest('hex').slice(0, 8)
       hash = `${APP_VERSION}-${digest}`
+      // The boot-critical code (JS + CSS) to precache with the shell, so a waiting
+      // build's cache stays self-consistent and never white-screens.
+      assets = names.filter((n) => /\.(js|css)$/.test(n)).map((n) => '/' + n)
     },
     closeBundle() {
       const swPath = resolve(root, outDir, 'sw.js')
-      const sw = readFileSync(swPath, 'utf8').replace(
-        "const CACHE = 'quiet-waters-dev'",
-        `const CACHE = 'quiet-waters-${hash}'`,
-      )
+      const sw = readFileSync(swPath, 'utf8')
+        .replace("const CACHE = 'quiet-waters-dev'", `const CACHE = 'quiet-waters-${hash}'`)
+        .replace('const ASSETS = []', `const ASSETS = ${JSON.stringify(assets)}`)
       writeFileSync(swPath, sw)
       // eslint-disable-next-line no-console
-      console.log(`sw.js: cache quiet-waters-${hash}`)
+      console.log(`sw.js: cache quiet-waters-${hash} (${assets.length} precached assets)`)
     },
   }
 }

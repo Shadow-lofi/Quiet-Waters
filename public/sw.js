@@ -6,6 +6,12 @@
 // registered (see main.tsx / lib/swUpdate.ts), so the 'dev' default stays inert.
 const CACHE = 'quiet-waters-dev'
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/quiet-waters.svg', '/announcements.json']
+// This build's hashed JS/CSS, injected by the stamp-sw plugin (vite.config.ts).
+// Precaching them WITH the shell keeps every version's cache self-consistent, so
+// a worker that's waiting on an older build still boots (its shell and its code
+// are cached together) instead of white-screening when a newer deploy has
+// replaced the assets on the network.
+const ASSETS = []
 
 // Routes that are their own static HTML documents (built by buildContentSite in
 // vite.config.ts), NOT screens of the single-page app. The fetch handler serves
@@ -15,19 +21,18 @@ function isContentPath(pathname) {
 }
 
 self.addEventListener('install', (event) => {
-  // Precache the shell, then take over immediately (skipWaiting). The ACTIVE
-  // worker must always be the CURRENT deploy: if it lingers on an old build, its
-  // cached index.html keeps pointing at JS chunks that later deploys have
-  // replaced — those 404, and the app white-screens. Self-activating keeps the
-  // cached shell and the live assets in lock-step. Updates then apply on the next
-  // open (with a one-time reload below) instead of waiting for a tap that a
-  // broken screen can't reach.
+  // Precache the shell AND this build's JS/CSS together, so the cache is a
+  // self-consistent snapshot of one version (no stale shell pointing at code a
+  // later deploy has purged). We DON'T skipWaiting: a fresh build waits so the
+  // app can offer a gentle "a new version is ready" nudge (see lib/swUpdate.ts)
+  // rather than swapping assets out mid-sitting; it activates when the user
+  // accepts (SKIP_WAITING below). Assets are cached individually (allSettled) so
+  // one failed fetch can't abort the whole precache.
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((c) => c.addAll(SHELL))
-      .catch(() => {})
-      .then(() => self.skipWaiting()),
+      .then((c) => Promise.allSettled([...SHELL, ...ASSETS].map((u) => c.add(u))))
+      .catch(() => {}),
   )
 })
 
@@ -38,26 +43,20 @@ self.addEventListener('message', (event) => {
 })
 
 self.addEventListener('activate', (event) => {
+  // Drop older builds' caches and take control. We do NOT reload open windows:
+  // activation only happens on first install (nothing to reload) or when the
+  // user has accepted the update (the page reloads itself once, via swUpdate).
   event.waitUntil(
-    (async () => {
-      const keys = await caches.keys()
-      const stale = keys.filter((k) => k.startsWith('quiet-waters-') && k !== CACHE)
-      await Promise.all(stale.map((k) => caches.delete(k)))
-      await self.clients.claim()
-      // On an update (a previous build's cache existed — not a first install),
-      // reload any open windows onto the fresh assets, so a stale or broken shell
-      // heals itself without the user having to do anything.
-      if (stale.length > 0) {
-        const windows = await self.clients.matchAll({ type: 'window' })
-        for (const w of windows) {
-          try {
-            w.navigate(w.url)
-          } catch {
-            /* window can't be navigated — the next open will pick up the new SW */
-          }
-        }
-      }
-    })(),
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((k) => k.startsWith('quiet-waters-') && k !== CACHE)
+            .map((k) => caches.delete(k)),
+        ),
+      )
+      .then(() => self.clients.claim()),
   )
 })
 
