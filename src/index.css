@@ -297,6 +297,100 @@ html[data-motion='reduce'] .qw-title {
 }
 
 /* ───────────────────────────────────────────────────────────
+   Opening intro — the installed app's "enter the quiet" splash.
+   A drop meets still water, "Quiet Waters" surfaces, and a soft
+   prompt waits for a tap. See src/components/IntroSplash.tsx. The
+   ground mirrors the body background so it reads as the same place,
+   in both Day and Night.
+   ─────────────────────────────────────────────────────────── */
+.qw-intro {
+  background-color: var(--color-mist-100);
+  background-image:
+    radial-gradient(70rem 70rem at 50% -20%, color-mix(in oklab, var(--color-water-400) 16%, transparent), transparent 60%),
+    radial-gradient(50rem 50rem at 110% 120%, color-mix(in oklab, var(--color-reed-400) 14%, transparent), transparent 55%);
+}
+
+/* The drop falls in and settles onto the water. */
+@keyframes qw-intro-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.qw-intro-drop {
+  animation: qw-intro-drop 1s ease-out both;
+}
+
+/* Concentric ripples spread out from where the drop met the water — a calm,
+   slow loop while the splash waits for a tap. */
+@keyframes qw-intro-ripple {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.qw-intro-ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 96px;
+  width: 96px;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in oklab, var(--color-water-400) 70%, transparent);
+  animation: qw-intro-ripple 4.5s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Title & psalm surface a beat after the drop (delays set inline). */
+.qw-intro-line {
+  animation: qw-rise 0.9s ease-out both;
+}
+
+/* The "tap to enter" prompt breathes gently. */
+@keyframes qw-intro-prompt {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+.qw-intro-prompt {
+  opacity: 0;
+  animation: qw-intro-prompt 3.2s ease-in-out 1.2s infinite;
+}
+
+/* Reduced motion — keep the moment, drop the entrance & looping motion. Elements
+   whose keyframes start hidden must be pinned visible so nothing disappears. */
+html[data-motion='reduce'] .qw-intro-drop,
+html[data-motion='reduce'] .qw-intro-line {
+  animation: none;
+}
+html[data-motion='reduce'] .qw-intro-ring {
+  animation: none;
+  opacity: 0.16;
+}
+html[data-motion='reduce'] .qw-intro-prompt {
+  animation: none;
+  opacity: 0.7;
+}
+
+/* ───────────────────────────────────────────────────────────
    Underwater background — soft light rays + rising bubbles.
    Colors flip with the theme: sunlit blue by day, moonlit teal by night.
    ─────────────────────────────────────────────────────────── */
