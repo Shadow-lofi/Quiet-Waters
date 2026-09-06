@@ -20,6 +20,36 @@ let currentKind: Soundscape = 'off'
 // Perceived-loudness trim per scape, applied under the user's 0–1 volume.
 const TRIM: Record<Exclude<Soundscape, 'off'>, number> = {
   music: 0.55,
+  spa: 0.5,
+}
+
+// "Spa" plays a real recorded loop (a licensed track, decoded once and cached).
+// Music: "Zen Spiritual Yoga Massage Meditation Spa" by REDproductions (Pixabay).
+const SPA_URL = '/audio/spa.mp3'
+let spaBuffer: AudioBuffer | null = null
+let spaLoading: Promise<AudioBuffer | null> | null = null
+
+function loadSpaBuffer(ctx: AudioContext): Promise<AudioBuffer | null> {
+  if (spaBuffer) return Promise.resolve(spaBuffer)
+  if (!spaLoading) {
+    spaLoading = fetch(SPA_URL)
+      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`spa ${r.status}`))))
+      // Callback form of decodeAudioData for the widest (older Safari) support.
+      .then(
+        (ab) =>
+          new Promise<AudioBuffer>((resolve, reject) => ctx.decodeAudioData(ab, resolve, reject)),
+      )
+      .then((buf) => {
+        spaBuffer = buf
+        return buf
+      })
+      .catch((e) => {
+        console.warn('[ambient] spa track failed to load', e)
+        spaLoading = null // allow a later retry
+        return null
+      })
+  }
+  return spaLoading
 }
 
 // A slow, consonant progression (frequencies in Hz). Voice 0 is the bass; the
@@ -89,6 +119,36 @@ function bell(ctx: AudioContext, out: AudioNode) {
   pan.connect(out)
   osc.start(t)
   osc.stop(t + decay + 0.5)
+}
+
+/** Loop a decoded buffer seamlessly by overlapping successive plays with an
+ *  equal fade-out/fade-in crossfade, so the loop point is inaudible. */
+function startSpaLoop(ctx: AudioContext, buffer: AudioBuffer, out: AudioNode, myGen: number) {
+  const XF = 3 // crossfade seconds
+  const dur = buffer.duration
+  const playFrom = (when: number) => {
+    if (myGen !== gen || !master) return
+    const src = ctx.createBufferSource()
+    src.buffer = buffer
+    const g = ctx.createGain()
+    g.gain.setValueAtTime(0.0001, when)
+    g.gain.linearRampToValueAtTime(1, when + XF) // fade in
+    g.gain.setValueAtTime(1, when + Math.max(XF, dur - XF))
+    g.gain.linearRampToValueAtTime(0.0001, when + dur) // fade out into the next
+    src.connect(g)
+    g.connect(out)
+    src.start(when)
+    src.stop(when + dur + 0.2)
+    sources.push(src)
+    // Start the next pass XF seconds before this one ends, so they crossfade.
+    const nextWhen = when + dur - XF
+    const id = window.setTimeout(
+      () => playFrom(nextWhen),
+      Math.max(0, (nextWhen - ctx.currentTime - 1) * 1000),
+    )
+    timers.push(id)
+  }
+  playFrom(ctx.currentTime + 0.05)
 }
 
 // ── control surface ─────────────────────────────────────────────────────────
@@ -169,6 +229,14 @@ export function startAmbient(kind: Soundscape, volume: number): void {
 
     // A soft bell, a little more often now.
     schedule(myGen, 5000, 11000, () => bell(ctx, out))
+  }
+
+  if (kind === 'spa') {
+    // A real recorded loop — decode once (cached), then crossfade-loop it.
+    loadSpaBuffer(ctx).then((buf) => {
+      if (myGen !== gen || !buf) return
+      startSpaLoop(ctx, buf, out, myGen)
+    })
   }
 
   const target = clamp01(volume) * trim

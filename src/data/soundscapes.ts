@@ -11,4 +11,5 @@ export interface SoundscapeInfo {
 export const SOUNDSCAPES: SoundscapeInfo[] = [
   { id: 'off', label: 'Off', hint: 'Silence' },
   { id: 'music', label: 'Music', hint: 'A soft, prayerful pad' },
+  { id: 'spa', label: 'Spa', hint: 'Gentle spa music' },
 ]

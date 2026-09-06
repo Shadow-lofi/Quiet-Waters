@@ -1,0 +1,13 @@
+Audio credits
+=============
+
+spa.m4a
+  Title:   "Zen Spiritual Yoga Massage Meditation Spa Relax Ambient Music"
+  Artist:  REDproductions
+  Source:  https://pixabay.com/music/meditationspiritual-zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403/
+  License: Pixabay Content License (https://pixabay.com/service/license-summary/)
+           — free for commercial and non-commercial use, no attribution required.
+           Used here as in-app background ambience during a meditation sitting.
+  Format:  Original 256 kbps MP3, unchanged (MP3 decodes on every target browser,
+           including codec-limited Chromium; AAC does not, so we kept MP3).
+  Note:    Attribution shown in-app is a courtesy, not a requirement of the license.

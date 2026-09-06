@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Music,
+  Waves,
   VolumeX,
   Play,
   Square,
@@ -51,6 +52,7 @@ import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types
 const SCAPE_ICON: Record<Soundscape, typeof Music> = {
   off: VolumeX,
   music: Music,
+  spa: Waves,
 }
 
 const APPEARANCE_HINT: Record<ThemePref, string> = {
@@ -567,6 +569,20 @@ export function Settings() {
               {previewing ? 'Stop' : 'Preview'}
             </button>
           </div>
+        )}
+
+        {s.soundscape === 'spa' && (
+          <p className="mt-3 text-[0.7rem] leading-relaxed text-deep-400">
+            Music:{' '}
+            <a
+              href="https://pixabay.com/music/meditationspiritual-zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-offset-2 hover:text-deep-600 hover:underline"
+            >
+              REDproductions · Pixabay
+            </a>
+          </p>
         )}
       </section>
 
