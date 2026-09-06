@@ -38,6 +38,7 @@ interface State {
   soundscape: Soundscape // ambient sound during a sitting ('off' = silence)
   ambientVolume: number // 0–1
   motion: MotionPref // whether the gentle animations run
+  introOn: boolean // the installed app's opening intro (a tap-to-enter welcome + music swell)
   breatheName: boolean // free timer: pray the Name (Yah/weh) instead of the verse
 
   // ── reader narration (text-to-speech) ──
@@ -157,6 +158,7 @@ type Prefs = Pick<
   | 'soundscape'
   | 'ambientVolume'
   | 'motion'
+  | 'introOn'
   | 'breatheName'
   | 'narrationVoiceURI'
   | 'narrationRate'
@@ -185,6 +187,7 @@ export const useStore = create<State>()(
       soundscape: 'off',
       ambientVolume: 0.6,
       motion: 'on',
+      introOn: true,
       breatheName: false,
 
       narrationVoiceURI: null,

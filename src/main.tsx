@@ -9,12 +9,14 @@ import '@fontsource-variable/newsreader/wght-italic.css'
 import './index.css'
 import App from './App'
 import { ThemeProvider } from './components/ThemeProvider'
+import { IntroSplash } from './components/IntroSplash'
 import { registerServiceWorker } from './lib/swUpdate'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider />
     <App />
+    <IntroSplash />
     <Analytics />
   </StrictMode>,
 )

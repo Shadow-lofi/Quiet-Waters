@@ -374,6 +374,13 @@ export function Settings() {
         />
       </section>
 
+      {/* opening intro — the installed app's tap-to-enter welcome + music swell */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <Row label="Opening intro" hint="A quiet welcome, with a touch of music, when the app opens">
+          <Toggle checked={s.introOn} onChange={(v) => s.setPref('introOn', v)} />
+        </Row>
+      </section>
+
       {/* reminder */}
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
         <div className={s.reminderOn ? 'divide-y divide-line' : ''}>
