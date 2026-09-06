@@ -71,26 +71,18 @@ function markReady(worker: ServiceWorker) {
   useAppUpdate.setState({ ready: true, checking: false, dismissed: false })
 }
 
-// Take the user to the Updates page (client-side, no reload) so they can see
-// what changed and install from the "Update now" button there.
-function openUpdatesPage() {
-  if (typeof window === 'undefined') return
-  if (window.location.pathname !== '/updates') {
-    window.history.pushState({}, '', '/updates')
-    window.dispatchEvent(new PopStateEvent('popstate'))
-  }
-}
-
 function promptUpdate(worker: ServiceWorker) {
   markReady(worker)
   if (prompted) return // one toast per page load, even if checks fire twice
   prompted = true
   useToast.getState().push({
     title: 'A new version is ready',
-    message: 'Open Updates to see what changed and install it.',
+    message: 'Get the latest changes.',
     tone: 'water',
     duration: 0, // persist until the user acts on it
-    action: { label: 'Review update', onClick: openUpdatesPage },
+    // One tap installs it and reloads (see apply above). What changed is always
+    // on the Updates page (Settings → What's new).
+    action: { label: 'Update now', onClick: () => useAppUpdate.getState().apply() },
   })
 }
 
