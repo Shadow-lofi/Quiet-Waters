@@ -10,6 +10,5 @@ export interface SoundscapeInfo {
 // by the Web Audio engine in lib/ambient.ts — no audio files.
 export const SOUNDSCAPES: SoundscapeInfo[] = [
   { id: 'off', label: 'Off', hint: 'Silence' },
-  { id: 'music', label: 'Music', hint: 'A soft, prayerful pad' },
-  { id: 'spa', label: 'Spa', hint: 'Gentle spa music' },
+  { id: 'music', label: 'Music', hint: 'Soft, soothing music' },
 ]

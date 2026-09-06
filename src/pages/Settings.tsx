@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Music,
-  Waves,
   VolumeX,
   Play,
   Square,
@@ -52,7 +51,6 @@ import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types
 const SCAPE_ICON: Record<Soundscape, typeof Music> = {
   off: VolumeX,
   music: Music,
-  spa: Waves,
 }
 
 const APPEARANCE_HINT: Record<ThemePref, string> = {
@@ -571,7 +569,7 @@ export function Settings() {
           </div>
         )}
 
-        {s.soundscape === 'spa' && (
+        {s.soundscape === 'music' && (
           <p className="mt-3 text-[0.7rem] leading-relaxed text-deep-400">
             Music:{' '}
             <a
