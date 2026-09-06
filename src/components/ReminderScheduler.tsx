@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useStore } from '../lib/store'
 import { dayKey } from '../lib/date'
-import { isSabbathToday } from '../data/sabbath'
+import { isSabbathToday, SABBATH_DAY } from '../data/sabbath'
 import {
   fireReminderNotification,
   fireSabbathNotification,
@@ -39,7 +39,7 @@ export function ReminderScheduler() {
       const st = useStore.getState()
       if (!st.sabbathReminderOn) return
       if (notificationPermission() !== 'granted') return
-      if (!isSabbathToday(st.sabbathDay)) return
+      if (!isSabbathToday(SABBATH_DAY)) return
       if (st.sabbathNotifiedDay === dayKey()) return
       if (!isPastReminderTime(st.sabbathReminderTime)) return
       // Already chose to rest today? No need to nudge — the card covers it.

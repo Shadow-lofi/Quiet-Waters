@@ -53,8 +53,7 @@ interface State {
   reminderDismissedDay: string // dayKey the in-app banner was last dismissed
   reminderNotifiedDay: string // dayKey a device notification last fired
 
-  // ── weekly Sabbath rhythm (local) ──
-  sabbathDay: number // 0=Sun..6=Sat (JS getDay); the day set apart to rest
+  // ── weekly Sabbath rhythm (local) ── the day is fixed to Saturday (SABBATH_DAY)
   sabbathLog: string[] // dayKeys the user chose to "keep the Sabbath"
   sabbathReminderOn: boolean // a gentle device notification on the Sabbath
   sabbathReminderTime: string // 'HH:MM' 24-hour, local time
@@ -138,7 +137,6 @@ interface State {
   nextVerse: (total: number) => void
   dismissReminderToday: () => void
   markReminderNotified: () => void
-  setSabbathDay: (day: number) => void
   keepSabbath: (dateKey: string) => void
   markSabbathNotified: () => void
   dismissInstallPrompt: () => void
@@ -202,7 +200,6 @@ export const useStore = create<State>()(
       reminderDismissedDay: '',
       reminderNotifiedDay: '',
 
-      sabbathDay: 0, // Sunday by default
       sabbathLog: [],
       sabbathReminderOn: false,
       sabbathReminderTime: '09:00',
@@ -246,7 +243,6 @@ export const useStore = create<State>()(
       dismissReminderToday: () => set({ reminderDismissedDay: dayKey() }),
       markReminderNotified: () => set({ reminderNotifiedDay: dayKey() }),
 
-      setSabbathDay: (day) => set({ sabbathDay: day }),
       // Toggle whether the given day was kept as a Sabbath rest — a gentle count,
       // never a streak to fail.
       keepSabbath: (dateKey) =>

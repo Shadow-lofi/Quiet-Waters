@@ -3,6 +3,10 @@
 // idleness or a day missed. Wordings kept close to public-domain (WEB/KJV-family)
 // to stay copyright-clean, matching the rest of the app's Scripture.
 
+// The Sabbath is the seventh day — Saturday (6 in JS getDay: 0=Sun … 6=Sat).
+// It's fixed to Scripture (Genesis 2:2–3; Exodus 20:8–11), not a user setting.
+export const SABBATH_DAY = 6
+
 export interface RestVerse {
   ref: string
   text: string
@@ -54,12 +58,13 @@ export function weekSeed(now: Date = new Date()): number {
   return Math.floor(now.getTime() / (7 * 86_400_000))
 }
 
-/** Days until the next occurrence of `sabbathDay` (0=today is the Sabbath). */
+/** Days until the next occurrence of `sabbathDay` (0=today is the Sabbath).
+ *  Pass SABBATH_DAY; the parameter is kept for testability. */
 export function daysUntilSabbath(sabbathDay: number, now: Date = new Date()): number {
   return (sabbathDay - now.getDay() + 7) % 7
 }
 
-/** Is the given day the user's weekly Sabbath? */
+/** Is the given day the weekly Sabbath? Pass SABBATH_DAY. */
 export function isSabbathToday(sabbathDay: number, now: Date = new Date()): boolean {
   return now.getDay() === sabbathDay
 }
