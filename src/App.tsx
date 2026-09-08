@@ -14,6 +14,7 @@ import { Study } from './pages/Study'
 import { LastDays } from './pages/LastDays'
 import { SevenChurches } from './pages/SevenChurches'
 import { TenVirgins } from './pages/TenVirgins'
+import { FeastOfTrumpets } from './pages/FeastOfTrumpets'
 import { Lectio } from './pages/Lectio'
 import { KidsStudy } from './pages/KidsStudy'
 import { Encourage } from './pages/Encourage'
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/last-days" element={<LastDays />} />
           <Route path="/seven-churches" element={<SevenChurches />} />
           <Route path="/ten-virgins" element={<TenVirgins />} />
+          <Route path="/feast-of-trumpets" element={<FeastOfTrumpets />} />
           <Route path="/lectio" element={<Lectio />} />
           <Route path="/kids" element={<KidsStudy />} />
           <Route path="/memory" element={<Memory />} />

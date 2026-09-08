@@ -73,6 +73,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
     type: 'article',
   },
   {
+    path: '/feast-of-trumpets',
+    title: 'The Feast of Trumpets (Yom Teruah) — A Study for Today | Quiet Waters',
+    description:
+      'A watchful, hopeful study of the Feast of Trumpets (Yom Teruah / Rosh Hashanah, Leviticus 23) — the awakening blast, the gathering, the coronation of the King, and the day no one can name — correlated to the trumpet of God in 1 Thessalonians 4. Includes why the shofar is silent on the first day in 2026. Never date-setting.',
+    type: 'article',
+  },
+  {
     path: '/lectio',
     title: 'Lectio Divina — Pray the Scriptures Slowly | Quiet Waters',
     description:

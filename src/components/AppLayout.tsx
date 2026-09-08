@@ -25,6 +25,7 @@ const BACK_FALLBACK: Record<string, string> = {
   '/last-days': '/study',
   '/seven-churches': '/study',
   '/ten-virgins': '/study',
+  '/feast-of-trumpets': '/study',
   '/lectio': '/meditate',
   '/kids': '/study',
   '/memory': '/study',

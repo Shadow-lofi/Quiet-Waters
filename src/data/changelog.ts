@@ -17,10 +17,46 @@ export interface ChangeEntry {
 
 // Shipped versions, newest first. Used on the Updates page to show the version
 // you're coming from, so the progression is visible. Add each new version here.
-export const VERSION_HISTORY: string[] = ['1.35.3', '1.35.2', '1.35.1', '1.35.0', '1.34.3', '1.34.2', '1.34.1', '1.34.0', '1.33.4', '1.33.3', '1.33.2', '1.33.1', '1.33.0', '1.32.1', '1.32.0', '1.31.1', '1.31.0', '1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
+export const VERSION_HISTORY: string[] = ['1.38.0', '1.37.1', '1.37.0', '1.36.0', '1.35.3', '1.35.2', '1.35.1', '1.35.0', '1.34.3', '1.34.2', '1.34.1', '1.34.0', '1.33.4', '1.33.3', '1.33.2', '1.33.1', '1.33.0', '1.32.1', '1.32.0', '1.31.1', '1.31.0', '1.30.1', '1.30.0', '1.29.0', '1.28.0', '1.27.0', '1.26.0', '1.25.0', '1.24.0', '1.23.0', '1.22.1', '1.22.0', '1.21.0', '1.20.0', '1.19.0', '1.18.0', '1.17.0', '1.16.0', '1.15.0', '1.14.0', '1.13.0', '1.12.0', '1.11.0', '1.10.0', '1.9.0', '1.8.0', '1.7.0', '1.6.0', '1.5.0', '1.4.4', '1.4.3', '1.4.2', '1.4.1', '1.4.0', '1.3.0', '1.2.0', '1.1.0', '1.0.0']
 
 // Newest first. Entries sharing a date are grouped together on the page.
 export const CHANGELOG: ChangeEntry[] = [
+  // ── September 8 (v1.38.0) ────────────────────────────────
+  {
+    date: 'September 8, 2026',
+    tag: 'New',
+    title: 'The Feast of Trumpets — a new study',
+    detail:
+      'Yom Teruah — the day of the blast (Leviticus 23) — read for its meaning now: the awakening, the gathering, the coronation of the King, the day no one can name, and the trumpet of God in 1 Thessalonians 4. Includes why the shofar is silent on the first day this year. Find it on the Deep Dive page.',
+    to: '/feast-of-trumpets',
+  },
+  // ── September 6 (v1.37.1) ────────────────────────────────
+  {
+    date: 'September 6, 2026',
+    tag: 'Improved',
+    title: 'The Sabbath rhythm keeps Saturday',
+    detail:
+      'The weekly Sabbath is now set to Saturday, the seventh day (Genesis 2:2–3; Exodus 20:8–11) — simpler, with no day to choose.',
+    to: '/meditate',
+  },
+  // ── September 6 (v1.37.0) ────────────────────────────────
+  {
+    date: 'September 6, 2026',
+    tag: 'New',
+    title: 'Music that stays with you',
+    detail:
+      'The meditation music can now play softly throughout the whole app — while you read, pray, and study — not just during a sitting. Tap the speaker button (bottom-right) to pause it anytime, or turn it off in Settings.',
+    to: '/settings',
+  },
+  // ── September 6 (v1.36.0) ────────────────────────────────
+  {
+    date: 'September 6, 2026',
+    tag: 'New',
+    title: 'A gentle welcome when you open the app',
+    detail:
+      'The installed app now opens with a quiet moment — a drop meeting still water, and a soft touch of the meditation music. Tap to enter. You can turn it off anytime in Settings.',
+    to: '/settings',
+  },
   // ── September 6 (v1.35.3) ────────────────────────────────
   {
     date: 'September 6, 2026',
