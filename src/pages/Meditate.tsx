@@ -91,7 +91,7 @@ export function Meditate() {
     <div className="relative flex flex-col gap-7">
       <Onboarding />
 
-      <NotificationsBell className="absolute right-0 top-0 z-10" />
+      <NotificationsBell className="fixed right-3 z-40 top-[calc(env(safe-area-inset-top)+0.875rem)]" />
 
       {/* header — centered hero */}
       <header className="qw-enter flex flex-col items-center gap-2 pt-2 text-center">
