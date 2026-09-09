@@ -6,7 +6,16 @@
 // character in both the light and night themes; only the halo and the water
 // ripple use `currentColor`, so they take on whatever accent it's placed in.
 
-export function Lamb({ size = 120, className = '' }: { size?: number; className?: string }) {
+export function Lamb({
+  size = 120,
+  className = '',
+  wave = false,
+}: {
+  size?: number
+  className?: string
+  /** Raise a little foreleg and wave hello (used for the corner lamb's entrance). */
+  wave?: boolean
+}) {
   // The fleece silhouette — bumps drawn twice: a slightly larger grey layer
   // behind gives a clean, seam-free outline that reads on white or dark cards.
   const puffs: [number, number, number][] = [
@@ -114,6 +123,23 @@ export function Lamb({ size = 120, className = '' }: { size?: number; className?
         strokeLinecap="round"
         opacity="0.75"
       />
+
+      {/* a little foreleg raised in a wave — only during the entrance. It swings
+          from the shoulder (see the qw-lamb-arm keyframes in index.css). */}
+      {wave && (
+        <g className="qw-lamb-arm">
+          <line
+            x1="83"
+            y1="67"
+            x2="96"
+            y2="45"
+            stroke={FACE_EDGE}
+            strokeWidth="6.5"
+            strokeLinecap="round"
+          />
+          <circle cx="97" cy="44" r="4.6" fill={FACE_EDGE} />
+        </g>
+      )}
     </svg>
   )
 }

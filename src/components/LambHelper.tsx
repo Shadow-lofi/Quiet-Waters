@@ -109,6 +109,15 @@ export function LambHelper() {
     return true
   })
 
+  // Raise a little foreleg and wave hello for the length of the entrance, then
+  // tuck it away so the resting lamb looks the same as everywhere else.
+  const [waving, setWaving] = useState(wanderIn)
+  useEffect(() => {
+    if (!waving) return
+    const id = window.setTimeout(() => setWaving(false), 2800)
+    return () => window.clearTimeout(id)
+  }, [waving])
+
   const pickTip = (): string => {
     const pool = tipsFor(path)
     const fresh = pool.filter((t) => t !== lastTip.current)
@@ -253,7 +262,7 @@ export function LambHelper() {
           title="A little guide"
           className="qw-float flex h-11 w-11 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95"
         >
-          <Lamb size={40} />
+          <Lamb size={40} wave={waving} />
         </button>
       </div>
     </>

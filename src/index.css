@@ -261,6 +261,42 @@
   animation: qw-wander-in 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
 }
 
+/* The raised foreleg's hello — it swings from the shoulder a few times, then
+   fades as the greeting ends. Pivots around the shoulder (~ (83,67) in the
+   120×120 viewBox). Timed to land just as the lamb settles into place. */
+@keyframes qw-lamb-wave {
+  0% {
+    opacity: 0;
+    transform: rotate(-8deg);
+  }
+  14% {
+    opacity: 1;
+    transform: rotate(16deg);
+  }
+  33% {
+    transform: rotate(-8deg);
+  }
+  52% {
+    transform: rotate(16deg);
+  }
+  71% {
+    transform: rotate(-8deg);
+  }
+  86% {
+    opacity: 1;
+    transform: rotate(12deg);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(4deg);
+  }
+}
+.qw-lamb-arm {
+  transform-box: view-box;
+  transform-origin: 69% 56%;
+  animation: qw-lamb-wave 2.1s ease-in-out 0.5s both;
+}
+
 /* Centered (the Bible reader): it settles down from just above instead. */
 @keyframes qw-drop-in {
   0% {
@@ -328,6 +364,11 @@ html[data-motion='reduce'] .qw-float,
 html[data-motion='reduce'] .qw-wander-in,
 html[data-motion='reduce'] .qw-drop-in {
   animation: none;
+}
+/* No wave when motion is stilled — keep the raised arm hidden entirely. */
+html[data-motion='reduce'] .qw-lamb-arm {
+  animation: none;
+  opacity: 0;
 }
 /* Never leave the title as transparent clipped text when unanimated. */
 html[data-motion='reduce'] .qw-title {
