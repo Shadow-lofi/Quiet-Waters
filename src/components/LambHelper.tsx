@@ -6,6 +6,7 @@ import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
 import { LAMB_HELPER_HIDDEN_ON, isLambCentered } from '../lib/lambHelper'
 import { onEntered } from '../lib/intro'
+import { isSittingActive } from '../lib/sitting'
 
 // The guiding lamb — a gentle floating helper that lives in the app shell. It
 // wanders in now and then with a short, page-aware tip (never a blocking modal),
@@ -76,8 +77,12 @@ function tipsFor(path: string): string[] {
   return TIP_GROUPS.find((g) => g.match(path))?.tips ?? FALLBACK_TIPS
 }
 
-const COOLDOWN_MS = 40 * 60_000 // at most one auto-pop every ~40 minutes
 const AUTO_DISMISS_MS = 18_000 // a gentle self-close if left untouched
+const FIRST_TIP_DELAY_MS = 4_000 // the welcome tip, shortly after you settle in
+// Periodic tips land at a jittered gap in this range — a gentle, occasional
+// nudge, never a stream. (Tweak here to make them rarer or more frequent.)
+const PERIODIC_MIN_MS = 180_000 // no sooner than 3 minutes apart
+const PERIODIC_MAX_MS = 300_000 // no longer than 5 minutes apart
 
 // The lamb ambles into its corner once per app open — a gentle "hello". This
 // module-level flag survives in-app navigation (AppLayout, and so this helper,
@@ -101,6 +106,15 @@ export function LambHelper() {
   const hidden = !helperOn || LAMB_HELPER_HIDDEN_ON.includes(path)
   const centered = isLambCentered(path)
 
+  // Live mirrors for the periodic timer's callback, which fires long after it was
+  // armed and must read the current state, not a stale closure.
+  const openRef = useRef(open)
+  openRef.current = open
+  const hiddenRef = useRef(hidden)
+  hiddenRef.current = hidden
+  const pathRef = useRef(path)
+  pathRef.current = path
+
   // The arrival plays once per app open, but only once the app has been *entered*
   // (past the tap-to-enter intro splash) — otherwise the lamb would amble in and
   // wave behind the splash, where no one can see it. `entranceActive` applies the
@@ -121,8 +135,8 @@ export function LambHelper() {
     })
   }, [hidden])
 
-  const pickTip = (): string => {
-    const pool = tipsFor(path)
+  const pickTip = (p: string): string => {
+    const pool = tipsFor(p)
     const fresh = pool.filter((t) => t !== lastTip.current)
     const from = fresh.length ? fresh : pool
     const chosen = from[Math.floor(Math.random() * from.length)]
@@ -151,34 +165,48 @@ export function LambHelper() {
     }
     setWaveNonce((n) => n + 1) // wave on tap
     const first = useStore.getState().helperTipAt == null
-    reveal(first ? INTRO_TIP : pickTip())
+    reveal(first ? INTRO_TIP : pickTip(path))
     if (first) useStore.getState().noteHelperTip()
   }
 
-  // Auto-pop: on landing somewhere new, sometimes the lamb wanders in with a tip.
-  // Close any open bubble first, then maybe schedule a fresh one. Reads the
-  // cooldown from the store directly so noting a tip doesn't retrigger this.
+  // Moving to a new page closes any open tip so it doesn't stick around.
   useEffect(() => {
     setShown(false)
     setOpen(false)
+  }, [path])
+
+  // Periodically offer a random, page-aware tip while you're using the app — a
+  // gentle, occasional nudge, not a stream. The first one is the welcome, shown
+  // shortly after you arrive; the rest come at a jittered few-minute gap. Stays
+  // quiet when a tip is already up, during a sitting, on the guide page, or when
+  // the tab is in the background — and reschedules to try again later.
+  useEffect(() => {
     if (hidden || !onboarded) return
+    let timer: number
 
-    const { helperTipAt } = useStore.getState()
-    const first = helperTipAt == null
-    const now = Date.now()
-    if (!first) {
-      if (now - (helperTipAt ?? 0) < COOLDOWN_MS) return
-      if (Math.random() > 0.5) return // keep it occasional, not every page
+    const canShow = () =>
+      !openRef.current &&
+      !hiddenRef.current &&
+      !isSittingActive() &&
+      (typeof document === 'undefined' || document.visibilityState === 'visible')
+
+    const scheduleNext = () => {
+      const first = useStore.getState().helperTipAt == null
+      const delay = first
+        ? FIRST_TIP_DELAY_MS
+        : PERIODIC_MIN_MS + Math.random() * (PERIODIC_MAX_MS - PERIODIC_MIN_MS)
+      timer = window.setTimeout(() => {
+        if (canShow()) {
+          const firstNow = useStore.getState().helperTipAt == null
+          reveal(firstNow ? INTRO_TIP : pickTip(pathRef.current))
+          useStore.getState().noteHelperTip()
+        }
+        scheduleNext()
+      }, delay)
     }
-
-    const delay = first ? 3500 : 1600
-    const id = window.setTimeout(() => {
-      reveal(first ? INTRO_TIP : pickTip())
-      useStore.getState().noteHelperTip()
-    }, delay)
-    return () => window.clearTimeout(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, hidden, onboarded])
+    scheduleNext()
+    return () => window.clearTimeout(timer)
+  }, [hidden, onboarded])
 
   // A gentle self-close so a tip never lingers.
   useEffect(() => {

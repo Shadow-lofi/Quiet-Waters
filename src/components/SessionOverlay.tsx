@@ -5,6 +5,7 @@ import { useStore } from '../lib/store'
 import { playChime, primeAudio } from '../lib/audio'
 import { startAmbient, stopAmbient } from '../lib/ambient'
 import { keepScreenAwake, releaseScreenAwake } from '../lib/wakeLock'
+import { setSittingActive } from '../lib/sitting'
 import { formatClock, formatMinutes } from '../lib/date'
 import type { MeditationVerse } from '../data/verses'
 import type { GuidedStep } from '../data/guided'
@@ -54,6 +55,7 @@ export function SessionOverlay({
 
   // ── mount: opening chime, ambient soundscape, wake lock ──
   useEffect(() => {
+    setSittingActive(true) // keep the guiding lamb's tips quiet during a sitting
     primeAudio()
     if (soundOn && openingChime) playChime('open')
     // When app-wide background music is on, it's already playing — leave it be so
@@ -62,6 +64,7 @@ export function SessionOverlay({
     if (!backgroundMusic) startAmbient(soundscape, ambientVolume, 'session')
     if (keepAwake) void keepScreenAwake()
     return () => {
+      setSittingActive(false)
       releaseScreenAwake()
       stopAmbient(false, 'session')
     }
