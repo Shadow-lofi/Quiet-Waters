@@ -23,6 +23,7 @@ import { EnochStudy } from './pages/EnochStudy'
 import { Memory } from './pages/Memory'
 import { Devotional } from './pages/Devotional'
 import { DevotionalSeries } from './pages/DevotionalSeries'
+import { Guide } from './pages/Guide'
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/bible" element={<Bible />} />
           <Route path="/enoch" element={<EnochStudy />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/notifications" element={<Notifications />} />
         </Route>
