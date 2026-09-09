@@ -241,6 +241,44 @@
   animation: qw-drift 6s ease-in-out infinite;
 }
 
+/* The guiding lamb ambling into its corner when the app opens — a gentle hello.
+   Runs on a positioning wrapper (not the button), so it never fights the
+   perpetual float above. A touch of tilt gives it a little toddle. */
+@keyframes qw-wander-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-2.75rem) rotate(-5deg);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+}
+.qw-wander-in {
+  animation: qw-wander-in 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+/* Centered (the Bible reader): it settles down from just above instead. */
+@keyframes qw-drop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.75rem);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.qw-drop-in {
+  animation: qw-drop-in 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
 /* Title shimmer: a soft band of light drifts across "Quiet Waters" like sun on
    water, then rests before the next pass. Built on the theme tokens, so it
    reads in both Day and Night.
@@ -286,7 +324,9 @@ html[data-motion='reduce'] .qw-ripple-ring {
   opacity: 0.18;
 }
 html[data-motion='reduce'] .qw-enter,
-html[data-motion='reduce'] .qw-float {
+html[data-motion='reduce'] .qw-float,
+html[data-motion='reduce'] .qw-wander-in,
+html[data-motion='reduce'] .qw-drop-in {
   animation: none;
 }
 /* Never leave the title as transparent clipped text when unanimated. */
