@@ -3,6 +3,7 @@ import { Logo } from './Logo'
 import { useStore } from '../lib/store'
 import { isStandalone } from '../lib/install'
 import { preloadIntroAudio, playIntroSwell } from '../lib/introAudio'
+import { markEntered } from '../lib/intro'
 
 // A brief, reverent "enter the quiet" moment shown when the installed app opens:
 // a drop meets still water, "Quiet Waters" surfaces, and a gentle prompt waits
@@ -39,7 +40,12 @@ export function IntroSplash() {
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!show) return
+    // No splash to wait on — the app is entered right away, so the lamb and any
+    // other arrival animations can begin immediately.
+    if (!show) {
+      markEntered()
+      return
+    }
     // Start loading the music now so the swell can begin the instant they tap.
     preloadIntroAudio()
     // Fade the splash in on the next frame, and move focus here so the tap can
@@ -54,6 +60,8 @@ export function IntroSplash() {
   const enter = () => {
     if (entered.current) return
     entered.current = true
+    // Let the app's arrival animations (the guiding lamb) begin as we dissolve.
+    markEntered()
     // Inside the tap gesture: ring in the music, then dissolve into the app.
     // When app-wide background music is on, this same tap starts that continuous
     // loop (it swells in as the splash dissolves — see BackgroundMusic), so we

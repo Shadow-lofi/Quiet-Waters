@@ -5,6 +5,7 @@ import { Lamb } from './Lamb'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
 import { LAMB_HELPER_HIDDEN_ON, isLambCentered } from '../lib/lambHelper'
+import { onEntered } from '../lib/intro'
 
 // The guiding lamb — a gentle floating helper that lives in the app shell. It
 // wanders in now and then with a short, page-aware tip (never a blocking modal),
@@ -100,23 +101,25 @@ export function LambHelper() {
   const hidden = !helperOn || LAMB_HELPER_HIDDEN_ON.includes(path)
   const centered = isLambCentered(path)
 
-  // Claim the once-per-open entrance on the first render where the lamb shows,
-  // so it ambles into place from the edge as the app opens (decided up front to
-  // avoid a flash of it sitting in place first).
-  const [wanderIn] = useState(() => {
-    if (hasWanderedIn || hidden) return false
-    hasWanderedIn = true
-    return true
-  })
+  // The arrival plays once per app open, but only once the app has been *entered*
+  // (past the tap-to-enter intro splash) — otherwise the lamb would amble in and
+  // wave behind the splash, where no one can see it. `entranceActive` applies the
+  // wander-in; `waveNonce` keys the raised foreleg so each bump (the entrance, or
+  // a tap) replays the wave. Until the arrival fires on a fresh open, the lamb
+  // stays hidden so it slides in cleanly instead of flashing into place.
+  const [entranceActive, setEntranceActive] = useState(false)
+  const [waveNonce, setWaveNonce] = useState(0)
+  const awaitingEntrance = !hasWanderedIn && !entranceActive
 
-  // Raise a little foreleg and wave hello for the length of the entrance, then
-  // tuck it away so the resting lamb looks the same as everywhere else.
-  const [waving, setWaving] = useState(wanderIn)
   useEffect(() => {
-    if (!waving) return
-    const id = window.setTimeout(() => setWaving(false), 2800)
-    return () => window.clearTimeout(id)
-  }, [waving])
+    if (hidden || hasWanderedIn) return
+    return onEntered(() => {
+      if (hasWanderedIn) return
+      hasWanderedIn = true
+      setEntranceActive(true)
+      setWaveNonce((n) => n + 1)
+    })
+  }, [hidden])
 
   const pickTip = (): string => {
     const pool = tipsFor(path)
@@ -139,12 +142,14 @@ export function LambHelper() {
     window.setTimeout(() => setOpen(false), 260) // let the leave transition play
   }
 
-  // Tap the lamb: open a tip (or close the current one).
+  // Tap the lamb: give a little wave hello and open a tip (or, if a tip is
+  // already open, just close it).
   const onTapLamb = () => {
     if (open) {
       close()
       return
     }
+    setWaveNonce((n) => n + 1) // wave on tap
     const first = useStore.getState().helperTipAt == null
     reveal(first ? INTRO_TIP : pickTip())
     if (first) useStore.getState().noteHelperTip()
@@ -249,7 +254,13 @@ export function LambHelper() {
           perpetual float on the button (both would animate transform). */}
       <div
         className={`fixed z-40 ${centered ? '' : 'left-3'} ${
-          wanderIn ? (centered ? 'qw-drop-in' : 'qw-wander-in') : ''
+          awaitingEntrance
+            ? 'opacity-0'
+            : entranceActive
+              ? centered
+                ? 'qw-drop-in'
+                : 'qw-wander-in'
+              : ''
         }`}
         style={{
           top: 'calc(env(safe-area-inset-top) + 0.75rem)',
@@ -262,7 +273,7 @@ export function LambHelper() {
           title="A little guide"
           className="qw-float flex h-11 w-11 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95"
         >
-          <Lamb size={40} wave={waving} />
+          <Lamb size={40} wave={waveNonce > 0} waveKey={waveNonce} />
         </button>
       </div>
     </>

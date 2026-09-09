@@ -267,34 +267,34 @@
 @keyframes qw-lamb-wave {
   0% {
     opacity: 0;
-    transform: rotate(-8deg);
+    transform: rotate(-12deg);
   }
   14% {
     opacity: 1;
-    transform: rotate(16deg);
+    transform: rotate(24deg);
   }
   33% {
-    transform: rotate(-8deg);
+    transform: rotate(-10deg);
   }
   52% {
-    transform: rotate(16deg);
+    transform: rotate(24deg);
   }
   71% {
-    transform: rotate(-8deg);
+    transform: rotate(-10deg);
   }
   86% {
     opacity: 1;
-    transform: rotate(12deg);
+    transform: rotate(18deg);
   }
   100% {
     opacity: 0;
-    transform: rotate(4deg);
+    transform: rotate(6deg);
   }
 }
 .qw-lamb-arm {
   transform-box: view-box;
   transform-origin: 69% 56%;
-  animation: qw-lamb-wave 2.1s ease-in-out 0.5s both;
+  animation: qw-lamb-wave 2.2s ease-in-out 0.25s both;
 }
 
 /* Centered (the Bible reader): it settles down from just above instead. */
