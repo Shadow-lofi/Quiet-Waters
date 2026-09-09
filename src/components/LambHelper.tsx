@@ -4,6 +4,7 @@ import { X, ArrowRight } from 'lucide-react'
 import { LambFace } from './Lamb'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
+import { LAMB_HELPER_HIDDEN_ON, isLambCentered } from '../lib/lambHelper'
 
 // The guiding lamb — a gentle floating helper that lives in the app shell. It
 // wanders in now and then with a short, page-aware tip (never a blocking modal),
@@ -91,7 +92,8 @@ export function LambHelper() {
   const lastTip = useRef('')
 
   const path = location.pathname
-  const hidden = !helperOn || path === '/guide'
+  const hidden = !helperOn || LAMB_HELPER_HIDDEN_ON.includes(path)
+  const centered = isLambCentered(path)
 
   const pickTip = (): string => {
     const pool = tipsFor(path)
@@ -175,14 +177,14 @@ export function LambHelper() {
 
   return (
     <>
-      {/* the tip bubble — a soft speech bubble above the lamb */}
+      {/* the tip bubble — a soft speech bubble just below the lamb */}
       {open && (
         <div
           role="status"
-          className={`fixed left-3 z-40 w-[min(19rem,calc(100vw-1.5rem))] rounded-2xl bg-card p-4 shadow-xl ring-1 ring-line transition-[opacity,transform] duration-300 ease-out ${
-            shown ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
-          }`}
-          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 8.5rem)' }}
+          className={`fixed z-40 w-[min(19rem,calc(100vw-1.5rem))] rounded-2xl bg-card p-4 shadow-xl ring-1 ring-line transition-[opacity,transform] duration-300 ease-out ${
+            centered ? 'left-1/2 -translate-x-1/2' : 'left-3'
+          } ${shown ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}
+          style={{ top: 'calc(env(safe-area-inset-top) + 4rem)' }}
         >
           <button
             onClick={close}
@@ -210,20 +212,26 @@ export function LambHelper() {
             </button>
           </div>
 
-          {/* little tail pointing down toward the lamb */}
-          <span className="absolute -bottom-1.5 left-6 h-3 w-3 rotate-45 border-b border-r border-line bg-card" />
+          {/* little tail pointing up toward the lamb */}
+          <span
+            className={`absolute -top-1.5 h-3 w-3 rotate-45 border-l border-t border-line bg-card ${
+              centered ? 'left-1/2 -translate-x-1/2' : 'left-6'
+            }`}
+          />
         </div>
       )}
 
-      {/* the floating lamb button */}
+      {/* the floating lamb button — top-left (opposite the bell), or top-center on the Bible reader */}
       <button
         onClick={onTapLamb}
         aria-label={open ? 'Close the guiding lamb' : 'Open the guiding lamb for a tip'}
         title="A little guide"
-        className="qw-float fixed left-3 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 4.75rem)' }}
+        className={`qw-float fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95 ${
+          centered ? 'left-1/2 -translate-x-1/2' : 'left-3'
+        }`}
+        style={{ top: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
       >
-        <LambFace size={34} />
+        <LambFace size={32} />
       </button>
     </>
   )

@@ -13,7 +13,7 @@ export function NotificationsBell({ className = '' }: { className?: string }) {
     <Link
       to="/notifications"
       aria-label={count > 0 ? `Notifications, ${count} waiting` : 'Notifications'}
-      className={`relative flex h-10 w-10 items-center justify-center rounded-full bg-card text-deep-600 shadow-sm ring-1 ring-line transition-colors hover:text-water-600 ${className}`}
+      className={`flex h-10 w-10 items-center justify-center rounded-full bg-card text-deep-600 shadow-sm ring-1 ring-line transition-colors hover:text-water-600 ${className}`}
     >
       <Bell size={18} />
       {count > 0 && (

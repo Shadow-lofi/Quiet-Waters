@@ -10,6 +10,8 @@ import { LambHelper } from './LambHelper'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 import { requestStoragePersistence } from '../lib/backup'
+import { useStore } from '../lib/store'
+import { LAMB_HELPER_HIDDEN_ON } from '../lib/lambHelper'
 
 const tabs = [
   { to: '/meditate', label: 'Meditate', Icon: Waves, end: true },
@@ -49,6 +51,11 @@ function fallbackFor(pathname: string): string {
 export function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const helperOn = useStore((s) => s.helperOn)
+
+  // The guiding lamb rides in a slim top band; when it's present, open up room at
+  // the top of the page so it never lands on the page title or the home hero.
+  const helperBand = helperOn && !LAMB_HELPER_HIDDEN_ON.includes(location.pathname)
 
   // Once, on entering the app, ask the browser to keep this device's data
   // (best-effort; guards against automatic eviction of the local-first store).
@@ -75,7 +82,11 @@ export function AppLayout() {
       <Toaster />
       <main
         className="flex-1 px-5 pb-28"
-        style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}
+        style={{
+          paddingTop: helperBand
+            ? 'calc(4rem + env(safe-area-inset-top))'
+            : 'calc(1.5rem + env(safe-area-inset-top))',
+        }}
       >
         <InstallBar />
         {!isTab && (
