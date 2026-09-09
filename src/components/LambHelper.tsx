@@ -78,6 +78,11 @@ function tipsFor(path: string): string[] {
 const COOLDOWN_MS = 40 * 60_000 // at most one auto-pop every ~40 minutes
 const AUTO_DISMISS_MS = 18_000 // a gentle self-close if left untouched
 
+// The lamb ambles into its corner once per app open — a gentle "hello". This
+// module-level flag survives in-app navigation (AppLayout, and so this helper,
+// stay mounted), so the entrance plays only on a fresh load, not on every page.
+let hasWanderedIn = false
+
 export function LambHelper() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -94,6 +99,15 @@ export function LambHelper() {
   const path = location.pathname
   const hidden = !helperOn || LAMB_HELPER_HIDDEN_ON.includes(path)
   const centered = isLambCentered(path)
+
+  // Claim the once-per-open entrance on the first render where the lamb shows,
+  // so it ambles into place from the edge as the app opens (decided up front to
+  // avoid a flash of it sitting in place first).
+  const [wanderIn] = useState(() => {
+    if (hasWanderedIn || hidden) return false
+    hasWanderedIn = true
+    return true
+  })
 
   const pickTip = (): string => {
     const pool = tipsFor(path)
@@ -221,18 +235,27 @@ export function LambHelper() {
         </div>
       )}
 
-      {/* the floating lamb button — top-left (opposite the bell), or top-center on the Bible reader */}
-      <button
-        onClick={onTapLamb}
-        aria-label={open ? 'Close the guiding lamb' : 'Open the guiding lamb for a tip'}
-        title="A little guide"
-        className={`qw-float fixed z-40 flex h-11 w-11 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95 ${
-          centered ? 'left-1/2 -translate-x-1/2' : 'left-3'
+      {/* the floating lamb button — top-left (opposite the bell), or top-center on the Bible reader.
+          A positioning wrapper carries the once-per-open "wander in" so it doesn't fight the
+          perpetual float on the button (both would animate transform). */}
+      <div
+        className={`fixed z-40 ${centered ? '' : 'left-3'} ${
+          wanderIn ? (centered ? 'qw-drop-in' : 'qw-wander-in') : ''
         }`}
-        style={{ top: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
+        style={{
+          top: 'calc(env(safe-area-inset-top) + 0.75rem)',
+          ...(centered ? { left: '50%', marginLeft: '-1.375rem' } : {}),
+        }}
       >
-        <Lamb size={40} />
-      </button>
+        <button
+          onClick={onTapLamb}
+          aria-label={open ? 'Close the guiding lamb' : 'Open the guiding lamb for a tip'}
+          title="A little guide"
+          className="qw-float flex h-11 w-11 items-center justify-center rounded-full bg-card/85 text-water-600 shadow-md ring-1 ring-line backdrop-blur-md transition active:scale-95"
+        >
+          <Lamb size={40} />
+        </button>
+      </div>
     </>
   )
 }
