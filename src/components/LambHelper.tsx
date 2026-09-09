@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { X, ArrowRight } from 'lucide-react'
-import { LambFace } from './Lamb'
+import { Lamb } from './Lamb'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
 import { LAMB_HELPER_HIDDEN_ON, isLambCentered } from '../lib/lambHelper'
@@ -231,7 +231,7 @@ export function LambHelper() {
         }`}
         style={{ top: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
       >
-        <LambFace size={32} />
+        <Lamb size={40} />
       </button>
     </>
   )
