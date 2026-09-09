@@ -81,8 +81,8 @@ const AUTO_DISMISS_MS = 18_000 // a gentle self-close if left untouched
 const FIRST_TIP_DELAY_MS = 4_000 // the welcome tip, shortly after you settle in
 // Periodic tips land at a jittered gap in this range — a gentle, occasional
 // nudge, never a stream. (Tweak here to make them rarer or more frequent.)
-const PERIODIC_MIN_MS = 180_000 // no sooner than 3 minutes apart
-const PERIODIC_MAX_MS = 300_000 // no longer than 5 minutes apart
+const PERIODIC_MIN_MS = 90_000 // no sooner than 1.5 minutes apart
+const PERIODIC_MAX_MS = 180_000 // no longer than 3 minutes apart
 
 // The lamb ambles into its corner once per app open — a gentle "hello". This
 // module-level flag survives in-app navigation (AppLayout, and so this helper,
