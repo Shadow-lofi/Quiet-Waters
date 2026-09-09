@@ -10,11 +10,14 @@ export function Lamb({
   size = 120,
   className = '',
   wave = false,
+  waveKey,
 }: {
   size?: number
   className?: string
-  /** Raise a little foreleg and wave hello (used for the corner lamb's entrance). */
+  /** Raise a little foreleg and wave hello (used for the corner lamb). */
   wave?: boolean
+  /** Bump to replay the wave — the raised arm remounts, restarting its animation. */
+  waveKey?: number
 }) {
   // The fleece silhouette — bumps drawn twice: a slightly larger grey layer
   // behind gives a clean, seam-free outline that reads on white or dark cards.
@@ -127,17 +130,17 @@ export function Lamb({
       {/* a little foreleg raised in a wave — only during the entrance. It swings
           from the shoulder (see the qw-lamb-arm keyframes in index.css). */}
       {wave && (
-        <g className="qw-lamb-arm">
+        <g key={waveKey} className="qw-lamb-arm">
           <line
             x1="83"
             y1="67"
-            x2="96"
-            y2="45"
+            x2="97"
+            y2="43"
             stroke={FACE_EDGE}
-            strokeWidth="6.5"
+            strokeWidth="7"
             strokeLinecap="round"
           />
-          <circle cx="97" cy="44" r="4.6" fill={FACE_EDGE} />
+          <circle cx="98" cy="42" r="5" fill={FACE_EDGE} />
         </g>
       )}
     </svg>
