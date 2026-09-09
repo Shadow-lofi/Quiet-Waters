@@ -63,6 +63,13 @@ interface State {
   installPromptDismissed: boolean // user tapped X — hide the banner for good
   installCompleted: boolean // the app was actually installed — stop prompting
 
+  // ── little guide ──
+  guideDismissed: boolean // user set aside the "new here? a little guide" nudge
+
+  // ── guiding lamb (the floating helper that offers gentle tips) ──
+  helperOn: boolean // master switch for the floating lamb helper
+  helperTipAt: number | null // when the lamb last popped up a tip (cooldown gate)
+
   // ── notifications inbox ──
   // Ids the user has checked off: announcement feed ids, and 'onthisday-<dayKey>'
   // for the local "on this day" card. Kept bounded.
@@ -142,6 +149,8 @@ interface State {
   dismissInstallPrompt: () => void
   markInstalled: () => void
   dismissNotice: (id: string) => void
+  dismissGuide: () => void
+  noteHelperTip: () => void
 }
 
 // The preference keys that setPref can write.
@@ -160,6 +169,7 @@ type Prefs = Pick<
   | 'motion'
   | 'introOn'
   | 'breatheName'
+  | 'helperOn'
   | 'narrationVoiceURI'
   | 'narrationRate'
   | 'narrationContinuous'
@@ -208,6 +218,10 @@ export const useStore = create<State>()(
       installPromptDismissed: false,
       installCompleted: false,
 
+      guideDismissed: false,
+      helperOn: true,
+      helperTipAt: null,
+
       dismissedNotices: [],
 
       savedVerses: {},
@@ -254,6 +268,8 @@ export const useStore = create<State>()(
       markSabbathNotified: () => set({ sabbathNotifiedDay: dayKey() }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       markInstalled: () => set({ installCompleted: true }),
+      dismissGuide: () => set({ guideDismissed: true }),
+      noteHelperTip: () => set({ helperTipAt: Date.now() }),
       dismissNotice: (id) =>
         set((st) =>
           st.dismissedNotices.includes(id)

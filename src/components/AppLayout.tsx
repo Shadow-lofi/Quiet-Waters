@@ -6,6 +6,7 @@ import { ReminderScheduler } from './ReminderScheduler'
 import { PullToRefresh } from './PullToRefresh'
 import { InstallBar } from './InstallBar'
 import { BackgroundMusic } from './BackgroundMusic'
+import { LambHelper } from './LambHelper'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 import { requestStoragePersistence } from '../lib/backup'
@@ -34,6 +35,7 @@ const BACK_FALLBACK: Record<string, string> = {
   '/prayers': '/journey',
   '/updates': '/meditate',
   '/notifications': '/meditate',
+  '/guide': '/settings',
 }
 
 // A direct-load Back target for a deeper path with no exact fallback above —
@@ -69,6 +71,7 @@ export function AppLayout() {
       <ReminderScheduler />
       <PullToRefresh />
       <BackgroundMusic />
+      <LambHelper />
       <Toaster />
       <main
         className="flex-1 px-5 pb-28"

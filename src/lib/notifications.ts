@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart, Flame, Star } from 'lucide-react'
+import { Waves, Download, RefreshCw, Sparkles, History, CalendarHeart, Flame, Star, Compass } from 'lucide-react'
 import { useStore } from './store'
 import { useAppUpdate } from './swUpdate'
 import { useAnnouncements } from './announcements'
@@ -82,6 +82,7 @@ export function useNotifications(): AppNotification[] {
   const reminderDismissedDay = useStore((s) => s.reminderDismissedDay)
   const installDismissed = useStore((s) => s.installPromptDismissed)
   const installCompleted = useStore((s) => s.installCompleted)
+  const guideDismissed = useStore((s) => s.guideDismissed)
   const dismissedNotices = useStore((s) => s.dismissedNotices)
   const updateReady = useAppUpdate((s) => s.ready)
   const updateDismissed = useAppUpdate((s) => s.dismissed)
@@ -195,6 +196,20 @@ export function useNotifications(): AppNotification[] {
         dismiss: () => useStore.getState().dismissNotice(id),
       })
     }
+  }
+
+  // A gentle welcome to the little guide — offered until the user turns on the
+  // daily reminder (a sign they've found their footing) or sets it aside. The
+  // guide itself is always reachable from Settings.
+  if (!guideDismissed && !reminderOn) {
+    list.push({
+      id: 'guide',
+      Icon: Compass,
+      title: 'New here? A little guide',
+      body: 'A gentle walkthrough — and turn on reminders to be nudged to be still.',
+      to: '/guide',
+      dismiss: () => useStore.getState().dismissGuide(),
+    })
   }
 
   if (!isStandalone() && !installCompleted && !installDismissed) {

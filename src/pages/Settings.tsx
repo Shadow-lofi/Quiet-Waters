@@ -16,6 +16,7 @@ import {
   Shield,
   ShieldCheck,
   AlertTriangle,
+  Compass,
 } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { DOW_FULL } from '../lib/date'
@@ -396,6 +397,16 @@ export function Settings() {
         </Row>
       </section>
 
+      {/* guiding lamb — the floating helper that offers gentle tips */}
+      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+        <Row
+          label="Guiding lamb"
+          hint="A little helper that offers gentle tips. Tap it anytime; open the full guide from About."
+        >
+          <Toggle checked={s.helperOn} onChange={(v) => s.setPref('helperOn', v)} />
+        </Row>
+      </section>
+
       {/* reminder */}
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
         <div className={s.reminderOn ? 'divide-y divide-line' : ''}>
@@ -750,6 +761,24 @@ export function Settings() {
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
         <p className="pt-3 text-xs uppercase tracking-[0.2em] text-deep-500">About</p>
         <div className="divide-y divide-line">
+          <Link
+            to="/guide"
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Compass size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">A little guide</span>
+                <span className="block text-xs text-deep-500">
+                  A gentle walkthrough — and turn on reminders
+                </span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </Link>
+
           {installable && (
             <button
               onClick={() => setShowInstall(true)}
