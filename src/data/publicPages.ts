@@ -80,6 +80,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
     type: 'article',
   },
   {
+    path: '/seven-bowls',
+    title: 'The Seven Last Plagues — The Seven Bowls of Revelation | Quiet Waters',
+    description:
+      'A reverent study of the seven last plagues — the seven bowls of the wrath of God poured out by seven angels (Revelation 15–16). The echoes of Egypt, the justice of God, the vindication of the martyrs, the one beatitude to watch, and the song of Moses and the Lamb. Never date-setting, never fearful.',
+    type: 'article',
+  },
+  {
     path: '/lectio',
     title: 'Lectio Divina — Pray the Scriptures Slowly | Quiet Waters',
     description:
