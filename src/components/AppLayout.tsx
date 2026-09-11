@@ -7,6 +7,7 @@ import { PullToRefresh } from './PullToRefresh'
 import { InstallBar } from './InstallBar'
 import { BackgroundMusic } from './BackgroundMusic'
 import { LambHelper } from './LambHelper'
+import { StandaloneWelcome } from './StandaloneWelcome'
 import { Toaster } from './Toaster'
 import { APP_VERSION } from '../lib/version'
 import { requestStoragePersistence } from '../lib/backup'
@@ -80,6 +81,7 @@ export function AppLayout() {
       <PullToRefresh />
       <BackgroundMusic />
       <LambHelper />
+      <StandaloneWelcome />
       <Toaster />
       <main
         className="flex-1 px-5 pb-28"
