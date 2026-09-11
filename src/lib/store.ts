@@ -62,6 +62,7 @@ interface State {
   // ── install invite (browser only) ──
   installPromptDismissed: boolean // user tapped X — hide the banner for good
   installCompleted: boolean // the app was actually installed — stop prompting
+  standaloneWelcomed: boolean // the big-lamb welcome has greeted this installed app once
 
   // ── little guide ──
   guideDismissed: boolean // user set aside the "new here? a little guide" nudge
@@ -148,6 +149,7 @@ interface State {
   markSabbathNotified: () => void
   dismissInstallPrompt: () => void
   markInstalled: () => void
+  markStandaloneWelcomed: () => void
   dismissNotice: (id: string) => void
   dismissGuide: () => void
   noteHelperTip: () => void
@@ -217,6 +219,7 @@ export const useStore = create<State>()(
 
       installPromptDismissed: false,
       installCompleted: false,
+      standaloneWelcomed: false,
 
       guideDismissed: false,
       helperOn: true,
@@ -268,6 +271,7 @@ export const useStore = create<State>()(
       markSabbathNotified: () => set({ sabbathNotifiedDay: dayKey() }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       markInstalled: () => set({ installCompleted: true }),
+      markStandaloneWelcomed: () => set({ standaloneWelcomed: true }),
       dismissGuide: () => set({ guideDismissed: true }),
       noteHelperTip: () => set({ helperTipAt: Date.now() }),
       dismissNotice: (id) =>
