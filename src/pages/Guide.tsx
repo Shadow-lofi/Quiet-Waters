@@ -17,11 +17,13 @@ import {
   Shield,
   Check,
   Sparkles,
+  Compass,
 } from 'lucide-react'
 import { Lamb } from '../components/Lamb'
 import { InstallGuide } from '../components/InstallGuide'
 import { useStore } from '../lib/store'
 import { useToast } from '../lib/toast'
+import { useTour } from '../lib/tour'
 import { isStandalone, detectPlatform } from '../lib/install'
 import {
   NOTIFICATIONS_SUPPORTED,
@@ -122,6 +124,7 @@ export function Guide() {
   const setPref = useStore((s) => s.setPref)
   const pushToast = useToast((t) => t.push)
 
+  const startTour = useTour((t) => t.start)
   const [perm, setPerm] = useState(notificationPermission())
   const [showInstall, setShowInstall] = useState(false)
   const [installable] = useState(() => !isStandalone())
@@ -177,6 +180,12 @@ export function Guide() {
           The Shepherd leads His flock beside still waters. Let this little lamb show you around
           Quiet Waters.
         </p>
+        <button
+          onClick={startTour}
+          className="mt-4 flex items-center justify-center gap-2 rounded-full bg-water-500 px-6 py-3 font-semibold text-onwater shadow-md transition-transform active:scale-[0.98]"
+        >
+          <Compass size={18} /> Take the guided tour
+        </button>
       </header>
 
       {/* notifications nudge — the heart of the guide's welcome */}

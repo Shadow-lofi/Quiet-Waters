@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Compass } from 'lucide-react'
 import { Lamb } from './Lamb'
 import { useStore } from '../lib/store'
 import { isStandalone } from '../lib/install'
 import { onEntered, hasEntered } from '../lib/intro'
+import { useTour } from '../lib/tour'
 
 // The installed app's first-run welcome: the big guiding lamb waves hello and
 // offers to show you around. Appears once, only in the installed / standalone
@@ -28,7 +28,7 @@ export function StandaloneWelcome() {
   const onboarded = useStore((s) => s.onboarded)
   const welcomed = useStore((s) => s.standaloneWelcomed)
   const markWelcomed = useStore((s) => s.markStandaloneWelcomed)
-  const navigate = useNavigate()
+  const startTourStore = useTour((s) => s.start)
 
   // Decide once, at mount, whether this device is even a candidate (installed app,
   // or a forced preview).
@@ -60,7 +60,7 @@ export function StandaloneWelcome() {
 
   const startTour = () => {
     markWelcomed()
-    navigate('/guide')
+    startTourStore()
   }
 
   const explore = () => {
