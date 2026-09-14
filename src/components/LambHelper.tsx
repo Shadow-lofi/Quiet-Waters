@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { X, ArrowRight } from 'lucide-react'
 import { Lamb } from './Lamb'
 import { useStore } from '../lib/store'
@@ -7,6 +7,7 @@ import { useToast } from '../lib/toast'
 import { LAMB_HELPER_HIDDEN_ON, isLambCentered } from '../lib/lambHelper'
 import { onEntered } from '../lib/intro'
 import { isSittingActive } from '../lib/sitting'
+import { useTour } from '../lib/tour'
 
 // The guiding lamb — a gentle floating helper that lives in the app shell. It
 // wanders in now and then with a short, page-aware tip (never a blocking modal),
@@ -91,7 +92,6 @@ let hasWanderedIn = false
 
 export function LambHelper() {
   const location = useLocation()
-  const navigate = useNavigate()
   const helperOn = useStore((s) => s.helperOn)
   const onboarded = useStore((s) => s.onboarded)
   const setPref = useStore((s) => s.setPref)
@@ -188,6 +188,7 @@ export function LambHelper() {
       !openRef.current &&
       !hiddenRef.current &&
       !isSittingActive() &&
+      !useTour.getState().active &&
       (typeof document === 'undefined' || document.visibilityState === 'visible')
 
     const scheduleNext = () => {
@@ -219,7 +220,7 @@ export function LambHelper() {
 
   const tour = () => {
     close()
-    navigate('/guide')
+    useTour.getState().start()
   }
 
   const turnOff = () => {
@@ -296,6 +297,7 @@ export function LambHelper() {
         }}
       >
         <button
+          data-tour="lamb"
           onClick={onTapLamb}
           aria-label={open ? 'Close the guiding lamb' : 'Open the guiding lamb for a tip'}
           title="A little guide"

@@ -20,6 +20,7 @@ export function Study() {
       {/* Featured: the End Times Study, opened on its own page */}
       <Link
         to="/last-days"
+        data-tour="study"
         className="group block rounded-card bg-card p-5 shadow-sm ring-1 ring-line transition hover:shadow-md hover:ring-water-400 sm:p-6"
       >
         <div className="flex items-center gap-4">

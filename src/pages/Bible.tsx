@@ -96,7 +96,7 @@ export function Bible() {
 
       {tab === 'read' ? (
         <>
-          <div className="flex items-center gap-2">
+          <div data-tour="bible" className="flex items-center gap-2">
             <button
               onClick={() => step(-1)}
               aria-label="Previous chapter"

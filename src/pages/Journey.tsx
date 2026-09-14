@@ -59,7 +59,7 @@ export function Journey() {
       </section>
 
       {/* stat grid */}
-      <section className="grid grid-cols-2 gap-3">
+      <section data-tour="journey-stats" className="grid grid-cols-2 gap-3">
         {stat.map(({ Icon, label, value }) => (
           <div key={label} className="rounded-card bg-card p-5 shadow-sm ring-1 ring-line">
             <Icon size={20} className="text-water-500" />

@@ -408,7 +408,7 @@ export function Settings() {
       </section>
 
       {/* reminder */}
-      <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
+      <section data-tour="reminder" className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
         <div className={s.reminderOn ? 'divide-y divide-line' : ''}>
           <Row label="Daily reminder" hint={reminderHint()}>
             <Toggle checked={s.reminderOn} onChange={toggleReminder} />

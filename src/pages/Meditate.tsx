@@ -160,7 +160,7 @@ export function Meditate() {
       <SoulCheck />
 
       {/* verse to dwell on */}
-      <section className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
+      <section data-tour="verse" className="rounded-card bg-card p-6 shadow-sm ring-1 ring-line">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Dwell on this</p>
           <div className="flex items-center gap-1">
@@ -265,6 +265,7 @@ export function Meditate() {
 
       {/* begin */}
       <button
+        data-tour="begin"
         onClick={begin}
         className="rounded-full bg-water-500 py-4 text-lg font-semibold text-onwater shadow-lg shadow-water-500/20 transition-transform active:scale-[0.98]"
       >

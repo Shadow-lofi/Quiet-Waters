@@ -103,7 +103,7 @@ export function EnochStudy() {
       </header>
 
       {ENOCH_BOOKS.length > 1 && (
-        <div className="flex gap-1 rounded-full bg-mist-100 p-1 ring-1 ring-line" role="tablist" aria-label="Choose a book">
+        <div data-tour="enoch" className="flex gap-1 rounded-full bg-mist-100 p-1 ring-1 ring-line" role="tablist" aria-label="Choose a book">
           {ENOCH_BOOKS.map((b) => (
             <button
               key={b.id}
