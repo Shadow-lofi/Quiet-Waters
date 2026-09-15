@@ -4,6 +4,8 @@ import { useStore } from '../lib/store'
 import { computeStats } from '../lib/streak'
 import { formatMinutes } from '../lib/date'
 import { soulById } from '../data/soul'
+import { SupportButton } from '../components/SupportButton'
+import { SUPPORT_ENABLED } from '../lib/links'
 
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
@@ -109,6 +111,18 @@ export function Journey() {
         </div>
         <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
       </Link>
+
+      {/* support the mission — a gentle, optional way to give back */}
+      {SUPPORT_ENABLED && (
+        <section className="rounded-card bg-card p-5 shadow-sm ring-1 ring-line">
+          <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Support the mission</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-deep-500">
+            Quiet Waters is free, offline, and ad-free — kept that way on purpose. If it’s been a
+            blessing, a small gift helps keep it growing.
+          </p>
+          <SupportButton className="mt-4" />
+        </section>
+      )}
 
       {/* recent sittings */}
       <section>
