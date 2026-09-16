@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.midnightcodex.quietwaters",
+      "sha256_cert_fingerprints": [
+        "E8:E0:A9:66:F9:CA:CD:57:5B:12:CE:66:68:FC:2F:A4:56:C9:A9:E4:36:F2:06:AA:BE:0C:0B:F5:51:90:F1:2D"
+      ]
+    }
+  }
+]
