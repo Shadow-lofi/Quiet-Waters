@@ -50,8 +50,6 @@ import {
   type StorageProtection,
 } from '../lib/backup'
 import { useBackup } from '../lib/useBackup'
-import { SUPPORT_ENABLED } from '../lib/links'
-import { SupportButton } from '../components/SupportButton'
 import type { BreathPace, MotionPref, Soundscape, ThemePref } from '../lib/types'
 
 const SCAPE_ICON: Record<Soundscape, typeof Music> = {
@@ -759,18 +757,6 @@ export function Settings() {
           className="hidden"
         />
       </section>
-
-      {/* support the mission — a gentle, optional way to give back */}
-      {SUPPORT_ENABLED && (
-        <section className="rounded-card bg-card px-5 py-4 shadow-sm ring-1 ring-line">
-          <p className="text-xs uppercase tracking-[0.2em] text-deep-500">Support the mission</p>
-          <p className="pb-2 pt-1.5 text-xs leading-relaxed text-deep-500">
-            Quiet Waters is free, offline, and ad-free — kept that way on purpose. If it’s been a
-            blessing, a small gift helps keep it growing.
-          </p>
-          <SupportButton className="mb-1" />
-        </section>
-      )}
 
       {/* about */}
       <section className="rounded-card bg-card px-5 py-2 shadow-sm ring-1 ring-line">
