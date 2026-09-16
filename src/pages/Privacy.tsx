@@ -5,9 +5,8 @@ import { ArrowLeft } from 'lucide-react'
 // Effective date of the current policy.
 const EFFECTIVE = 'September 16, 2026'
 
-// Public contact for privacy questions. NOTE: make sure this inbox exists (or
-// change it to one you monitor) — Google Play requires a working contact.
-const CONTACT_EMAIL = 'privacy@quiet-waters-meditation.com'
+// Public contact for privacy questions (shown on the /privacy page).
+const CONTACT_EMAIL = 'shadeshadowtech@gmail.com'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
