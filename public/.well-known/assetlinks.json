@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.midnightcodex.quietwaters",
       "sha256_cert_fingerprints": [
-        "E8:E0:A9:66:F9:CA:CD:57:5B:12:CE:66:68:FC:2F:A4:56:C9:A9:E4:36:F2:06:AA:BE:0C:0B:F5:51:90:F1:2D"
+        "E8:E0:A9:66:F9:CA:CD:57:5B:12:CE:66:68:FC:2F:A4:56:C9:A9:E4:36:F2:06:AA:BE:0C:0B:F5:51:90:F1:2D",
+        "F1:76:29:A9:3B:CD:7E:96:D4:4A:5F:21:E0:77:F4:9C:B3:DD:1C:8C:08:C8:76:BE:9A:1D:79:C6:58:BF:3F:08"
       ]
     }
   }
