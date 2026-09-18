@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Compass,
   Lock,
+  Mail,
 } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { DOW_FULL } from '../lib/date'
@@ -865,6 +866,22 @@ export function Settings() {
                 <span className="block text-xs text-deep-500">
                   What stays on your device, and what doesn’t
                 </span>
+              </span>
+            </span>
+            <ChevronRight size={17} className="shrink-0 text-deep-300" />
+          </Link>
+
+          <Link
+            to="/contact"
+            className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+                <Mail size={18} />
+              </span>
+              <span>
+                <span className="block text-deep-800">Contact</span>
+                <span className="block text-xs text-deep-500">Questions, feedback, or a hello</span>
               </span>
             </span>
             <ChevronRight size={17} className="shrink-0 text-deep-300" />

@@ -26,6 +26,7 @@ import { Devotional } from './pages/Devotional'
 import { DevotionalSeries } from './pages/DevotionalSeries'
 import { Guide } from './pages/Guide'
 import { Privacy } from './pages/Privacy'
+import { Contact } from './pages/Contact'
 
 export default function App() {
   return (
@@ -37,8 +38,9 @@ export default function App() {
         <Route path="/churches" element={<Churches />} />
         <Route path="/churches/flyer" element={<ChurchesFlyer />} />
         <Route path="/churches/slide" element={<ChurchesSlide />} />
-        {/* Privacy policy — standalone, linkable from Settings and the Play listing. */}
+        {/* Privacy policy & contact — standalone, linkable from Settings and the Play listing. */}
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
         {/* The app itself lives under the bottom-tab layout. */}
         <Route element={<AppLayout />}>
           <Route path="/meditate" element={<Meditate />} />
