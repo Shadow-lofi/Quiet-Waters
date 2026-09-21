@@ -1,13 +1,18 @@
 // The daily "verse to dwell on" broadcast. Triggered by a Vercel Cron (see the
-// `crons` entry in vercel.json) once a day; sends the same gentle line to every
-// subscriber. It's a broadcast, so everyone gets it at the one scheduled UTC
-// time — no per-person schedules or timezones (that's a heavier, later phase).
+// `crons` entry in vercel.json); sends the same gentle line to every subscriber.
+// It's a broadcast, so everyone gets it at the one scheduled UTC time — no
+// per-person schedules or timezones (that's a heavier, later phase).
+//
+// This shares the daily notification slot with the daily hymn: subscribers get
+// ONE push a day, alternating by day-of-year — the verse on odd days, the hymn
+// on even days (see api/_daily.js). On the hymn's days this endpoint no-ops.
 //
 // Protected by CRON_SECRET: Vercel Cron sends `Authorization: Bearer <secret>`
 // when that env var is set, so set it to keep the endpoint from being poked.
 
 import { broadcast, pushReady } from './_send.js'
 import { kvReady } from './_kv.js'
+import { dayOfYear, isHymnDay } from './_daily.js'
 
 // Public-domain (WEB/KJV) lines, mirroring the rotation in src/lib/reminders.ts.
 const NUDGES = [
@@ -21,9 +26,7 @@ const NUDGES = [
 ]
 
 function todaysNudge(now = new Date()) {
-  const start = new Date(now.getFullYear(), 0, 0)
-  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86_400_000)
-  return NUDGES[dayOfYear % NUDGES.length]
+  return NUDGES[dayOfYear(now) % NUDGES.length]
 }
 
 export default async function handler(req, res) {
@@ -32,6 +35,9 @@ export default async function handler(req, res) {
     const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
     if (bearer !== secret) return res.status(401).json({ error: 'unauthorized' })
   }
+
+  // On the hymn's days, stay quiet — the daily-hymn cron takes the slot.
+  if (isHymnDay()) return res.status(200).json({ ok: true, skipped: 'hymn-day' })
 
   if (!pushReady()) return res.status(500).json({ error: 'push-not-configured' })
   if (!kvReady()) return res.status(500).json({ error: 'store-not-configured' })

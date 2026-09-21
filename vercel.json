@@ -14,7 +14,7 @@
   ],
   "crons": [
     { "path": "/api/daily-verse", "schedule": "0 13 * * *" },
-    { "path": "/api/daily-hymn", "schedule": "0 22 * * *" }
+    { "path": "/api/daily-hymn", "schedule": "0 13 * * *" }
   ],
   "headers": [
     {
