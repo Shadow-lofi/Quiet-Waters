@@ -1,8 +1,12 @@
 // The daily "hymn to dwell on" broadcast. Triggered by a Vercel Cron (see the
-// `crons` entry in vercel.json) once a day; sends the day's hymn to every
-// subscriber. Like the daily-verse cron, it's a broadcast — everyone gets it at
-// the one scheduled UTC time (no per-person schedules or timezones, which is a
-// heavier, later phase).
+// `crons` entry in vercel.json); sends the day's hymn to every subscriber. Like
+// the daily-verse cron, it's a broadcast — everyone gets it at the one scheduled
+// UTC time (no per-person schedules or timezones, which is a heavier, later
+// phase).
+//
+// This shares the daily notification slot with the daily verse: subscribers get
+// ONE push a day, alternating by day-of-year — the hymn on even days, the verse
+// on odd days (see api/_daily.js). On the verse's days this endpoint no-ops.
 //
 // The cron fires during Americas daytime (see vercel.json) so the UTC calendar
 // day matches the local day for the bulk of users — which keeps the hymn named
@@ -13,6 +17,7 @@
 
 import { broadcast, pushReady } from './_send.js'
 import { kvReady } from './_kv.js'
+import { isHymnDay } from './_daily.js'
 
 // A lightweight mirror of src/data/hymns.ts — SAME titles, SAME order — with a
 // short teaser line for the notification body. Keep this list in sync with the
@@ -50,6 +55,9 @@ export default async function handler(req, res) {
     const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
     if (bearer !== secret) return res.status(401).json({ error: 'unauthorized' })
   }
+
+  // On the verse's days, stay quiet — the daily-verse cron takes the slot.
+  if (!isHymnDay()) return res.status(200).json({ ok: true, skipped: 'verse-day' })
 
   if (!pushReady()) return res.status(500).json({ error: 'push-not-configured' })
   if (!kvReady()) return res.status(500).json({ error: 'store-not-configured' })

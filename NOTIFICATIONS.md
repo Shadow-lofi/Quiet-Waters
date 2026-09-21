@@ -26,8 +26,9 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | Install invite | inbox | Reuses the home-screen install prompt's flag |
 | "New version ready" | inbox | Detected client-side by the service worker |
 | **New feature / version announcement** | push | Manual broadcast via `scripts/broadcast.mjs` |
-| **Daily verse / prayer of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-verse`) |
-| **Daily hymn of the day** | push | Cron broadcast, 22:00 UTC (`api/daily-hymn`); names the day's hymn, links to `/hymns`. Fired during Americas daytime so the UTC day matches the local day (the named hymn matches the page). Keep the inline hymn list in sync with `src/data/hymns.ts`. |
+| **Daily verse / prayer of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-verse`). Sends on **odd** days of the year; no-ops on even days (the hymn's slot). |
+| **Daily hymn of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-hymn`); names the day's hymn, links to `/hymns`. Sends on **even** days of the year; no-ops on odd days (the verse's slot). Fired during Americas daytime so the UTC day matches the local day (the named hymn matches the page). Keep the inline hymn list in sync with `src/data/hymns.ts`. |
+| **One push a day, alternating** | push | Verse and hymn share a single daily slot — one gentle notification a day, alternating by day-of-year. The odd/even rule lives in `api/_daily.js` (imported by both crons); both are scheduled at the same UTC time and exactly one sends each day. |
 | **Announcements feed → inbox** | both | `public/announcements.json` → inbox cards; network-first SW; the enabler |
 | **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
 | **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
