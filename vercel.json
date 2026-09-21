@@ -12,7 +12,10 @@
     { "source": "/read/2-enoch", "destination": "/read/2-enoch/index.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
-  "crons": [{ "path": "/api/daily-verse", "schedule": "0 13 * * *" }],
+  "crons": [
+    { "path": "/api/daily-verse", "schedule": "0 13 * * *" },
+    { "path": "/api/daily-hymn", "schedule": "0 22 * * *" }
+  ],
   "headers": [
     {
       "source": "/sw.js",
