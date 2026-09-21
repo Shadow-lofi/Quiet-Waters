@@ -33,6 +33,7 @@ const BACK_FALLBACK: Record<string, string> = {
   '/feast-of-trumpets': '/study',
   '/seven-bowls': '/study',
   '/lectio': '/meditate',
+  '/hymns': '/meditate',
   '/kids': '/study',
   '/memory': '/study',
   '/devotional': '/study',

@@ -94,6 +94,13 @@ export const PUBLIC_PAGES: PublicPageMeta[] = [
     type: 'article',
   },
   {
+    path: '/hymns',
+    title: 'Daily Hymn — A Hymn to Dwell On Each Day | Quiet Waters',
+    description:
+      'A beloved public-domain hymn of the church to read slowly and pray — a new one each day, from Be Thou My Vision and It Is Well with My Soul to Amazing Grace and Holy, Holy, Holy. With a gentle read-aloud. Free, private, works offline.',
+    type: 'website',
+  },
+  {
     path: '/kids',
     title: 'Kids Bible Study — Animated Bible Stories | Quiet Waters',
     description:
