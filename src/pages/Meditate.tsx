@@ -16,6 +16,7 @@ import {
   HeartHandshake,
   ArrowRight,
   Brain,
+  Music4,
 } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { Onboarding } from '../components/Onboarding'
@@ -283,6 +284,21 @@ export function Meditate() {
         <div className="min-w-0 flex-1">
           <p className="font-medium text-deep-900">Lectio Divina</p>
           <p className="truncate text-sm text-deep-500">Pray the Scriptures, slowly</p>
+        </div>
+        <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
+      </Link>
+
+      {/* Daily Hymn — a hymn of the church to dwell on and pray (own page) */}
+      <Link
+        to="/hymns"
+        className="group flex items-center gap-4 rounded-2xl bg-card px-4 py-4 text-left shadow-sm ring-1 ring-line transition-transform active:scale-[0.99]"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mist-200 text-water-600">
+          <Music4 size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-deep-900">Daily Hymn</p>
+          <p className="truncate text-sm text-deep-500">A hymn to dwell on today</p>
         </div>
         <ArrowRight size={18} className="shrink-0 text-water-600 transition group-hover:translate-x-0.5" />
       </Link>

@@ -17,6 +17,7 @@ import { TenVirgins } from './pages/TenVirgins'
 import { FeastOfTrumpets } from './pages/FeastOfTrumpets'
 import { SevenBowls } from './pages/SevenBowls'
 import { Lectio } from './pages/Lectio'
+import { Hymns } from './pages/Hymns'
 import { KidsStudy } from './pages/KidsStudy'
 import { Encourage } from './pages/Encourage'
 import { Bible } from './pages/Bible'
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/feast-of-trumpets" element={<FeastOfTrumpets />} />
           <Route path="/seven-bowls" element={<SevenBowls />} />
           <Route path="/lectio" element={<Lectio />} />
+          <Route path="/hymns" element={<Hymns />} />
           <Route path="/kids" element={<KidsStudy />} />
           <Route path="/memory" element={<Memory />} />
           <Route path="/devotional" element={<Devotional />} />
