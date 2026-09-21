@@ -27,6 +27,7 @@ backend (cron + per-user schedule/timezone, i.e. the "phase 2" lift).
 | "New version ready" | inbox | Detected client-side by the service worker |
 | **New feature / version announcement** | push | Manual broadcast via `scripts/broadcast.mjs` |
 | **Daily verse / prayer of the day** | push | Cron broadcast, 13:00 UTC (`api/daily-verse`) |
+| **Daily hymn of the day** | push | Cron broadcast, 22:00 UTC (`api/daily-hymn`); names the day's hymn, links to `/hymns`. Fired during Americas daytime so the UTC day matches the local day (the named hymn matches the page). Keep the inline hymn list in sync with `src/data/hymns.ts`. |
 | **Announcements feed → inbox** | both | `public/announcements.json` → inbox cards; network-first SW; the enabler |
 | **"On this day"** | inbox | Remembrance from local session history (same month/day, prior year) |
 | **Weekly reflection** | inbox | Sunday recap of the past week's sittings, from local data |
