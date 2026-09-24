@@ -10,7 +10,7 @@
 // (the "Still Waters" palette, mirroring src/index.css) is inlined, and a tiny
 // no-flash script honors the same saved theme preference the app uses.
 
-import { SITE_URL } from '../data/publicPages'
+import { SITE_URL } from '../data/publicPages.ts'
 
 export { SITE_URL }
 

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { DEFAULT_OG_IMAGE, PUBLIC_PAGES, SITE_URL } from './src/data/publicPages'
+import { DEFAULT_OG_IMAGE, PUBLIC_PAGES, SITE_URL } from './src/data/publicPages.ts'
 import {
   ARTICLES,
   ENOCH_READ,
@@ -12,7 +12,7 @@ import {
   renderEnochPage,
   renderLearnIndex,
   type EnochBookData,
-} from './src/content'
+} from './src/content/index.ts'
 
 const escAttr = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')

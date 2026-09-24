@@ -5,7 +5,7 @@
 // store (src/lib/enoch.ts). These pages are the site's biggest search magnet:
 // people searching "book of enoch read online" should land on the whole text.
 
-import { pageShell, breadcrumb, escHtml, SITE_URL, type ContentHead } from './shell'
+import { pageShell, breadcrumb, escHtml, SITE_URL, type ContentHead } from './shell.ts'
 
 export type EnochChapterData = { n: number; text: string }
 export type EnochBookData = {
