@@ -8,7 +8,7 @@
 // clean and consistent. Paragraph and list HTML is hand-written and trusted
 // (internal links, <em>); headings, quotes, and the index cards are escaped.
 
-import { pageShell, breadcrumb, escHtml, SITE_URL, type ContentHead } from './shell'
+import { pageShell, breadcrumb, escHtml, SITE_URL, type ContentHead } from './shell.ts'
 
 export type Block =
   | { t: 'p'; html: string }

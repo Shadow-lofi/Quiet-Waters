@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { NavLink, Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { RouteFallback } from './RouteFallback'
 import { Waves, CalendarHeart, BookOpen, Book, ScrollText, ChevronLeft, Settings as SettingsIcon } from 'lucide-react'
 import { WaterBackground } from './WaterBackground'
 import { ReminderScheduler } from './ReminderScheduler'
@@ -104,7 +105,11 @@ export function AppLayout() {
             Back
           </button>
         )}
-        <Outlet />
+        {/* Keep the shell (tab bar, background) in place while a lazily-loaded
+            in-app route chunk arrives; the fallback fills only the content area. */}
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
         <footer className="mt-12 text-center text-xs leading-relaxed text-deep-400">
           <p>
             Developed by <span className="text-deep-500">Tavaris Freeman</span> · Midnight Codex
